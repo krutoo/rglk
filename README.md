@@ -12,8 +12,8 @@ var dungeon = new rglk.Dungeon({
 	density: 1
 });
 
-// generate new map
-dungeon.forEachTile(function (x, y, isFloor) {
+// each call returns new random dungeon
+dungeon.generate(function (x, y, isFloor) {
 	// ...draw tile?
 });
 ```
