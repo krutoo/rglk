@@ -32,6 +32,7 @@ function resize() {
 	// resize canvas 
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
+	draw();
 }
 
 function draw() {
@@ -68,13 +69,15 @@ function drawPath() {
 	ctx.strokeStyle = '#0f0';
 	ctx.lineWidth = Math.ceil(tileSize / 2);
 
-	ctx.beginPath();
-	ctx.moveTo(path[0].x * tileSize + (tileSize / 2), path[0].y * tileSize + (tileSize / 2));
-	path.forEach(function (point) {
-		ctx.lineTo(point.x * tileSize + (tileSize / 2), point.y * tileSize + (tileSize / 2));
-	});
-	ctx.stroke();
-	ctx.closePath();
+	if (path.length) {
+		ctx.beginPath();
+		ctx.moveTo(path[0].x * tileSize + (tileSize / 2), path[0].y * tileSize + (tileSize / 2));
+		path.forEach(function (point) {
+			ctx.lineTo(point.x * tileSize + (tileSize / 2), point.y * tileSize + (tileSize / 2));
+		});
+		ctx.stroke();
+		ctx.closePath();
+	}
 }
 
 window.addEventListener('resize', resize, false);
