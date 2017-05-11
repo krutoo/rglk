@@ -10,6 +10,7 @@ class Dungeon {
 			roomAmount: isNaN(options.roomAmount) ? 1 : options.roomAmount,
 			density: isNaN(options.density) ? 1 : options.density
 		};
+		this._tiles = [[]];
 	}
 
 	get width() {
