@@ -10,100 +10,16 @@ html {
 	font-family: monospace;
 	font-size: 16px;
 	line-height: 1;
-	color: #323232;
+	color: #eee;
 }
 
 html,
 body {
 	width: 100%;
 	height: 100%;
-	background-color: #000;
+	background-color: #111;
 }
 
 canvas {
 	display: block;
-}
-
-.window {
-	position: fixed;
-	width: 25%;
-	padding: .5rem;
-	color: #fff;
-	border: .1rem solid;
-	background-color: rgba(0,0,0,.8);
-	overflow: hidden;
-}
-
-.window-header {
-	font-weight: bold;
-	padding: 0 .5rem .5rem .5rem;
-	margin: 0 -.5rem .5rem -.5rem;
-	border-bottom: .1rem solid;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.inventory-container {
-	bottom: 1rem;
-	right: 1rem;
-	height: 24%;
-}
-
-.equipment-container {
-	top: 1rem;
-	right: 1rem;
-	height: 24%;
-}
-
-.history-container {
-	bottom: 1rem;
-	left: 1rem;
-	min-height: 20%;
-	max-height: 25%;
-	width: auto;
-	min-width: 40%;
-}
-
-.history-container .action {
-	color: #777;
-}
-
-.parameters-container {
-	top: 1rem;
-	left: 1rem;
-}
-
-#parameters {
-	line-height: 1.5;
-}
-
-#inventory,
-#equipment {
-	position: absolute;
-	top: 2rem;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	padding: .5rem;
-	overflow-y: scroll;
-}
-
-.item {
-	padding: .2rem;
-}
-
-.item:hover,
-.item:focus {
-	background-color: #fff;
-	color: #000;
-	cursor: pointer;
-}
-
-#history {
-	font-style: italic;
-	line-height: 1.5;
-}
-
-.remove {
-	display: none;
 }
