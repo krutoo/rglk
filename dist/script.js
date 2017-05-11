@@ -1,5 +1,7 @@
 ;(function() {
+	
 'use strict';
+	
 var canvas = document.getElementById('canvas'),
 	ctx = canvas.getContext('2d'),
 	dungeon = new rglk.Dungeon({roomAmount: 1280, roomMinSize: 1, roomMaxSize: 1, density: 1}),
@@ -19,14 +21,17 @@ var canvas = document.getElementById('canvas'),
 	});
 
 document.addEventListener('DOMContentLoaded', function () {
+	// resize canvas
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
+	// generate dungeon
 	dungeon.generate(function (x, y, isFloor) {
 		ctx.fillStyle = isFloor ? '#445' : '#000';
 		ctx.fillRect(x * 10, y * 10, 10, 10);
 	});
 
+	// calculate fov
 	explorer.calculate(
 		dungeon.rooms[0].center.x, 
 		dungeon.rooms[0].center.y, 
@@ -46,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	);
 
+	// search path
 	console.time('1');
 	var path = pathfinder.search(
 		dungeon.rooms[0].center.x, 
@@ -54,9 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		dungeon.rooms[dungeon.rooms.length - 1].center.y
 	);
 	console.timeEnd('1');
-
-	console.log(path);
-
+	
+	// draw path
 	ctx.beginPath();
 	ctx.strokeStyle = '#0f0';
 	ctx.lineWidth = 4;
