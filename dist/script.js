@@ -5,10 +5,10 @@
 var canvas = document.getElementById('canvas'),
 	ctx = canvas.getContext('2d'),
 	dungeon = new rglk.Dungeon({
-		roomAmount: 16, 
-		roomMinSize: 3, 
-		roomMaxSize: 7, 
-		density: 0
+		roomAmount: 64, 
+		roomMinSize: 5, 
+		roomMaxSize: 11, 
+		density: 1
 	}),
 	pathfinder = new rglk.Pathfinder(function (x, y) {
 		if (dungeon._tiles[y] && dungeon._tiles[y][x]) {
@@ -24,12 +24,11 @@ var canvas = document.getElementById('canvas'),
 
 		return false;
 	}),
-	tileSize = 16,
+	tileSize = 32,
 	path = [],
 	fov = [];
 
 function resize() {
-	// resize canvas 
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	draw();
@@ -53,15 +52,6 @@ function drawFov() {
 	fov.forEach(function (tile) {
 		ctx.fillStyle = '#aa7';
 		ctx.fillRect(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize);
-
-		ctx.fillStyle = '#333';
-		for (var iy = tile.y - 1; iy <= tile.y + 1; iy++) {
-			for (var ix = tile.x - 1; ix <= tile.x + 1; ix++) {
-				if (dungeon._tiles[iy] && dungeon._tiles[iy][ix] === false) {
-					ctx.fillRect(ix * tileSize, iy * tileSize, tileSize, tileSize);
-				}
-			}
-		}
 	});
 }
 
@@ -80,15 +70,20 @@ function drawPath() {
 	}
 }
 
-window.addEventListener('resize', resize, false);
+function init() {
+	generateDungeon();
+	calculateFov();
+	searchPath();
+}
 
-document.addEventListener('DOMContentLoaded', function () {
-	resize();
-
-	// generate dungeon 
+function generateDungeon() {
+	console.time('dungeon generate');
 	dungeon.generate();
+	console.timeEnd('dungeon generate');
+}
 
-	// calculate fov
+function calculateFov() {
+	console.time('fov calculate');
 	explorer.calculate(
 		dungeon.rooms[0].center.x, 
 		dungeon.rooms[0].center.y, 
@@ -97,15 +92,25 @@ document.addEventListener('DOMContentLoaded', function () {
 			fov.push({x: x, y: y});
 		}
 	);
+	console.timeEnd('fov calculate');
+}
 
-	// search path
+function searchPath() {
+	console.time('path search');
 	path = pathfinder.search(
 		dungeon.rooms[0].center.x, 
 		dungeon.rooms[0].center.y, 
 		dungeon.rooms[dungeon.rooms.length - 1].center.x, 
 		dungeon.rooms[dungeon.rooms.length - 1].center.y
 	);
+	console.timeEnd('path search');
+}
 
+window.addEventListener('resize', resize, false);
+
+document.addEventListener('DOMContentLoaded', function () {
+	resize();
+	init();
 	draw();
 }, false);
 

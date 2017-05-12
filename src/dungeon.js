@@ -49,7 +49,9 @@ class Dungeon {
 	}
 
 	_createRooms() {
-		var random = new Helper().random,
+		var random = (max, min) => {
+				return new Helper().randomInt(max, min);
+			},
 			density = this.options.density,
 			amount = this.options.roomAmount,
 			minSize = this.options.roomMinSize,

@@ -9,10 +9,10 @@ class Point2 {
 	}
 	
 	set x(value) {
-		if (!isNaN(value)) {
-			this._x = value;
-		} else {
+		if (isNaN(value)) {
 			console.warn(`Point2.x: value ${value} is NaN`);
+		} else {
+			this._x = value;
 		}
 	}
 
@@ -21,10 +21,10 @@ class Point2 {
 	}
 
 	set y(value) {
-		if (!isNaN(value)) {
-			this._y = value;
-		} else {
+		if (isNaN(value)) {
 			console.warn(`Point2.y: value ${value} is NaN`);
+		} else {
+			this._y = value;
 		}
 	}
 	

@@ -23,16 +23,15 @@ class Helper {
 	/*
 	 * Math
 	 */
-	random(min, max) {
-		var args = Array.prototype.slice.call(arguments);
-		
-		if (!args.length) {
-			return Math.random();
-		} else if (args.length === 1) {
-			return Math.round(min * Math.random());
-		} else if (args.length === 2) {
-			return Math.round(min + Math.random() * (max - min));
-		}
+	random(max, min) {
+		max = isNaN(max) ? 1 : max;
+		min = isNaN(min) ? 0 : min;
+
+		return Math.random() * (max - min) + min;
+	}
+
+	randomInt(max, min) {
+		return Math.round(this.random(max, min));
 	}
 
 	lerp(start, end, amt) {
@@ -48,16 +47,14 @@ class Helper {
 	}
 
 	generateID(length) {
-		length = (!isNaN(length) && length > 0) ? length : 1;
-		
+		length = (!isNaN(length) && length > 0) ? length : 8;
+
 		var id = '';
-		
+
 		while (id.length < length) {
-			var char = Math.random().toString(16).slice(2);
-			
-			id += char;
+			id += Math.random().toString(16).slice(2);
 		}
-		
+
 		return id.slice(0, length);
 	}
 
@@ -65,19 +62,30 @@ class Helper {
 	 * Array
 	 */
 	arrayGetRandom(array) {
+		if (!Array.isArray(array)) {
+			console.warn(`Helper.arrayGetRandom: argument ${array} is not a Array`);
+			return undefined;
+		}
+
 		if (!array.length) { 
 			return null; 
 		}
+
 		return array[this.random(0, array.length - 1)];
 	}
 
 	arrayRandomize(array) {
+		if (!Array.isArray(array)) {
+			console.warn(`Helper.arrayRandomize: argument ${array} is not a Array`);
+			return array;
+		}
+
 		var clone = array.slice();
-		
-		clone.sort(function() {
+
+		clone.sort(() => {
 			return (Math.random() >= 0.5) ? 1 : -1;
 		});
-		
+
 		return clone;
 	}
 }
