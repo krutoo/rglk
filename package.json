@@ -10,6 +10,7 @@
     "astar",
     "fov"
   ],
+  "main": "./src/rglk.js", 
   "scripts": {
     "build": "webpack",
     "watch": "webpack -w"
