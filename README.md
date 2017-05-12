@@ -3,7 +3,7 @@ Very simple library for development roguelike games, designed for training purpo
 
 ## Usage
 ### Dungeon
-Object of class Dungeon generates a random (non seeded) two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and density of location.
+Object of class Dungeon generates a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and density of location.
 ```javascript
 var dungeon = new rglk.Dungeon({
 	roomAmount: 64, 
@@ -12,8 +12,8 @@ var dungeon = new rglk.Dungeon({
 	density: 1
 });
 
-// each call returns new random (non seeded) dungeon
-dungeon.generate(function (x, y, isFloor) {
+// each call returns new random dungeon
+dungeon.generate(function makeTile(x, y, isFloor) {
 	// ...draw tile?
 });
 ```
@@ -33,7 +33,7 @@ explorer.calculate(centerX, centerY, radius, function isExploredCallback(x, y) {
 ### Pathfinder
 The work of Pathfinder is based on an algorithm __A*__.
 ```javascript
-var pathfinder = new rglk.Pathfinder(function isWalkable (x, y) {
+var pathfinder = new rglk.Pathfinder(function isWalkable(x, y) {
 	// return Boolean
 });
 
