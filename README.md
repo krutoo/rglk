@@ -44,7 +44,7 @@ pathfinder.search(x1, y1, x2, y2); // returns array of points
 Object containing utility methods for working with objects, arrays and numbers.
 ```javascript
 // Math
-rglk.utils.random(2, 8); // returns 7 or 3 i don't know
+rglk.utils.random(2, 8); // returns 7.89 or 3.45 i don't know
 rglk.utils.lerp(1, 2, 3); // linear interpolation
 rglk.utils.toDegree(radians);
 rglk.utils.toRadian(degree);
