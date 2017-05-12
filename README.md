@@ -19,7 +19,7 @@ dungeon.generate(function (x, y, isFloor) {
 ```
 
 ### Explorer
-object of class Explorer allows to define FOV.
+object of class Explorer allows to define FOV based on **raycasting** algorytm.
 ```
 var explorer = new rglk.Explorer(function isTtransparentTile(x, y) {
 	// return Boolean
@@ -31,7 +31,7 @@ explorer.calculate(centerX, centerY, radius, function isExploredCallback(x, y) {
 ```
 
 ### Pathfinder
-The work of Pathfinder is based on an algorithm A*.
+The work of Pathfinder is based on an algorithm __A*__.
 ```
 var pathfinder = new rglk.Pathfinder(function isWalkable (x, y) {
 	// return Boolean
@@ -46,6 +46,8 @@ Object containing utility methods for working with objects, arrays and numbers.
 // Math
 rglk.utils.random(2, 8); // returns 7 or 3 i don't know
 rglk.utils.lerp(1, 2, 3); // linear interpolation
+rglk.utils.toDegree(radians);
+rglk.utils.toRadian(degree);
 // and other
 
 // Object
