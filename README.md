@@ -4,7 +4,7 @@ Very simple library for development roguelike games, designed for training purpo
 ## Usage
 ### Dungeon
 Object of class Dungeon generates a random (non seeded) two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and density of location.
-```
+```javascript
 var dungeon = new rglk.Dungeon({
 	roomAmount: 64, 
 	roomMinSize: 5, 
@@ -20,7 +20,7 @@ dungeon.generate(function (x, y, isFloor) {
 
 ### Explorer
 object of class Explorer allows to define FOV based on **raycasting** algorytm.
-```
+```javascript
 var explorer = new rglk.Explorer(function isTtransparentTile(x, y) {
 	// return Boolean
 });
@@ -32,7 +32,7 @@ explorer.calculate(centerX, centerY, radius, function isExploredCallback(x, y) {
 
 ### Pathfinder
 The work of Pathfinder is based on an algorithm __A*__.
-```
+```javascript
 var pathfinder = new rglk.Pathfinder(function isWalkable (x, y) {
 	// return Boolean
 });
@@ -42,7 +42,7 @@ pathfinder.search(x1, y1, x2, y2); // returns array of points
 
 ### rglk.utils aka Helper
 Object containing utility methods for working with objects, arrays and numbers.
-```
+```javascript
 // Math
 rglk.utils.random(2, 8); // returns 7 or 3 i don't know
 rglk.utils.lerp(1, 2, 3); // linear interpolation
