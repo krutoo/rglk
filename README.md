@@ -1,9 +1,9 @@
 # rglk.js
 Very simple library for development roguelike games, designed for training purposes. Inspired by [rot.js](http://ondras.github.io/rot.js/hp/).
 
-## usage
+## Usage
 ### Dungeon
-Object of class Dungeon generates a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and density of location.
+Object of class Dungeon generates a random (non seeded) two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and density of location.
 ```
 var dungeon = new rglk.Dungeon({
 	roomAmount: 64, 
@@ -12,7 +12,7 @@ var dungeon = new rglk.Dungeon({
 	density: 1
 });
 
-// each call returns new random dungeon
+// each call returns new random (non seeded) dungeon
 dungeon.generate(function (x, y, isFloor) {
 	// ...draw tile?
 });
@@ -40,7 +40,7 @@ var pathfinder = new rglk.Pathfinder(function isWalkable (x, y) {
 pathfinder.search(x1, y1, x2, y2); // returns array of points
 ```
 
-### rglk.utils
+### rglk.utils aka Helper
 Object containing utility methods for working with objects, arrays and numbers.
 ```
 // Math
