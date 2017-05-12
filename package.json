@@ -1,13 +1,21 @@
 {
   "name": "rglk",
   "version": "1.0.0",
-  "description": "Simple JS library for development roguelike games",
+  "description": "Very simple JS library for development roguelike games",
+  "keywords": [
+    "roguelike",
+    "game",
+    "development",
+    "dungeon",
+    "astar",
+    "fov"
+  ],
   "scripts": {
     "build": "webpack",
     "watch": "webpack -w"
   },
   "author": "Dmitry Petrov <dima.krutoo@ya.ru>",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
