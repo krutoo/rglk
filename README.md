@@ -1,4 +1,4 @@
-# rglk.js
+# rglk.js ⚔️
 Very simple library for development roguelike games, designed for training purposes. Inspired by [rot.js](http://ondras.github.io/rot.js/hp/).
 
 ## Features
@@ -46,6 +46,16 @@ var pathfinder = new rglk.Pathfinder(function isWalkable(x, y) {
 });
 
 pathfinder.search(x1, y1, x2, y2); // returns Array of points
+```
+
+### PRNG
+Constructor PRNG (Pseudo Random Number Generator) retuns object, which allows you to get numbers based on the seed.
+```javascript
+var prng = new rglk.PRNG(0);
+
+prng.seed = 2;
+
+prng.getRandom(min, max); // returns Number
 ```
 
 ### rglk.utils aka Helper

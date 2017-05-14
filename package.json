@@ -10,7 +10,7 @@
     "astar",
     "fov"
   ],
-  "main": "./src/roguelike.js", 
+  "main": "./dist/rglk.min.js", 
   "scripts": {
     "build": "webpack",
     "watch": "webpack -w"

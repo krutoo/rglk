@@ -5,9 +5,9 @@
 var canvas = document.getElementById('canvas'),
 	ctx = canvas.getContext('2d'),
 	dungeon = new rglk.Dungeon({
-		roomAmount: 64, 
+		roomAmount: 8, 
 		roomMinSize: 5, 
-		roomMaxSize: 11, 
+		roomMaxSize: 10, 
 		density: 1
 	}),
 	pathfinder = new rglk.Pathfinder(function (x, y) {
