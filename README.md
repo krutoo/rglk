@@ -9,7 +9,8 @@ var dungeon = new rglk.Dungeon({
 	roomAmount: 64, 
 	roomMinSize: 5, 
 	roomMaxSize: 11, 
-	density: 1
+	density: 1,
+	seed: 12345
 });
 
 // each call returns new random dungeon
@@ -24,6 +25,18 @@ dungeon.forEachTile(function makeTile(x, y, isFloor) {
 
 // check tile, returns Boolean
 dungeon.isWall(x, y);
+
+// update options
+dungeon.updateOptions({
+	roomAmount: 32,
+	roomMinSize: 3,
+	roomMaxSize: 9,
+	density: 0,
+	seed: 54321
+});
+
+// current value of seed
+console.log(dungeon.prng.seed);
 ```
 
 ### Explorer

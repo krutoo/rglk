@@ -1,16 +1,20 @@
 import Point2 from './point2';
 import Room from './room';
 import Helper from './helper';
+import PRNG from './prng';
 
 class Dungeon {
 	constructor(options = {}) {
-		this.options = {
+		this._options = {
+			seed: isNaN(options.seed) ? 0 : options.seed,
 			roomMinSize: isNaN(options.roomMinSize) ? 5 : options.roomMinSize,
 			roomMaxSize: isNaN(options.roomMaxSize) ? 5 : options.roomMaxSize,
 			roomAmount: isNaN(options.roomAmount) ? 1 : options.roomAmount,
 			density: isNaN(options.density) ? 1 : options.density
 		};
+
 		this._tiles = [[]];
+		this.prng = new PRNG(this._options.seed);
 	}
 
 	get width() {
@@ -19,6 +23,23 @@ class Dungeon {
 
 	get height() {
 		return this._tiles.length || 0;
+	}
+
+	get options() {
+		return this._options;
+	}
+
+	updateOptions(options) {
+		var newOptions = {
+			seed: isNaN(options.seed) ? this._options.seed : options.seed,
+			roomMinSize: isNaN(options.roomMinSize) ? this._options.roomMinSize : options.roomMinSize,
+			roomMaxSize: isNaN(options.roomMaxSize) ? this._options.roomMaxSize : options.roomMaxSize,
+			roomAmount: isNaN(options.roomAmount) ? this._options.roomAmount : options.roomAmount,
+			density: isNaN(options.density) ? this._options.density : options.density
+		};
+
+		this._options = newOptions;
+		this.prng = new PRNG(this._options.seed);
 	}
 	
 	generate(callback) {
@@ -50,12 +71,12 @@ class Dungeon {
 
 	_createRooms() {
 		var random = (max, min) => {
-				return new Helper().randomInt(max, min);
+				return Math.round(this.prng.getRandom(max, min));
 			},
-			density = this.options.density,
-			amount = this.options.roomAmount,
-			minSize = this.options.roomMinSize,
-			maxSize = this.options.roomMaxSize,
+			density = this._options.density,
+			amount = this._options.roomAmount,
+			minSize = this._options.roomMinSize,
+			maxSize = this._options.roomMaxSize,
 			firstRoom = new Room(1, 1, random(minSize, maxSize), random(minSize, maxSize));
 		
 		this.rooms = [firstRoom];

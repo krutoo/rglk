@@ -5,10 +5,11 @@
 var canvas = document.getElementById('canvas'),
 	ctx = canvas.getContext('2d'),
 	dungeon = new rglk.Dungeon({
-		roomAmount: 8, 
+		roomAmount: 32, 
 		roomMinSize: 5, 
 		roomMaxSize: 10, 
-		density: 1
+		density: 1,
+		seed: rglk.utils.random(0, 1000)
 	}),
 	pathfinder = new rglk.Pathfinder(function (x, y) {
 		if (dungeon._tiles[y] && dungeon._tiles[y][x]) {
@@ -28,14 +29,10 @@ var canvas = document.getElementById('canvas'),
 	path = [],
 	fov = [];
 
-function resize() {
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-	draw();
-}
-
 function draw() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	tileSize = Math.floor(Math.min(window.innerWidth, window.innerHeight) / Math.max(dungeon.width, dungeon.height));
+
 	drawMap();
 	drawFov();
 	drawPath();
@@ -84,6 +81,7 @@ function generateDungeon() {
 
 function calculateFov() {
 	console.time('fov calculate');
+	fov = [];
 	explorer.calculate(
 		dungeon.rooms[0].center.x, 
 		dungeon.rooms[0].center.y, 
@@ -106,6 +104,12 @@ function searchPath() {
 	console.timeEnd('path search');
 }
 
+function resize() {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	draw();
+}
+
 window.addEventListener('resize', resize, false);
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -113,5 +117,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	init();
 	draw();
 }, false);
+
+window.addEventListener('keydown', function (event) {
+	if (event.keyCode === 32) {
+		init();
+		draw();
+	}
+});
 
 }());
