@@ -2,6 +2,7 @@
   "name": "rglk",
   "version": "1.0.0",
   "description": "Very simple JS library for development roguelike games",
+  "author": "Dmitry Petrov <dima.krutoo@ya.ru>",
   "keywords": [
     "roguelike",
     "game",
@@ -10,12 +11,15 @@
     "astar",
     "fov"
   ],
-  "main": "./dist/rglk.min.js", 
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/krutoo/rglk.js.git"
+  },
+  "main": "./dist/rglk.min.js",
   "scripts": {
     "build": "webpack",
     "watch": "webpack -w"
   },
-  "author": "Dmitry Petrov <dima.krutoo@ya.ru>",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.24.1",

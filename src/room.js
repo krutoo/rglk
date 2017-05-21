@@ -3,7 +3,7 @@ import Point2 from './point2';
 class Room extends Point2 {
 	constructor(x, y, width, height) {
 		super(x, y);
-		
+
 		this._width = isNaN(width) ? 5 : width;
 		this._height = isNaN(height) ? 5 : height;
 	}
@@ -13,10 +13,10 @@ class Room extends Point2 {
 	}
 
 	set width(value) {
-		if (!isNaN(value)) {
-			this._width = value;
+		if (isNaN(value)) {
+			console.warn(`Room.width: value ${value} is NaN`);
 		} else {
-			throw new TypeError('Value ' + value + ' is not a Number');
+			this._width = value;
 		}
 	}
 
@@ -25,15 +25,18 @@ class Room extends Point2 {
 	}
 
 	set height(value) {
-		if (!isNaN(value)) {
-			this._height = value;
+		if (isNaN(value)) {
+			console.warn(`Room.height: value ${value} is NaN`);
 		} else {
-			throw new TypeError('Value ' + value + ' is not a Number');
+			this._height = value;
 		}
 	}
 
 	get center() {
-		return new Point2(Math.floor(this.x + this.width / 2), Math.floor(this.y + this.height / 2)); 
+		return new Point2(
+			Math.floor(this.x + this.width / 2), 
+			Math.floor(this.y + this.height / 2)
+		); 
 	}
 
 	intersects(room) {

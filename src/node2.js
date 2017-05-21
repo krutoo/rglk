@@ -6,7 +6,7 @@ class Node2 extends Point2 {
 
 		this._g = isNaN(options.g) ? 0 : options.g;
 		this._h = isNaN(options.h) ? 0 : options.h;
-		this._parent = options.parent || null;
+		this._parent = (options.parent instanceof Node2) ? options.parent : null;
 	}
 
 	get g() {
