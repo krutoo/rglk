@@ -6,10 +6,10 @@ var canvas = document.getElementById('canvas'),
 	ctx = canvas.getContext('2d'),
 	dungeon = new rglk.Dungeon({
 		roomAmount: 32, 
-		roomMinSize: 5, 
+		roomMinSize: 4, 
 		roomMaxSize: 10, 
 		density: 1,
-		seed: rglk.utils.random(0, 1000)
+		seed: 1337
 	}),
 	pathfinder = new rglk.Pathfinder(function (x, y) {
 		if (dungeon._tiles[y] && dungeon._tiles[y][x]) {

@@ -1,11 +1,12 @@
 const webpack = require('webpack');
 
-module.exports = {
+module.exports = [{
 	entry: './src/roguelike.js',
 	output: {
 		path: __dirname + '/dist',
 		filename: 'rglk.min.js',
-		library: 'rglk'
+		library: 'rglk',
+		libraryTarget: 'umd'
 	},
 	module: {
 		rules: [
@@ -22,9 +23,6 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new webpack.optimize.UglifyJsPlugin({ 
-			minimize: true,
-			compress: true
-		})
+		new webpack.optimize.UglifyJsPlugin()
 	]
-};
+}];

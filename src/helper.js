@@ -71,7 +71,7 @@ class Helper {
 			return null; 
 		}
 
-		return array[this.random(0, array.length - 1)];
+		return array[Math.round(this.random(0, array.length - 1))];
 	}
 
 	arrayRandomize(array) {

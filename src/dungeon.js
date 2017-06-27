@@ -98,11 +98,13 @@ class Dungeon {
 				dyMax = Math.floor(dyMin * (2 - density)),
 				newRoom = new Room(0, 0, newWidth, newHeight),
 				direction = random(0, 3),
-				collision = false;
+				collision = false,
+				dWidth = Math.round((newRoom.width - lastRoom.width) / 2),
+				dHeight = Math.round((newRoom.height - lastRoom.height) / 2);
 
-			newRoom.x = lastRoom.x - Math.round((newRoom.width - lastRoom.width) / 2);
-			newRoom.y = lastRoom.y - Math.round((newRoom.height - lastRoom.height) / 2);
-			
+			newRoom.x = lastRoom.x - dWidth;
+			newRoom.y = lastRoom.y - dHeight;
+
 			switch (direction) {
 				case 0: newRoom.x -= random(dxMin, dxMax); break;
 				case 1: newRoom.y += random(dyMin, dyMax); break;
