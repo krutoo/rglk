@@ -15,9 +15,7 @@ var dungeon = new rglk.Dungeon({
 });
 
 // each call returns new random dungeon
-dungeon.generate(function makeTile(x, y, isFloor) {
-	// ...draw tile?
-});
+dungeon.generate();
 
 // for generated dungeon
 dungeon.forEachTile(function makeTile(x, y, isFloor) {
@@ -33,9 +31,6 @@ dungeon.updateOptions({
 	roomMinSize: 3,
 	corridorMaxLength: 5
 });
-
-// current value of seed
-console.log(dungeon.prng.seed);
 ```
 
 ### Explorer

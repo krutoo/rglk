@@ -87,6 +87,10 @@ class Dungeon {
 	}
 
 	forEachTile(callback) {
+		if (!this._tiles.length) {
+			return;
+		}
+
 		if (callback instanceof Function) {
 			for (var y = 0; y < this._tiles.length; y++) {
 				for (var x = 0; x < this._tiles[y].length; x++) {
