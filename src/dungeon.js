@@ -3,7 +3,7 @@ import Rectangle from './rectangle';
 import Helper from './helper';
 import PRNG from './prng';
 
-class Dungeon {
+export default class Dungeon {
 	constructor(options = {}) {
 		this._options = {
 			seed: isNaN(options.seed)
@@ -53,6 +53,10 @@ class Dungeon {
 
 	get options() {
 		return this._options;
+	}
+
+	get prng() {
+		return this._prng;
 	}
 
 	updateOptions(options = {}) {
@@ -322,5 +326,3 @@ class Dungeon {
 		}
 	}
 }
-
-module.exports = Dungeon;

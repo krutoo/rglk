@@ -1,7 +1,7 @@
 import Point2 from './point2.js';
 import Helper from './helper';
 
-class Explorer {
+export default class Explorer {
 	constructor(isTransparent) {
 		if (!new Helper().isFunction(isTransparent)) {
 			console.warn(`Pathfinder: argument ${isTransparent} is not a Function`);
@@ -84,5 +84,3 @@ class Explorer {
 		}
 	}
 }
-
-export default Explorer;

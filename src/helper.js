@@ -1,4 +1,4 @@
-class Helper {
+export default class Helper {
 	constructor() {}
 
 	/*
@@ -89,5 +89,3 @@ class Helper {
 		return clone;
 	}
 }
-
-export default Helper;

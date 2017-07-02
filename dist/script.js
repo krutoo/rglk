@@ -8,8 +8,8 @@ var canvas = document.getElementById('canvas'),
 		roomAmount: 15,
 		roomMinSize: 3,
 		roomMaxSize: 12,
-		corridorMinLength: 1,
-		corridorMaxLength: 10,
+		corridorMinLength: 3,
+		corridorMaxLength: 3,
 		seed: 1337
 	}),
 	pathfinder = new rglk.Pathfinder(function (x, y) {

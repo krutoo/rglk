@@ -2,7 +2,7 @@ import Point2 from './point2';
 import Node2 from './node2';
 import Helper from './helper';
 
-class Pathfinder {
+export default class Pathfinder {
 	constructor(isWalkable) {
 		if (!new Helper().isFunction(isWalkable)) {
 			console.warn(`Pathfinder: value ${isWalkable} is not a Function`);
@@ -114,5 +114,3 @@ class Pathfinder {
 		return [];
 	}
 }
-
-export default Pathfinder;

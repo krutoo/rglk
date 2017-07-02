@@ -1,5 +1,5 @@
 // source: http://indiegamr.com/generate-repeatable-random-numbers-in-js/
-class PRNG {
+export default class PRNG {
 	constructor(seed) {
 		this._seed = isNaN(seed) ? 12345 : seed;
 	}
@@ -26,5 +26,3 @@ class PRNG {
 		}
 	}
 }
-
-export default PRNG;

@@ -1,6 +1,6 @@
 import Point2 from './point2';
 
-class Node2 extends Point2 {
+export default class Node2 extends Point2 {
 	constructor(options = {}) {
 		super(options.x, options.y);
 
@@ -49,5 +49,3 @@ class Node2 extends Point2 {
 		return (this.g + this.h);
 	}
 }
-
-export default Node2;

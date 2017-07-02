@@ -1,4 +1,4 @@
-class Point2 {
+export default class Point2 {
 	constructor(x, y) {
 		this._x = isNaN(x) ? 0 : x;
 		this._y = isNaN(x) ? 0 : y;
@@ -32,5 +32,3 @@ class Point2 {
 		return Math.sqrt(Math.pow(point2.x - this.x, 2) + Math.pow(point2.y - this.y, 2));
 	}
 }
-
-export default Point2;
