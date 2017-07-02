@@ -32,6 +32,22 @@ class Room extends Point2 {
 		}
 	}
 
+	get top() {
+		return this._y;
+	}
+
+	get right() {
+		return this._x + this._width - 1;
+	}
+
+	get bottom() {
+		return this._y + this._height - 1;
+	}
+
+	get left() {
+		return this._x;
+	}
+
 	get center() {
 		return new Point2(
 			Math.floor(this.x + this.width / 2), 

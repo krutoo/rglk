@@ -5,10 +5,11 @@
 var canvas = document.getElementById('canvas'),
 	ctx = canvas.getContext('2d'),
 	dungeon = new rglk.Dungeon({
-		roomAmount: 32, 
-		roomMinSize: 4, 
-		roomMaxSize: 10, 
-		density: 1,
+		roomAmount: 15,
+		roomMinSize: 3,
+		roomMaxSize: 12,
+		corridorMinLength: 1,
+		corridorMaxLength: 10,
 		seed: 1337
 	}),
 	pathfinder = new rglk.Pathfinder(function (x, y) {
@@ -54,7 +55,7 @@ function drawFov() {
 
 function drawPath() {
 	ctx.strokeStyle = '#0f0';
-	ctx.lineWidth = Math.ceil(tileSize / 2);
+	ctx.lineWidth = Math.ceil(tileSize / 3);
 
 	if (path.length) {
 		ctx.beginPath();
@@ -83,8 +84,8 @@ function calculateFov() {
 	console.time('fov calculate');
 	fov = [];
 	explorer.calculate(
-		dungeon.rooms[0].center.x, 
-		dungeon.rooms[0].center.y, 
+		dungeon.rooms[0].x, 
+		dungeon.rooms[0].y, 
 		7,
 		function (x, y) {
 			fov.push({x: x, y: y});
@@ -96,10 +97,10 @@ function calculateFov() {
 function searchPath() {
 	console.time('path search');
 	path = pathfinder.search(
-		dungeon.rooms[0].center.x, 
-		dungeon.rooms[0].center.y, 
-		dungeon.rooms[dungeon.rooms.length - 1].center.x, 
-		dungeon.rooms[dungeon.rooms.length - 1].center.y
+		dungeon.rooms[0].x, 
+		dungeon.rooms[0].y, 
+		dungeon.rooms[dungeon.rooms.length - 1].x, 
+		dungeon.rooms[dungeon.rooms.length - 1].y
 	);
 	console.timeEnd('path search');
 }
@@ -110,12 +111,12 @@ function resize() {
 	draw();
 }
 
-window.addEventListener('resize', resize, false);
 
 document.addEventListener('DOMContentLoaded', function () {
 	resize();
 	init();
 	draw();
+	window.addEventListener('resize', resize, false);
 }, false);
 
 window.addEventListener('keydown', function (event) {

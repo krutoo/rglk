@@ -3,13 +3,14 @@ Very simple library for development roguelike games, designed for training purpo
 
 ## Features
 ### Dungeon
-Object of class Dungeon generates a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and density of location.
+Object of class Dungeon generates a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and length of corridors between rooms.
 ```javascript
 var dungeon = new rglk.Dungeon({
 	roomAmount: 64, 
 	roomMinSize: 5, 
 	roomMaxSize: 11, 
-	density: 1,
+	corridorMinLength: 1,
+	corridorMaxLength: 10,
 	seed: 12345
 });
 
@@ -30,9 +31,7 @@ dungeon.isWall(x, y);
 dungeon.updateOptions({
 	roomAmount: 32,
 	roomMinSize: 3,
-	roomMaxSize: 9,
-	density: 0,
-	seed: 54321
+	corridorMaxLength: 5
 });
 
 // current value of seed
