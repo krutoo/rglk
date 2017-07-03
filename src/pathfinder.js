@@ -1,16 +1,13 @@
-import Point2 from './point2';
-import Node2 from './node2';
-import Helper from './helper';
+import Node from './node';
 
 export default class Pathfinder {
 	constructor(isWalkable) {
-		if (!new Helper().isFunction(isWalkable)) {
-			console.warn(`Pathfinder: value ${isWalkable} is not a Function`);
-			this._isWalkable = () => {return null;};
-			return;
+		if (isWalkable instanceof Function) {
+			this._isWalkable = isWalkable;
+		} else {
+			console.warn(`Pathfinder.constructor: value ${isWalkable} is not a Function`);
+			this._isWalkable = null;
 		}
-
-		this._isWalkable = isWalkable;
 	}
 
 	_heuristic(x1, y1, x2, y2) {
@@ -22,7 +19,7 @@ export default class Pathfinder {
 	}
 
 	_findNode(array, node) {
-		if (node instanceof Node2) {
+		if (node instanceof Node) {
 			for (var i = 0; i < array.length; i++) {
 				if (array[i].x === node.x && array[i].y === node.y) {
 					return i;
@@ -42,7 +39,7 @@ export default class Pathfinder {
 				if (x === node.x && y != node.y || x != node.x && y === node.y) {
 					if (this._isWalkable(x, y)) {
 						// push node with updated g and parent
-						neighbors.push(new Node2({
+						neighbors.push(new Node({
 							x: x, 
 							y: y,
 							g: node.g + 1,
@@ -57,8 +54,12 @@ export default class Pathfinder {
 	}
 
 	search(x1, y1, x2, y2) {
-		var start = new Node2({x: x1, y: y1}),
-			end = new Node2({x: x2, y: y2}),
+		if (!(this._isWalkable instanceof Function)) {
+			return console.warn(`Pathfinder.search: ${this._isWalkable} is not a Function`);
+		}
+
+		var start = new Node({x: x1, y: y1}),
+			end = new Node({x: x2, y: y2}),
 			openList   = [start], // unvisited nodes
 			closedList = []; // visited nodes
 

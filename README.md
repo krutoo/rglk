@@ -64,23 +64,3 @@ prng.seed = 2;
 
 prng.getRandom(min, max); // returns Number
 ```
-
-### rglk.utils aka Helper
-Object containing utility methods for working with objects, arrays and numbers.
-```javascript
-// Math
-rglk.utils.random(2, 8); // returns Number 7.89 or 3.45, i don't know
-rglk.utils.lerp(1, 2, 3); // linear interpolation, return Number
-rglk.utils.toDegree(radians); // returns Boolean
-rglk.utils.toRadian(degree); // also returns Boolean
-
-// Object
-rglk.utils.classOf(2); // return String 'Number'
-rglk.utils.isObject(2); // return Boolean false
-rglk.utils.isFunction(2); // also returns Boolean false
-rglk.utils.isString(2); // and there
-
-// Array
-rglk.utils.arrayGetRandom([1, 2, 3]); // returns Array maybe [2, 1, 3]
-rglk.utils.arrayRandomize([1 ,2 ,3]); // returns maybe 2
-```

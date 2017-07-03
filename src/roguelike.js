@@ -1,16 +1,16 @@
-import Helper from './helper';
 import Dungeon from './dungeon';
 import Pathfinder from './pathfinder';
 import Explorer from './explorer';
 import PRNG from './prng';
 
 /** 
- * Main class. 
- * Use this as window.rglk.
+ * Represents a toolkit for development roguelike games.
  */
 class Roguelike {
+	/**
+	 * Create a Roguelike toolkit.
+	 */
 	constructor() {
-		this._utils = new Helper();
 		this._Dungeon = Dungeon;
 		this._Explorer = Explorer;
 		this._Pathfinder = Pathfinder;
@@ -18,37 +18,33 @@ class Roguelike {
 	}
 
 	/**
-	* get utils (Object of class Helper).
-	* @return {Object}
-	*/
-	get utils() {
-		return this._utils;
-	}
-
-	/**
-	* @return {function} Dungeon class constructor
-	*/
+	 * Get Dungeon class
+	 * @return {class} Dungeon class constructor.
+	 */
 	get Dungeon() {
 		return this._Dungeon;
 	}
 
 	/**
-	* @return {function} Explorer class constructor
-	*/
+	 * Get Explorer class.
+	 * @return {class} Explorer class.
+	 */
 	get Explorer() {
 		return this._Explorer;
 	}
 
 	/** 
-	* @return {function} Pathfinder class constructor
-	*/
+	 * Get Pathfinder class.
+	 * @return {class} Pathfinder class.
+	 */
 	get Pathfinder() {
 		return this._Pathfinder;
 	}
 
 	/** 
-	* @return {function} PRNG class constructor
-	*/
+	 * Get PRNG class.
+	 * @return {class} PRNG class.
+	 */
 	get PRNG() {
 		return this._PRNG;
 	}

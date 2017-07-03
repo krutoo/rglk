@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 
-module.exports = [{
+module.exports = {
 	entry: './src/roguelike.js',
 	output: {
 		path: __dirname + '/dist',
@@ -25,4 +25,4 @@ module.exports = [{
 	plugins: [
 		new webpack.optimize.UglifyJsPlugin()
 	]
-}];
+};

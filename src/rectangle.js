@@ -1,6 +1,17 @@
-import Point2 from './point2';
+import Point from './point';
 
-export default class Rectangle extends Point2 {
+/**
+ * Represents a Rectangle
+ * @extends Point
+ */
+export default class Rectangle extends Point {
+	/**
+	 * Create a Rectangle.
+	 * @param {number} x - Left border position of rectangle.
+	 * @param {number} y - Top border position of rectangle.
+	 * @param {number} width - Width of rectangle.
+	 * @param {number} height - Height of rectangle.
+	 */
 	constructor(x, y, width, height) {
 		super(x, y);
 
@@ -8,35 +19,18 @@ export default class Rectangle extends Point2 {
 		this._height = isNaN(height) ? 1: height;
 	}
 
-	// x
-	get x() {
-		return this._x;
-	}
-
-	set x(value) {
-		if (isNaN(value)) {
-			return;
-		}
-		this._x = value;
-	}
-
-	// y
-	get y() {
-		return this._y;
-	}
-
-	set y(value) {
-		if (isNaN(value)) {
-			return;
-		}
-		this._y = value;
-	}
-
-	// width
+	/**
+	 * Get width of Rectangle.
+	 * @return {number} The width of Rectangle.
+	 */
 	get width() {
 		return this._width;
 	}
 
+	/**
+	 * Set width of Rectangle.
+	 * @param {number} The Width of Rectangle.
+	 */
 	set width(value) {
 		if (isNaN(value)) {
 			return;
@@ -44,11 +38,18 @@ export default class Rectangle extends Point2 {
 		this._width = value;
 	}
 
-	// height
+	/**
+	 * Get height of Rectangle.
+	 * @return {number} The height of Rectangle.
+	 */
 	get height() {
 		return this._height;
 	}
 
+	/**
+	 * Set height of Rectangle.
+	 * @param {number} The height of Rectangle.
+	 */
 	set height(value) {
 		if (isNaN(value)) {
 			return;
@@ -56,27 +57,43 @@ export default class Rectangle extends Point2 {
 		this._height = value;
 	}
 
-	// top
+	/**
+	 * Get top of Rectangle.
+	 * @return {number} The top border of Rectangle.
+	 */
 	get top() {
 		return this._y;
 	}
 
-	// right
+	/**
+	 * Get right of Rectangle.
+	 * @return {number} The right border of Rectangle.
+	 */
 	get right() {
 		return this._x + this._width - 1;
 	}
 
-	// bottom
+	/**
+	 * Get bottom of Rectangle.
+	 * @return {number} The bottom border of Rectangle.
+	 */
 	get bottom() {
 		return this._y + this._height - 1;
 	}
 
-	// left
+	/**
+	 * Get left of Rectangle.
+	 * @return {number} The left border of Rectangle.
+	 */
 	get left() {
 		return this._x;
 	}
 
-	// check collides
+	/**
+	 * Check collides with other Rectangle.
+	 * @param {object} rectangle - Object of class Rectangle.
+	 * @return {boolean} The boolean.
+	 */
 	collides(rectangle) {
 		if (
 			rectangle.left > this.left + this.width ||
