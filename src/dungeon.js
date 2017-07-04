@@ -17,37 +17,26 @@ export default class Dungeon {
 	 * @param {number} options.corridorMaxLength - Max length of corridors.
 	 */
 	constructor(options = {}) {
-		this._options = {
-			seed: isNaN(options.seed)
-				? 0
-				: options.seed,
-			roomAmount: isNaN(options.roomAmount)
-				? 5
-				: options.roomAmount,
-			roomMinSize: isNaN(options.roomMinSize)
-				? 3
-				: options.roomMinSize,
-			roomMaxSize: isNaN(options.roomMaxSize)
-				? 5
-				: options.roomMaxSize,
-			corridorMinLength: isNaN(options.corridorMinLength)
-				? 1
-				: options.corridorMinLength,
-			corridorMaxLength: isNaN(options.corridorMaxLength)
-				? 3
-				: options.corridorMaxLength
-		};
+		options = options instanceof Object ? options : {};
+
 		this._tiles = [];
 		this._rooms = [];
 		this._corridors = [];
-		this._prng = new PRNG(this._options.seed);
+		this._prng = new PRNG(isNaN(options.seed) ? 0 : options.seed);
+		this._options = {};
+
+		// correct & add options
+		Object.keys(options).forEach((key) => {
+			let option = options[key];
+			this._options[key] = (isNaN(option) || option < 1) ? 1 : option;
+		});
 	}
 
 	/**
 	 * Get the array of rooms.
 	 * @return {array} List of rooms.
 	 */
-	get rooms() {
+	getRooms() {
 		return this._rooms;
 	}
 
@@ -55,7 +44,7 @@ export default class Dungeon {
 	 * Get the array of corridors.
 	 * @return {array} List of corridors.
 	 */
-	get corridors() {
+	getCorridors() {
 		return this._corridors;
 	}
 
@@ -63,7 +52,7 @@ export default class Dungeon {
 	 * Get the array of all builds.
 	 * @return {array} List of builds (rooms & corridors).
 	 */
-	get builds() {
+	getBuilds() {
 		return this._rooms.concat(this._corridors);
 	}
 
@@ -71,7 +60,7 @@ export default class Dungeon {
 	 * Get the width of dungeon.
 	 * @return {number} The dungeon width (number of tiles).
 	 */
-	get width() {
+	getWidth() {
 		return Array.isArray(this._tiles[0]) ? this._tiles[0].length : 0;
 	}
 
@@ -79,80 +68,24 @@ export default class Dungeon {
 	 * Get the height of dungeon.
 	 * @return {number} The dungeon height (number of tiles).
 	 */
-	get height() {
-		return this._tiles.length;
+	getHeight() {
+		return Array.isArray(this._tiles) ? this._tiles.length : 0;
 	}
 
 	/**
-	 * Get the options of dungeon generation.
-	 * @return {object} The options list.
+	 * Get seed of dungeon.
+	 * @return {number} The seed value.
 	 */
-	get options() {
-		return this._options;
-	}
-
-	/**
-	 * Get the PRNG object.
-	 * @return {object} The PRNG.
-	 */
-	get prng() {
-		return this._prng;
-	}
-
-	/**
-	 * Update options.
-	 * @param {object} options - List of options.
-	 * @param {number} options.seed - The seed to pseudorandom number generator.
-	 * @param {number} options.roomMinSize - Min size of room.
-	 * @param {number} options.roomMaxSize - Max size of room.
-	 * @param {number} options.corridorMinLength - Min length of corridors.
-	 * @param {number} options.corridorMaxLength - Max length of corridors.
-	 */
-	updateOptions(options = {}) {
-		let seed = isNaN(options.seed)
-				? this._options.seed
-				: options.seed,
-			roomAmount = isNaN(options.roomAmount)
-				? this._options.roomAmount 
-				: options.roomAmount,
-			roomMinSize = isNaN(options.roomMinSize)
-				? this._options.roomMinSize
-				: options.roomMinSize,
-			roomMaxSize = isNaN(options.roomMaxSize)
-				? this._options.roomMaxSize
-				: options.roomMaxSize,
-			corridorMinLength = isNaN(options.corridorMinLength)
-				? this._options.corridorMinLength
-				: options.corridorMinLength,
-			corridorMaxLength = isNaN(options.corridorMaxLength)
-				? this._options.corridorMaxLength
-				: options.corridorMaxLength;
-
-		this._prng = new PRNG(seed);
-		this._options = {
-			seed,
-			roomAmount,
-			roomMinSize,
-			roomMaxSize,
-			corridorMinLength,
-			corridorMaxLength
-		};
+	getSeed() {
+		return this._prng.seed;
 	}
 
 	/**
 	 * Run callback to each tile of generated map.
 	 * @param {Dungeon~forEachTileCallback} forEachTileCallback - function called fo each tile.
 	 */
-
-	 /**
-	 * This callback called fo each tile. Is the part of the Dungeon class.
-	 * @callback Dungeon~forEachTileCallback
-	 * @param {number} The x of tile.
-	 * @param {number} The y of tile.
-	 * @param {boolean} Boolean giving is floor tile or not.
-	 */
 	forEachTile(callback) {
-		if (!this._tiles.length) {
+		if (!this._tiles) {
 			return;
 		}
 
@@ -163,7 +96,16 @@ export default class Dungeon {
 				}
 			}
 		}
+
+		return this;
 	}
+	/**
+	 * This callback called fo each tile. Is the part of the Dungeon class.
+	 * @callback Dungeon~forEachTileCallback
+	 * @param {number} The x of tile.
+	 * @param {number} The y of tile.
+	 * @param {boolean} Boolean giving is floor tile or not.
+	 */
 
 	/**
 	 * Get type of tile.
@@ -182,35 +124,11 @@ export default class Dungeon {
 	 * Generate dungeon. Generate arrays of rooms and corridors, matrix of tiles
 	 */
 	generate() {
-		this._correctOptions();
 		this._generateBuilds();
 		this._optimizeBuilds();
 		this._createMap();
-	}
 
-	/**
-	 * Correct input options.
-	 */
-	_correctOptions() {
-		if (this._options.roomAmount < 1) {
-			this._options.roomAmount = 1;
-		}
-
-		if (this._options.roomMinSize < 1) {
-			this._options.roomMinSize = 1;
-		}
-
-		if (this._options.roomMaxSize < 1) {
-			this._options.roomMaxSize = 1;
-		}
-
-		if (this._options.corridorMinLength < 1) {
-			this._options.corridorMinLength = 1;
-		}
-
-		if (this._options.corridorMaxLength < 1) {
-			this._options.corridorMaxLength = 1;
-		}
+		return this;
 	}
 
 	/**
@@ -340,7 +258,7 @@ export default class Dungeon {
 	_getTopLeft() {
 		var topLeft = new Point(Infinity, Infinity);
 		
-		this.builds.forEach(function (build) {
+		this.getBuilds().forEach(function (build) {
 			if (build.x < topLeft.x) {
 				topLeft.x = build.x;
 			}
@@ -360,7 +278,7 @@ export default class Dungeon {
 	_getBottomRight() {
 		var bottomRight = new Point(-Infinity, -Infinity);
 		
-		this.builds.forEach(function (build) {
+		this.getBuilds().forEach(function (build) {
 			if (build.right > bottomRight.x) {
 				bottomRight.x = build.right;
 			}
@@ -379,7 +297,7 @@ export default class Dungeon {
 	 * @param {number} offsetY - Offset by y axis.
 	 */
 	_translateBuilds(offsetX, offsetY) {
-		this.builds.forEach(function(build) {
+		this.getBuilds().forEach(function(build) {
 			build.x += offsetX;
 			build.y += offsetY;
 		});
@@ -392,7 +310,7 @@ export default class Dungeon {
 		let bottomRight = this._getBottomRight();
 
 		this._fillMap(bottomRight.x + 2, bottomRight.y + 2);
-		this.builds.forEach((build) => {
+		this.getBuilds().forEach((build) => {
 			this._fillRectangle(build.x, build.y, build.width, build.height);
 		});
 	}

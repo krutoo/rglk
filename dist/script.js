@@ -13,18 +13,10 @@ var canvas = document.getElementById('canvas'),
 		seed: 1337
 	}),
 	pathfinder = new rglk.Pathfinder(function (x, y) {
-		if (dungeon._tiles[y] && dungeon._tiles[y][x]) {
-			return true;
-		}
-
-		return false;
+		return !dungeon.isWall(x, y);
 	}),
 	explorer = new rglk.Explorer(function (x, y) {
-		if (dungeon._tiles[y] && dungeon._tiles[y][x]) {
-			return true;
-		}
-
-		return false;
+		return !dungeon.isWall(x, y);
 	}),
 	tileSize = 32,
 	path = [],
@@ -32,7 +24,11 @@ var canvas = document.getElementById('canvas'),
 
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	tileSize = Math.floor(Math.min(window.innerWidth, window.innerHeight) / Math.max(dungeon.width, dungeon.height));
+
+	var canvasMinSide = Math.min(window.innerWidth, window.innerHeight),
+		dungeonMaxSide = Math.max(dungeon.getWidth(), dungeon.getHeight());
+
+	tileSize = Math.floor(canvasMinSide / dungeonMaxSide);
 
 	drawMap();
 	drawFov();
@@ -69,6 +65,7 @@ function drawPath() {
 }
 
 function init() {
+	console.log('seed: ' + dungeon.getSeed());
 	generateDungeon();
 	calculateFov();
 	searchPath();
@@ -84,8 +81,8 @@ function calculateFov() {
 	console.time('fov calculate');
 	fov = [];
 	explorer.calculate(
-		dungeon.rooms[0].x, 
-		dungeon.rooms[0].y, 
+		dungeon.getRooms()[0].x, 
+		dungeon.getRooms()[0].y, 
 		7,
 		function (x, y) {
 			fov.push({x: x, y: y});
@@ -97,10 +94,10 @@ function calculateFov() {
 function searchPath() {
 	console.time('path search');
 	path = pathfinder.search(
-		dungeon.rooms[0].x, 
-		dungeon.rooms[0].y, 
-		dungeon.rooms[dungeon.rooms.length - 1].x, 
-		dungeon.rooms[dungeon.rooms.length - 1].y
+		dungeon.getRooms()[0].x, 
+		dungeon.getRooms()[0].y, 
+		dungeon.getRooms()[dungeon.getRooms().length - 1].x, 
+		dungeon.getRooms()[dungeon.getRooms().length - 1].y
 	);
 	console.timeEnd('path search');
 }

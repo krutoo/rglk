@@ -24,13 +24,6 @@ dungeon.forEachTile(function makeTile(x, y, isFloor) {
 
 // check tile, returns Boolean
 dungeon.isWall(x, y);
-
-// update options
-dungeon.updateOptions({
-	roomAmount: 32,
-	roomMinSize: 3,
-	corridorMaxLength: 5
-});
 ```
 
 ### Explorer

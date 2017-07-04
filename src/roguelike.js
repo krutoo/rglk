@@ -19,7 +19,7 @@ class Roguelike {
 
 	/**
 	 * Get Dungeon class
-	 * @return {class} Dungeon class constructor.
+	 * @return {class} Dungeon class.
 	 */
 	get Dungeon() {
 		return this._Dungeon;
