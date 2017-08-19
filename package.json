@@ -12,20 +12,19 @@
     "fov"
   ],
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/krutoo/rglk.js.git"
+    "type": "git",
+    "url": "https://github.com/krutoo/rglk.js.git"
   },
-  "main": "./dist/rglk.min.js",
+  "main": "./dist/rglk.js",
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack -w"
+    "dev": "webpack -w",
+    "build": "webpack"
   },
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
     "babel-preset-env": "^1.4.0",
-    "babel-preset-es2015": "^6.24.1",
     "webpack": "^2.5.1"
   }
 }
