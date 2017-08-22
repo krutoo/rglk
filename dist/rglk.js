@@ -1219,7 +1219,7 @@ var Rectangle = function (_Point) {
 	}, {
 		key: 'center',
 		get: function get() {
-			return new _point2.default((this.right - this.left) / 2, (this.bottom - this.top) / 2);
+			return new _point2.default(this.x + this.width / 2, this.y + this.height / 2);
 		}
 	}]);
 

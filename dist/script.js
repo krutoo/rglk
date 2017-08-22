@@ -40,6 +40,16 @@ function drawMap() {
 		ctx.fillStyle = isFloor ? '#445' : '#000';
 		ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
 	});
+
+	dungeon.getRooms().forEach((room) => {
+		ctx.fillStyle = '#a00';
+		ctx.fillRect(
+			(-tileSize / 2) + (room.center.x * tileSize), 
+			(-tileSize / 2) + (room.center.y * tileSize), 
+			tileSize, 
+			tileSize
+		);
+	});
 }
 
 function drawFov() {
