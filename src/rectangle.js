@@ -94,7 +94,7 @@ export default class Rectangle extends Point {
 	 * @return {Point} Point with coordinates to center of Rectangle.
 	 */
 	get center() {
-		return new Point((this.width - this.x) / 2, (this.height - this.y) / 2);
+		return new Point((this.right - this.left) / 2, (this.bottom - this.top) / 2);
 	}
 
 	/**
