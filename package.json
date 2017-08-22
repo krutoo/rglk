@@ -1,6 +1,6 @@
 {
   "name": "rglk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Very simple JS library for development roguelike games",
   "author": "Dmitry Petrov <dima.krutoo@ya.ru>",
   "keywords": [
