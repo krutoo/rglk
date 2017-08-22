@@ -90,6 +90,14 @@ export default class Rectangle extends Point {
 	}
 
 	/**
+	 * Get center of Rectangle.
+	 * @return {Point} Point with coordinates to center of Rectangle.
+	 */
+	get center() {
+		return new Point((this.width - this.x) / 2, (this.height - this.x) / 2);
+	}
+
+	/**
 	 * Check collides with other Rectangle.
 	 * @param {object} rectangle - Object of class Rectangle.
 	 * @return {boolean} The boolean.

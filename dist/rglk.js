@@ -1210,6 +1210,17 @@ var Rectangle = function (_Point) {
 		get: function get() {
 			return this._x;
 		}
+
+		/**
+   * Get center of Rectangle.
+   * @return {Point} Point with coordinates to center of Rectangle.
+   */
+
+	}, {
+		key: 'center',
+		get: function get() {
+			return new _point2.default((this.width - this.x) / 2, (this.height - this.x) / 2);
+		}
 	}]);
 
 	return Rectangle;
