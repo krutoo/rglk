@@ -8,27 +8,33 @@ export default class Point {
 	 * @param {number} y - the y of point.
 	 */
 	constructor(x, y) {
-		this._x = isNaN(x) ? 0 : x;
-		this._y = isNaN(x) ? 0 : y;
+		this.x = x;
+		this.y = y;
+	}
+
+	static create (object) {
+		object = object || {};
+		return new Point(
+			object.x,
+			object.y,
+		);
 	}
 
 	/**
 	 * Get x value.
 	 * @return {number} The x value.
 	 */
-	get x() {
-		return this._x;
+	get x () {
+		return Number(this._x) || 0;
 	}
 
 	/**
 	 * Set x value.
 	 * @param {number} The x value.
 	 */
-	set x(value) {
-		if (isNaN(value)) {
-			console.warn(`Point.x: value ${value} is NaN`);
-		} else {
-			this._x = value;
+	set x (value) {
+		if (!isNaN(value)) {
+			this._x = Number(value);
 		}
 	}
 
@@ -36,28 +42,27 @@ export default class Point {
 	 * Get y value.
 	 * @return {number} The y value.
 	 */
-	get y() {
-		return this._y;
+	get y () {
+		return Number(this._y) || 0;
 	}
 
 	/**
 	 * Set y value.
 	 * @param {number} The y value.
 	 */
-	set y(value) {
-		if (isNaN(value)) {
-			console.warn(`Point.y: value ${value} is NaN`);
-		} else {
-			this._y = value;
+	set y (value) {
+		if (!isNaN(value)) {
+			this._y = Number(value);
 		}
 	}
 
 	/**
 	 * Get distance to a point.
-	 * @param {object} Object of Point class.
+	 * @param {Point} Object of Point class.
 	 * @return {number} The distance.
 	 */
-	distance(point2) {
+	distance (point) {
+		point = point || {};
 		return Math.sqrt(Math.pow(point2.x - this.x, 2) + Math.pow(point2.y - this.y, 2));
 	}
 }

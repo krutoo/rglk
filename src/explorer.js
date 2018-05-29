@@ -1,4 +1,4 @@
-import Point from './point.js';
+import Point from './Point.js';
 
 /**
  * Represents a Exlorer (FOV calculation) class.
@@ -6,38 +6,29 @@ import Point from './point.js';
 export default class Explorer {
 	/**
 	 * Create a Explorer.
-	 * @param {Explorer~isTransparentCallback} isTransparentCallback - callback for identify tile.
+	 * @param {Function} isTransparent - callback for identify tile.
 	 */
-	constructor(isTransparentCallback) {
-		if (isTransparentCallback instanceof Function) {
-			this._isTransparent = isTransparentCallback;
-		} else {
-			console.warn(`Pathfinder: argument ${isTransparentCallback} is not a Function`);
-			this._isTransparent = null;
+	constructor(isTransparent) {
+		if (isTransparent instanceof Function) {
+			this._isTransparent = isTransparent;
 		}
 	}
-	/**
-	 * @callback Explorer~isTransparentCallback
-	 * @param {number} The x position of tile.
-	 * @param {number} The y position of tile.
-	 * @return {boolean} Boolean: tile is transparent (true).
-	 */
 
 	/**
-	 * Get line on a grid.
-	 * @param {object} p0 - Object of class Point, start position.
-	 * @param {object} p1 - Object of class Point, end position.
+	 * Get line on a grid. Based on Bresenham's line algorithm.
+	 * @param {Point} point0 - Object of class Point, start position.
+	 * @param {Point} point1 - Object of class Point, end position.
+	 * @private
 	 */
-	_line(p0, p1) {
-		let dx = p1.x - p0.x, 
-			dy = p1.y - p0.y,
-			nx = Math.abs(dx), 
+	_getPointsOfLine (point0, point1) {
+		let dx = point1.x - point0.x,
+			dy = point1.y - point0.y,
+			nx = Math.abs(dx),
 			ny = Math.abs(dy),
-			sx = (dx > 0) ? 1 : -1, 
+			sx = (dx > 0) ? 1 : -1,
 			sy = (dy > 0) ? 1 : -1,
 			p = new Point(p0.x, p0.y),
 			points = [new Point(p.x, p.y)];
-
 		for (var ix = 0, iy = 0; ix < nx || iy < ny;) {
 			if ((0.5 + ix) / nx == (0.5 + iy) / ny) {
 				p.x += sx;
@@ -51,33 +42,28 @@ export default class Explorer {
 				p.y += sy;
 				iy++;
 			}
-
 			points.push(new Point(p.x, p.y));
 		}
-
 		return points;
 	}
 
 	/**
 	 * Calculate FOV.
-	 * @param {number} centerX - The x position of center.
-	 * @param {number} centerY - The y position of center.
-	 * @param {number} radius - radius of view.
-	 * @callback {Explorer~isExploredCallback} isExploredCallback - called if tile is explored.
+	 * @param {number} centerX The x position of center.
+	 * @param {number} centerY The y position of center.
+	 * @param {number} radius Radius of view.
+	 * @param {Function} isExplored Called if tile is explored.
 	 */
-	calculate(centerX, centerY, radius, isExploredCallback) {
+	calculate(centerX, centerY, radius, isExplored) {
 		if (!(this._isTransparent instanceof Function)) {
 			return console.warn(`Explorer.calculate: ${this._isTransparent} is not a Function`);
 		}
-
 		if (isNaN(centerX) || isNaN(centerY) || isNaN(radius)) {
 			return console.warn(`Explorer.calculate: arguments ${centerX, centerY, radius} must be a Number`);
 		}
-
 		if (!(isExploredCallback instanceof Function)) {
 			return console.warn(`Explorer.calculate: argument ${isExploredCallback} is not a Function`);
 		}
-
 		let squareRaduis = Math.pow(radius, 2),
 			center = new Point(centerX, centerY),
 			minX = center.x - radius,
@@ -90,12 +76,10 @@ export default class Explorer {
 			for (var x = minX; x <= maxX; x++) {
 				if (y === minY || y === maxY || x === minX || x === maxX) {
 					// check line of sight
-					let line = this._line(center, new Point(x, y));
-
+					const line = this._getPointsOfLine(center, new Point(x, y));
 					for (var i = 0; i < line.length; i++) {
 						var tile = line[i],
 							squareDistance = Math.pow(center.x - tile.x, 2) + Math.pow(center.y - tile.y, 2);
-
 						if (squareDistance <= squareRaduis) {
 							if (!this._isTransparent(tile.x, tile.y) ) {
 								break;
@@ -110,9 +94,4 @@ export default class Explorer {
 			}
 		}
 	}
-	/**
-	 * @callback Explorer~isExploredCallback
-	 * @param {number} The x position of explored tile.
-	 * @param {number} The y position of explored tile.
-	 */
 }

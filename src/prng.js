@@ -1,29 +1,26 @@
-// source: http://indiegamr.com/generate-repeatable-random-numbers-in-js/
-
+/**
+ * Represents a Pseudo Random Number Generator.
+ * Thanks for author of this article: http://indiegamr.com/generate-repeatable-random-numbers-in-js/
+ */
 export default class PRNG {
-	constructor(seed) {
-		this._seed = isNaN(seed) ? 12345 : seed;
+	/**
+	 * Create a PRNG.
+	 * @param  {number} seed Seed - number which will the base for generate numbers.
+	 */
+	constructor (seed) {
+		this._seed = isNaN(seed) // @TODO не изменять seed
+			? Math.random()
+			: Number(seed);
 	}
 
-	getRandom(min, max) {
-		max = isNaN(max) ? 1 : max;
-		min = isNaN(min) ? 0 : min;
-
-		this._seed = (this._seed * 9301 + 49297) % 233280;
-		var rnd = this._seed / 233280;
-
+	generate (min, max) {
+		max = isNaN(max) ? 1 : Number(max);
+		min = isNaN(min) ? 0 : Number(min);
+		const rnd = this._updateSeed() / 233280;
 		return min + rnd * (max - min);
 	}
 
-	get seed() {
-		return this._seed;
-	}
-
-	set seed(value) {
-		if (isNaN(value)) {
-			return;
-		} else {
-			this._seed = value;
-		}
+	_updateSeed () {
+		return this._seed = (this._seed * 9301 + 49297) % 233280;
 	}
 }

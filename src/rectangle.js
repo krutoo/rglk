@@ -1,4 +1,4 @@
-import Point from './point';
+import Point from './Point';
 
 /**
  * Represents a Rectangle
@@ -14,9 +14,18 @@ export default class Rectangle extends Point {
 	 */
 	constructor(x, y, width, height) {
 		super(x, y);
+		this.width = width;
+		this.height = height;
+	}
 
-		this._width = isNaN(width) ? 1: width;
-		this._height = isNaN(height) ? 1: height;
+	static create (object) {
+		object = object || {};
+		return new Rectangle(
+			object.x,
+			object.y,
+			object.width,
+			object.height,
+		);
 	}
 
 	/**
@@ -24,7 +33,7 @@ export default class Rectangle extends Point {
 	 * @return {number} The width of Rectangle.
 	 */
 	get width() {
-		return this._width;
+		return Number(this._width) || 0;
 	}
 
 	/**
@@ -32,10 +41,9 @@ export default class Rectangle extends Point {
 	 * @param {number} The Width of Rectangle.
 	 */
 	set width(value) {
-		if (isNaN(value)) {
-			return;
+		if (!isNaN(value)) {
+			this._width = Number(value);
 		}
-		this._width = value;
 	}
 
 	/**
@@ -43,57 +51,56 @@ export default class Rectangle extends Point {
 	 * @return {number} The height of Rectangle.
 	 */
 	get height() {
-		return this._height;
+		return Number(this._height) || 0;
 	}
 
 	/**
 	 * Set height of Rectangle.
 	 * @param {number} The height of Rectangle.
 	 */
-	set height(value) {
-		if (isNaN(value)) {
-			return;
+	set height (value) {
+		if (!isNaN(value)) {
+			this._height = Number(value);
 		}
-		this._height = value;
 	}
 
 	/**
 	 * Get top of Rectangle.
 	 * @return {number} The top border of Rectangle.
 	 */
-	get top() {
-		return this._y;
+	get top () {
+		return this.y;
 	}
 
 	/**
 	 * Get right of Rectangle.
 	 * @return {number} The right border of Rectangle.
 	 */
-	get right() {
-		return this._x + this._width - 1;
+	get right () {
+		return this.x + this.width - 1;
 	}
 
 	/**
 	 * Get bottom of Rectangle.
 	 * @return {number} The bottom border of Rectangle.
 	 */
-	get bottom() {
-		return this._y + this._height - 1;
+	get bottom () {
+		return this.y + this.height - 1;
 	}
 
 	/**
 	 * Get left of Rectangle.
 	 * @return {number} The left border of Rectangle.
 	 */
-	get left() {
-		return this._x;
+	get left () {
+		return this.x;
 	}
 
 	/**
 	 * Get center of Rectangle.
 	 * @return {Point} Point with coordinates to center of Rectangle.
 	 */
-	get center() {
+	get center () {
 		return new Point(
 			this.x + (this.width / 2),
 			this.y + (this.height / 2)
@@ -106,15 +113,17 @@ export default class Rectangle extends Point {
 	 * @return {boolean} The boolean.
 	 */
 	collides(rectangle) {
+		let result = true;
 		if (
 			rectangle.left > this.left + this.width ||
 			rectangle.left + rectangle.width < this.left ||
 			rectangle.top > this.top + this.height ||
 			rectangle.top + rectangle.height < this.top
 		) {
-			return false;
+			result = false;
 		}
-		
-		return true;
+		return result;
 	}
+
+	forEachPoint (callback) {}
 }

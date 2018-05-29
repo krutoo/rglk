@@ -1,51 +1,47 @@
-import Point from './point';
+import Point from './Point';
 
 export default class Node extends Point {
-	constructor(options = {}) {
+	constructor(options) {
+		options = options || {};
 		super(options.x, options.y);
-
-		this._g = isNaN(options.g) ? 0 : options.g;
-		this._h = isNaN(options.h) ? 0 : options.h;
-		this._parent = (options.parent instanceof Node) ? options.parent : null;
+		this.g = options.g;
+		this.h = options.h;
+		this.parent = options.parent;
 	}
 
-	get g() {
-		return this._g;
+	get g () {
+		return Number(this._g) || 0;
 	}
 
-	set g(value) {
-		if (isNaN(value)) {
-			return;
-		} else {
-			this._g = value;
+	set g (value) {
+		if (!isNaN(value)) {
+			this._g = Number(value);
 		}
 	}
 
-	get h() {
-		return this._h;
+	get h () {
+		return Number(this._h) || 0;
 	}
 
-	set h(value) {
-		if (isNaN(value)) {
-			return;
-		} else {
-			this._h = value;
+	set h (value) {
+		if (!isNaN(value)) {
+			this._h = Number(value);
 		}
 	}
 
-	get parent() {
-		return this._parent;
+	get parent () {
+		return this._parent instanceof Node
+			? this._parent
+			: null;
 	}
 
-	set parent(value) {
-		if (value instanceof Node) {
+	set parent (node) {
+		if (node instanceof Node) {
 			this._parent = value;
-		} else {
-			return;
 		}
 	}
 
-	get f() {
+	get f () {
 		return (this.g + this.h);
 	}
 }
