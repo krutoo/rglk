@@ -8,8 +8,9 @@ const libraryName = 'rglk',
 	outputFileName = 'rglk.js',
 	outputDirectoryName = 'build';
 
-const getConfig = () => {
-	const isProduction = Boolean(process.env.WEBPACK_MODE === 'production');
+const getConfig = (env, options) => {
+	const isProduction = Boolean(options.mode === 'production');
+	console.log(isProduction);
 	const config = {
 			entry: './src/index.js',
 			output: {
@@ -43,20 +44,21 @@ const getConfig = () => {
 					allChunks: true,
 				}),
 			],
+			optimization: {
+				minimize: isProduction,
+			}
 		};
 	if (isProduction) {
 		config.plugins.push(
 			new OptimizeCssAssetsPlugin(),
 		);
-		config.optimization = {
-			minimizer: [
-				new UglifyJsPlugin({
-					cache: true,
-					parallel: true,
-					sourceMap: true,
-				}),
-			],
-		};
+		config.optimization.minimizer = [
+			new UglifyJsPlugin({
+				cache: true,
+				parallel: true,
+				sourceMap: true,
+			}),
+		];
 	}
 	return config;
 };
