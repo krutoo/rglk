@@ -1,4 +1,4 @@
-import Rglk from 'rglk.js';
+import Rglk from './Rglk';
 
 const rglk = new Rglk();
 
