@@ -1,4 +1,4 @@
-import Point from './Point.js';
+import Point from './Point';
 
 /**
  * Represents a Exlorer (FOV calculation) class.
@@ -11,6 +11,8 @@ export default class Explorer {
 	constructor(isTransparent) {
 		if (isTransparent instanceof Function) {
 			this._isTransparent = isTransparent;
+		} else {
+			throw new TypeError(`Explorer.calculate: ${this._isTransparent} is not a Function`);
 		}
 	}
 
@@ -27,9 +29,9 @@ export default class Explorer {
 			ny = Math.abs(dy),
 			sx = (dx > 0) ? 1 : -1,
 			sy = (dy > 0) ? 1 : -1,
-			p = new Point(p0.x, p0.y),
+			p = new Point(point0.x, point0.y),
 			points = [new Point(p.x, p.y)];
-		for (var ix = 0, iy = 0; ix < nx || iy < ny;) {
+		for (let ix = 0, iy = 0; ix < nx || iy < ny;) {
 			if ((0.5 + ix) / nx == (0.5 + iy) / ny) {
 				p.x += sx;
 				p.y += sy;
@@ -52,19 +54,11 @@ export default class Explorer {
 	 * @param {number} centerX The x position of center.
 	 * @param {number} centerY The y position of center.
 	 * @param {number} radius Radius of view.
-	 * @param {Function} isExplored Called if tile is explored.
+	 * @param {Function} checkExplored Called if tile is explored.
 	 */
-	calculate(centerX, centerY, radius, isExplored) {
-		if (!(this._isTransparent instanceof Function)) {
-			return console.warn(`Explorer.calculate: ${this._isTransparent} is not a Function`);
-		}
-		if (isNaN(centerX) || isNaN(centerY) || isNaN(radius)) {
-			return console.warn(`Explorer.calculate: arguments ${centerX, centerY, radius} must be a Number`);
-		}
-		if (!(isExploredCallback instanceof Function)) {
-			return console.warn(`Explorer.calculate: argument ${isExploredCallback} is not a Function`);
-		}
-		let squareRaduis = Math.pow(radius, 2),
+	calculate(centerX, centerY, radius, checkExplored) {
+		this.checkArguments(...arguments);
+		const squareRaduis = Math.pow(radius, 2),
 			center = new Point(centerX, centerY),
 			minX = center.x - radius,
 			maxX = center.x + radius,
@@ -72,19 +66,19 @@ export default class Explorer {
 			maxY = center.y + radius;
 
 		// check floors in radius
-		for (var y = minY; y <= maxY; y++) {
-			for (var x = minX; x <= maxX; x++) {
+		for (let y = minY; y <= maxY; y++) {
+			for (let x = minX; x <= maxX; x++) {
 				if (y === minY || y === maxY || x === minX || x === maxX) {
 					// check line of sight
 					const line = this._getPointsOfLine(center, new Point(x, y));
-					for (var i = 0; i < line.length; i++) {
-						var tile = line[i],
+					for (let i = 0; i < line.length; i++) {
+						let tile = line[i],
 							squareDistance = Math.pow(center.x - tile.x, 2) + Math.pow(center.y - tile.y, 2);
 						if (squareDistance <= squareRaduis) {
 							if (!this._isTransparent(tile.x, tile.y) ) {
 								break;
 							} else {
-								isExploredCallback(tile.x, tile.y);
+								checkExplored(tile.x, tile.y);
 							}
 						} else {
 							break;
@@ -92,6 +86,15 @@ export default class Explorer {
 					}
 				}
 			}
+		}
+	}
+
+	checkArguments (centerX, centerY, radius, checkExplored) {
+		if (isNaN(centerX) || isNaN(centerY) || isNaN(radius)) {
+			throw new TypeError(`Explorer.calculate: first three arguments must be a number`);
+		}
+		if (!(checkExplored instanceof Function)) {
+			throw new TypeError(`Explorer.calculate: fourth argument must be a function`);
 		}
 	}
 }
