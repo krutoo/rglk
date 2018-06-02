@@ -1,72 +1,48 @@
-import Node from './node';
+import Node from './Node';
 
+/**
+ * Represents a Pathfinder class.
+ */
 export default class Pathfinder {
-	constructor(isWalkable) {
-		if (isWalkable instanceof Function) {
-			this._isWalkable = isWalkable;
+	/**
+	 * Create a Pathfinder.
+	 * @param {Function} isOpen Callback, defines that point is open.
+	 */
+	constructor(isOpen) {
+		if (isOpen instanceof Function) {
+			this._isOpen = isOpen;
 		} else {
-			console.warn(`Pathfinder.constructor: value ${isWalkable} is not a Function`);
-			this._isWalkable = null;
+			throw new TypeError('Pathfinder.constructor: first argument must be a function');
 		}
 	}
 
-	_heuristic (x1, y1, x2, y2) {
-		// get manhattan distance
-		const d1 = Math.abs(x2 - x1),
-			d2 = Math.abs(y2 - y1);
-		return d1 + d2;
-	}
-
-	_findNode (array, node) {
-		if (node instanceof Node) {
-			for (var i = 0; i < array.length; i++) {
-				if (array[i].x === node.x && array[i].y === node.y) {
-					return i;
-				}
-			}
-		}
-
-		return undefined;
-	}
-
-	// without diagonals
-	_getNeighbors (node) {
-		var neighbors = [];
-		for (var y = node.y - 1; y <= node.y + 1; y++) {
-			for (var x = node.x - 1; x <= node.x + 1; x++) {
-				if (x === node.x && y != node.y || x != node.x && y === node.y) {
-					if (this._isWalkable(x, y)) {
-						// push node with updated g and parent
-						neighbors.push(new Node({
-							x: x,
-							y: y,
-							g: node.g + 1,
-							parent: node
-						}));
-					}
-				}
-			}
-		}
-		return neighbors;
-	}
-
+	/**
+	 * Search path between two points.
+	 * @param {number} x1 First point x.
+	 * @param {number} y1 First point y.
+	 * @param {number} x2 Second point x.
+	 * @param {number} y2 Second point y.
+	 * @return {Array} List of path points.
+	 */
 	search(x1, y1, x2, y2) {
-		if (!(this._isWalkable instanceof Function)) {
-			return console.warn(`Pathfinder.search: ${this._isWalkable} is not a Function`);
-		}
-
-		var start = new Node({x: x1, y: y1}),
-			end = new Node({x: x2, y: y2}),
-			openList   = [start], // unvisited nodes
-			closedList = []; // visited nodes
+		let start = new Node({
+				x: x1,
+				y: y1,
+			}),
+			end = new Node({
+				x: x2,
+				y: y2,
+			}),
+			unvisitedNodes = [start],
+			visitedNodes = [],
+			resultPath = [];
 
 		// main loop
-		while (openList.length > 0) {
+		while (unvisitedNodes.length) {
 			// search in open list node with lowest value f = g + h
-			var currentNodeIndex = 0,
-				currentNode = openList[0];
-
-			openList.forEach(function(item, i) {
+			let currentNodeIndex = 0,
+				currentNode = unvisitedNodes[0];
+			unvisitedNodes.forEach((item, i) => {
 				if (item.f < currentNode.f) {
 					currentNode = item;
 					currentNodeIndex = i;
@@ -74,40 +50,71 @@ export default class Pathfinder {
 			});
 
 			// add found node to closed list, delete it from open list
-			openList.splice(currentNodeIndex, 1);
-			closedList.push(currentNode);
+			unvisitedNodes.splice(currentNodeIndex, 1);
+			visitedNodes.push(currentNode);
 
-			// if current node is target, then return path
-			if (currentNode.x === end.x && currentNode.y === end.y) {
-				var current = currentNode,
-					path = [];
-
-				while(current.parent) {
-					path.push(current);
-					current = current.parent;
-				}
-
-				return path.reverse();
+			// if current node is target then create path and break
+			if (currentNode.isEqualTo(end)) {
+				resultPath = currentNode.getPathToRoot();
+				break;
 			}
 
-			var neighbors = this._getNeighbors(currentNode);
-			for (var i = 0; i < neighbors.length; i++) {
-				var neighbor = neighbors[i];
+			let neighbors = this._getNeighbors(currentNode); // @TODO check length before run cycle
+			for (let i = 0; i < neighbors.length; i++) {
+				let neighbor = neighbors[i];
 
 				// ignore neighbor if he in closed list
-				if (this._findNode(closedList, neighbor)) {
+				if (visitedNodes.find(node => node.isEqualTo(neighbor))) {
 					continue;
 				}
 
 				// if neighbor not in open list, add him to open list, update h
-				if (!this._findNode(openList, neighbor)) {
-					neighbor.h = this._heuristic(neighbor.x, neighbor.y, end.x, end.y);
-					openList.push(neighbor);
+				if (!unvisitedNodes.find(node => node.isEqualTo(neighbor))) {
+					neighbor.h = this._getHeuristic(neighbor.x, neighbor.y, end.x, end.y);
+					unvisitedNodes.push(neighbor);
 				}
 			}
 		}
+		return resultPath;
+	}
 
-		// return empty array if path is not finded
-		return [];
+	/**
+	 * Returns heuristic value (Manhattan distance) between two nodes.
+	 * @param  {number} x1 First node x.
+	 * @param  {number} y1 First node y.
+	 * @param  {number} x2 Second node x.
+	 * @param  {number} y2 Second node y.
+	 * @return {number} heuristic value.
+	 */
+	_getHeuristic (x1, y1, x2, y2) {
+		const d1 = Math.abs(x2 - x1),
+			d2 = Math.abs(y2 - y1);
+		return d1 + d2;
+	}
+
+	/**
+	 * Returns list of node neighbors.
+	 * @param  {Node} node Node to get a neighbors.
+	 * @return {Array} List of neighbors.
+	 * @TODO move to Node class?
+	 */
+	_getNeighbors (node) {
+		let neighbors = [];
+		for (let y = -1; y <= 1; y++) {
+			for (let x = -1; x <= 1; x++) {
+				// if is not diagonal neighbor
+				if (Math.abs(x + y) === 1) {
+					if (this._isOpen(node.x + x, node.y + y)) {
+						neighbors.push(new Node({
+							x: node.x + x,
+							y: node.y + y,
+							g: node.g + 1,
+							parent: node,
+						}));
+					}
+				}
+			}
+		}
+		return neighbors;
 	}
 }
