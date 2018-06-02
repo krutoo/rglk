@@ -8,18 +8,28 @@ export default class PRNG {
 	 * @param  {number} seed Seed - number which will the base for generate numbers.
 	 */
 	constructor (seed) {
-		this._seed = isNaN(seed) // @TODO не изменять seed
+		this._seed = isNaN(seed) || !isFinite(seed)
 			? Math.random()
 			: Number(seed);
 	}
 
+	/**
+	 * Resturs random number between min and max.
+	 * @param  {number} [min=0] Lower bound.
+	 * @param  {number} [max=1] Upper bound.
+	 * @return {number} Float between min and max.
+	 */
 	generate (min, max) {
 		max = isNaN(max) ? 1 : Number(max);
 		min = isNaN(min) ? 0 : Number(min);
-		const rnd = this._updateSeed() / 233280;
-		return min + rnd * (max - min);
+		const random = this._updateSeed() / 233280;
+		return min + random * (max - min);
 	}
 
+	/**
+	 * Update seed.
+	 * @return {number} Updated seed.
+	 */
 	_updateSeed () {
 		return this._seed = (this._seed * 9301 + 49297) % 233280;
 	}
