@@ -65,4 +65,12 @@ export default class Point {
 		point = point || {};
 		return Math.sqrt(Math.pow(point2.x - this.x, 2) + Math.pow(point2.y - this.y, 2));
 	}
+
+	isEqualTo (point) {
+		let result = false;
+		if (point instanceof Point) {
+			result = point.x === this.x && point.y === this.y;
+		}
+		return result;
+	}
 }
