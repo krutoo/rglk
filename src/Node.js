@@ -37,11 +37,21 @@ export default class Node extends Point {
 
 	set parent (node) {
 		if (node instanceof Node) {
-			this._parent = value;
+			this._parent = node;
 		}
 	}
 
 	get f () {
 		return (this.g + this.h);
+	}
+
+	getPathToRoot () {
+		const path = [];
+		let currentNode = this;
+		while (currentNode.parent) {
+			path.push(currentNode);
+			currentNode = currentNode.parent;
+		}
+		return path.reverse();
 	}
 }
