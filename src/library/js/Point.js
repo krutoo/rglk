@@ -61,9 +61,9 @@ export default class Point {
 	 * @param {Point} Object of Point class.
 	 * @return {number} The distance.
 	 */
-	distance (point) {
+	distanceTo (point) {
 		point = point || {};
-		return Math.sqrt(Math.pow(point2.x - this.x, 2) + Math.pow(point2.y - this.y, 2));
+		return Math.sqrt(Math.pow(point.x - this.x, 2) + Math.pow(point.y - this.y, 2));
 	}
 
 	isEqualTo (point) {

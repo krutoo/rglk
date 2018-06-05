@@ -77,7 +77,7 @@ export default class Rectangle extends Point {
 	 * @return {number} The right border of Rectangle.
 	 */
 	get right () {
-		return this.x + this.width - 1;
+		return this.x + this.width;
 	}
 
 	/**
@@ -85,7 +85,7 @@ export default class Rectangle extends Point {
 	 * @return {number} The bottom border of Rectangle.
 	 */
 	get bottom () {
-		return this.y + this.height - 1;
+		return this.y + this.height;
 	}
 
 	/**
@@ -112,18 +112,20 @@ export default class Rectangle extends Point {
 	 * @param {object} rectangle - Object of class Rectangle.
 	 * @return {boolean} The boolean.
 	 */
-	collides(rectangle) {
-		let result = true;
+	collides (rectangle) {
+		let result = false;
 		if (
-			rectangle.left > this.left + this.width ||
-			rectangle.left + rectangle.width < this.left ||
-			rectangle.top > this.top + this.height ||
-			rectangle.top + rectangle.height < this.top
+			rectangle.x <= this.x + this.width
+			&& rectangle.x + rectangle.width >= this.x
+			&& rectangle.y <= this.y + this.height
+			&& rectangle.height + rectangle.y >= this.y
 		) {
-			result = false;
+			result = true;
 		}
 		return result;
 	}
 
 	forEachPoint (callback) {}
 }
+
+window.Rectangle = Rectangle;
