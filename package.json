@@ -1,6 +1,6 @@
 {
   "name": "rglk",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "license": "MIT",
   "description": "Simple JS library for development roguelike games",
   "author": "Dmitry Petrov <dima.krutoo@ya.ru>",
@@ -16,7 +16,7 @@
     "type": "git",
     "url": "https://github.com/krutoo/rglk.js.git"
   },
-  "main": "./src/index.js",
+  "main": "./src/library/index.js",
   "scripts": {
     "build": "webpack --mode production",
     "watch": "webpack --mode development"
@@ -27,8 +27,12 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
+    "css-loader": "^0.28.11",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "node-sass": "^4.9.0",
     "optimize-css-assets-webpack-plugin": "^4.0.2",
+    "sass-loader": "^7.0.2",
+    "style-loader": "^0.21.0",
     "webpack": "^4.10.1",
     "webpack-cli": "^2.1.4"
   }
