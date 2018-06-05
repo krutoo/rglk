@@ -1,13 +1,60 @@
 <!doctype html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<title>rglk.js demo</title>
-		<link rel="stylesheet" href="./css/style.css">
+		<link rel="stylesheet" href="./css/demo.css">
 	</head>
 	<body>
-		<canvas></canvas>
+		<div class="main-container">
+			<section class="main-section">
+				<h1>rglk.js</h1>
+				<p>Simple library for development roguelike games.</p>
+				<p>
+					<span>Check API on</span>
+					<a href="https://github.com/krutoo/rglk.js" target="_blank">GitHub</a>.
+				</p>
+			</section>
+			<section class="main-section js-section-dungeon">
+				<h2>Features</h2>
+				<hr>
+				<h3>Dungeon</h3>
+				<p>Object of class Dungeon can generate a random two-dimensional map consisting of walls and floors.</p>
+				<div class="canvas-wrapper">
+					<div class="reload-button js-reload-button">reload</div>
+					<canvas class="canvas js-dungeon-canvas"></canvas>
+				</div>
+				<p>Simple dungeon (rooms with corridors)</p>
+			</section>
+			<section class="main-section js-section-labyrinth">
+				<div class="canvas-wrapper">
+					<div class="reload-button js-reload-button">reload</div>
+					<canvas class="canvas js-labyrinth-canvas"></canvas>
+				</div>
+				<p>Labyrinth (rooms with size 1x1)</p>
+			</section>
+			<section class="main-section js-section-explorer">
+				<h3>Explorer</h3>
+				<div class="canvas-wrapper">
+					<div class="reload-button js-reload-button">reload</div>
+					<canvas class="canvas js-explorer-canvas"></canvas>
+				</div>
+				<p>Object of class Explorer allows to define FOV based on raycasting algorytm.</p>
+			</section>
+			<section class="main-section js-section-pathfinder">
+				<h3>Pathfinder</h3>
+				<div class="canvas-wrapper">
+					<div class="reload-button js-reload-button">reload</div>
+					<canvas class="canvas js-pathfinder-canvas"></canvas>
+				</div>
+				<p>The work of Pathfinder is based on an algorithm A*.</p>
+			</section>
+			<footer class="main-section main-footer">
+				<span>rglk.js</span>
+				<a href="https://github.com/krutoo/rglk.js" target="_blank">GitHub</a>
+			</footer>
+		</div>
 		<script src="./js/rglk.js"></script>
-		<script src="./js/script.js"></script>
+		<script src="./js/demo.js"></script>
 	</body>
 </html>
