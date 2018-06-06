@@ -1,9 +1,20 @@
-import Rglk from './Rglk';
+import PRNG from './PRNG';
+import Dungeon from './Dungeon';
+import Explorer from './Explorer';
+import Pathfinder from './Pathfinder';
 
-const rglk = new Rglk();
+const rglk = {
+	PRNG,
+	Dungeon,
+	Explorer,
+	Pathfinder,
+};
+Object.freeze(rglk);
 
 export default rglk;
-export const PRNG = rglk.PRNG;
-export const Dungeon = rglk.Dungeon;
-export const Explorer = rglk.Explorer;
-export const Pathfinder = rglk.Pathfinder;
+export {
+	PRNG,
+	Dungeon,
+	Explorer,
+	Pathfinder,
+};
