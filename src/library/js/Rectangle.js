@@ -12,27 +12,17 @@ export default class Rectangle extends Point {
 	 * @param {number} width - Width of rectangle.
 	 * @param {number} height - Height of rectangle.
 	 */
-	constructor(x, y, width, height) {
+	constructor (x, y, width, height) {
 		super(x, y);
 		this.width = width;
 		this.height = height;
-	}
-
-	static create (object) {
-		object = object || {};
-		return new Rectangle(
-			object.x,
-			object.y,
-			object.width,
-			object.height,
-		);
 	}
 
 	/**
 	 * Get width of Rectangle.
 	 * @return {number} The width of Rectangle.
 	 */
-	get width() {
+	get width () {
 		return Number(this._width) || 0;
 	}
 
@@ -40,7 +30,7 @@ export default class Rectangle extends Point {
 	 * Set width of Rectangle.
 	 * @param {number} The Width of Rectangle.
 	 */
-	set width(value) {
+	set width (value) {
 		if (!isNaN(value)) {
 			this._width = Number(value);
 		}
@@ -50,7 +40,7 @@ export default class Rectangle extends Point {
 	 * Get height of Rectangle.
 	 * @return {number} The height of Rectangle.
 	 */
-	get height() {
+	get height () {
 		return Number(this._height) || 0;
 	}
 
@@ -109,13 +99,15 @@ export default class Rectangle extends Point {
 
 	/**
 	 * Check collides with other Rectangle.
-	 * @param {object} rectangle - Object of class Rectangle.
-	 * @return {boolean} The boolean.
+	 * @param {Object} rectangle Object with x, y, width and height properties.
+	 * @return {boolean} Rectangles collides?.
 	 */
 	collides (rectangle) {
+		rectangle = rectangle || {};
 		let result = false;
 		if (
-			rectangle.x <= this.x + this.width
+			!isNaN(rectangle.x + rectangle.y + rectangle.width + rectangle.height)
+			&& rectangle.x <= this.x + this.width
 			&& rectangle.x + rectangle.width >= this.x
 			&& rectangle.y <= this.y + this.height
 			&& rectangle.height + rectangle.y >= this.y
@@ -125,7 +117,6 @@ export default class Rectangle extends Point {
 		return result;
 	}
 
+	// @TODO complete!
 	forEachPoint (callback) {}
 }
-
-window.Rectangle = Rectangle;
