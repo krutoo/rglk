@@ -8,13 +8,29 @@ export default class PRNG {
 	 * @param  {number} seed Seed - number which will the base for generate numbers.
 	 */
 	constructor (seed) {
-		this._seed = isNaN(seed) || !isFinite(seed)
-			? Math.random()
-			: Number(seed);
+		this.seed = seed;
 	}
 
 	/**
-	 * Resturs random number between min and max.
+	 * Get a seed
+	 * @return {number} Seed.
+	 */
+	get seed () {
+		return this._seed;
+	}
+
+	/**
+	 * Set a seed.
+	 * @param {number} value Finite number.
+	 */
+	set seed (value) {
+		this._seed = isNaN(value) || !isFinite(value)
+			? Math.random()
+			: Number(value);
+	}
+
+	/**
+	 * Returns random number between min and max.
 	 * @param  {number} [min=0] Lower bound.
 	 * @param  {number} [max=1] Upper bound.
 	 * @return {number} Float between min and max.
