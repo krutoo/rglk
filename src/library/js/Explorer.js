@@ -1,28 +1,74 @@
 import Point from './Point';
 
 /**
- * Represents a Exlorer (FOV calculation) class.
+ * Represents a Explorer (FOV calculation) class.
  */
 export default class Explorer {
 	/**
 	 * Create a Explorer.
-	 * @param {Function} isTransparent - callback for identify tile.
+	 * @param {Function} isTransparent Callback which must determine that tile is transparent.
 	 */
-	constructor(isTransparent) {
+	constructor (isTransparent) {
 		if (isTransparent instanceof Function) {
 			this._isTransparent = isTransparent;
-		} else {
-			throw new TypeError(`Explorer.calculate: ${this._isTransparent} is not a Function`);
 		}
 	}
 
 	/**
-	 * Get line on a grid. Based on Bresenham's line algorithm.
-	 * @param {Point} point0 - Object of class Point, start position.
-	 * @param {Point} point1 - Object of class Point, end position.
-	 * @private
+	 * Returns an array of points in field of view.
+	 * @param {number} centerX The x position of center.
+	 * @param {number} centerY The y position of center.
+	 * @param {number} radius Radius of view.
+	 * @param {Function} [checkExplored] Called if tile is explored.
+	 * @return {Array} Visible points array.
 	 */
-	_getPointsOfLine (point0, point1) {
+	calculate (centerX, centerY, radius, checkExplored) {
+		const visiblePoints = {};
+		if (this._checkArguments(...arguments)) {
+			const squareRadius = radius**2,
+				center = new Point(centerX, centerY),
+				minX = center.x - radius,
+				maxX = center.x + radius,
+				minY = center.y - radius,
+				maxY = center.y + radius,
+				canCheck = checkExplored instanceof Function;
+
+			// check floors in radius
+			for (let y = minY; y <= maxY; y++) {
+				for (let x = minX; x <= maxX; x++) {
+					// if x or y equals to bound of square area
+					if ([minX, maxX].includes(x) || [minY, maxY].includes(y)) {
+						const points = this.getPointsOfLine(center, new Point(x, y));
+						line: for (let i = 0; i < points.length; i++) {
+							const point = points[i],
+								squareDistance = (center.x - point.x)**2 + (center.y - point.y)**2;
+							if (squareDistance <= squareRadius && this._isTransparent(point.x, point.y)) {
+								if (canCheck) {
+									checkExplored(point.x, point.y);
+								}
+								visiblePoints[`${point.x}x${point.y}`] = point;
+							} else {
+								break line;
+							}
+						}
+					}
+				}
+			}
+		}
+		return Object.values(visiblePoints);
+	}
+
+	_checkArguments (centerX, centerY, radius, checkExplored) {
+		return !isNaN(centerX + centerY + radius)
+			&& isFinite(centerX + centerY + radius);
+	}
+
+	/**
+	 * Get line on a grid. Based on Bresenham's line algorithm.
+	 * @param {Point} point0 Start position.
+	 * @param {Point} point1 End position.
+	 */
+	getPointsOfLine (point0, point1) {
 		let dx = point1.x - point0.x,
 			dy = point1.y - point0.y,
 			nx = Math.abs(dx),
@@ -47,54 +93,5 @@ export default class Explorer {
 			points.push(new Point(p.x, p.y));
 		}
 		return points;
-	}
-
-	/**
-	 * Calculate FOV.
-	 * @param {number} centerX The x position of center.
-	 * @param {number} centerY The y position of center.
-	 * @param {number} radius Radius of view.
-	 * @param {Function} checkExplored Called if tile is explored.
-	 */
-	calculate(centerX, centerY, radius, checkExplored) {
-		this.checkArguments(...arguments);
-		const squareRaduis = Math.pow(radius, 2),
-			center = new Point(centerX, centerY),
-			minX = center.x - radius,
-			maxX = center.x + radius,
-			minY = center.y - radius,
-			maxY = center.y + radius;
-
-		// check floors in radius
-		for (let y = minY; y <= maxY; y++) {
-			for (let x = minX; x <= maxX; x++) {
-				if (y === minY || y === maxY || x === minX || x === maxX) {
-					// check line of sight
-					const line = this._getPointsOfLine(center, new Point(x, y));
-					for (let i = 0; i < line.length; i++) {
-						let tile = line[i],
-							squareDistance = Math.pow(center.x - tile.x, 2) + Math.pow(center.y - tile.y, 2);
-						if (squareDistance <= squareRaduis) {
-							if (!this._isTransparent(tile.x, tile.y) ) {
-								break;
-							} else {
-								checkExplored(tile.x, tile.y);
-							}
-						} else {
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	checkArguments (centerX, centerY, radius, checkExplored) {
-		if (isNaN(centerX) || isNaN(centerY) || isNaN(radius)) {
-			throw new TypeError(`Explorer.calculate: first three arguments must be a number`);
-		}
-		if (!(checkExplored instanceof Function)) {
-			throw new TypeError(`Explorer.calculate: fourth argument must be a function`);
-		}
 	}
 }
