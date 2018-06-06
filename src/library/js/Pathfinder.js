@@ -23,6 +23,7 @@ export default class Pathfinder {
 	 * @param {number} x2 Second point x.
 	 * @param {number} y2 Second point y.
 	 * @return {Array} List of path points.
+	 * @TODO Make calculation can be async?
 	 */
 	search(x1, y1, x2, y2) {
 		let start = new Node({
@@ -80,6 +81,7 @@ export default class Pathfinder {
 
 	/**
 	 * Returns heuristic value (Manhattan distance) between two nodes.
+	 * @readOnly
 	 * @param  {number} x1 First node x.
 	 * @param  {number} y1 First node y.
 	 * @param  {number} x2 Second node x.
@@ -94,6 +96,7 @@ export default class Pathfinder {
 
 	/**
 	 * Returns list of node neighbors.
+	 * @readOnly
 	 * @param  {Node} node Node to get a neighbors.
 	 * @return {Array} List of neighbors.
 	 * @TODO move to Node class?
