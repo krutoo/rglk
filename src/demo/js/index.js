@@ -42,18 +42,18 @@ initSection('.js-section-explorer', canvas => {
 			corridorMaxLength: 1,
 			seed: Math.random(),
 		}),
-		explorer = new rglk.Explorer((x, y) => !dungeon.isWall(x, y)),
-		fov = [];
-	explorer.calculate(
+		explorer = new rglk.Explorer((x, y) => !dungeon.isWall(x, y));
+	const fov = explorer.calculate(
 		parseInt(dungeon.rooms[0].center.x, 10),
 		parseInt(dungeon.rooms[0].center.y, 10),
-		16,
-		(x, y) => fov.push({x: x, y: y}),
+		12,
 	);
 	draw(canvas, {
 		fov,
 		dungeon,
-		radius: 16,
+		radius: 12,
+		roomColor: '#222',
+		corridorColor: '#222',
 		center: dungeon.rooms[0].center,
 	});
 });
@@ -171,7 +171,7 @@ function drawFOV (context, data) {
 		const distance = center.distanceTo(tile),
 			proportion = 1 - (distance / radius);
 		context.fillStyle = `rgba(255,210,150,${proportion})`;
-		context.globalAlpha = 0.1;
+		context.globalAlpha = 0.7;
 		context.fillRect(
 			tile.x * tileSize,
 			tile.y * tileSize,
