@@ -7,17 +7,9 @@ export default class Point {
 	 * @param {number} x - the x of point.
 	 * @param {number} y - the y of point.
 	 */
-	constructor(x, y) {
+	constructor (x, y) {
 		this.x = x;
 		this.y = y;
-	}
-
-	static create (object) {
-		object = object || {};
-		return new Point(
-			object.x,
-			object.y,
-		);
 	}
 
 	/**
@@ -59,18 +51,20 @@ export default class Point {
 	/**
 	 * Get distance to a point.
 	 * @param {Point} Object of Point class.
-	 * @return {number} The distance.
+	 * @return {number|NaN} The distance.
 	 */
 	distanceTo (point) {
 		point = point || {};
 		return Math.sqrt(Math.pow(point.x - this.x, 2) + Math.pow(point.y - this.y, 2));
 	}
 
+	/**
+	 * Check that argument point is equal to self.
+	 * @param  {Object} point Object with x and y properties.
+	 * @return {boolean} Are points is equal?
+	 */
 	isEqualTo (point) {
-		let result = false;
-		if (point instanceof Point) {
-			result = point.x === this.x && point.y === this.y;
-		}
-		return result;
+		point = point || {};
+		return point.x === this.x && point.y === this.y;
 	}
 }
