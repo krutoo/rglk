@@ -8,17 +8,16 @@ import Rectangle from './Rectangle';
 export default class Dungeon {
 	/**
 	 * Create a dungeon.
-	 * @param {Object} [options] - Dungeon generation options.
-	 * @param {number} options.seed - The seed to pseudorandom number generator.
-	 * @param {number} options.roomsAmount - The amount of rooms.
-	 * @param {number} options.roomMinSize - Min size of room.
-	 * @param {number} options.roomMaxSize - Max size of room.
-	 * @param {number} options.corridorMinLength - Min length of corridors.
-	 * @param {number} options.corridorMaxLength - Max length of corridors.
-	 * @param {number} options.corridorComplexity - Complexity corridors.
+	 * @param {Object} [options] Dungeon generation options.
+	 * @param {number} options.seed The seed to pseudorandom number generator.
+	 * @param {number} options.roomsAmount The amount of rooms.
+	 * @param {number} options.roomMinSize Min size of room.
+	 * @param {number} options.roomMaxSize Max size of room.
+	 * @param {number} options.corridorMinLength Min length of corridors.
+	 * @param {number} options.corridorMaxLength Max length of corridors.
+	 * @param {number} options.corridorComplexity Complexity corridors.
 	 */
 	constructor (options) {
-		options = options || {};
 		// @TODO this.map = new Rectangle()?
 		this._tiles = [];
 		this._rooms = [];
@@ -28,6 +27,11 @@ export default class Dungeon {
 		this.generate();
 	}
 
+	/**
+	 * Returns validated options.
+	 * @param  {Object} options Options.
+	 * @return {Object} validated options.
+	 */
 	validateOptions (options) {
 		options = options || {};
 		const resultOptions = {};
@@ -43,8 +47,9 @@ export default class Dungeon {
 	}
 
 	/**
-	 * Get default options.
-	 * @readonly
+	 * Get a default options.
+	 * @readOnly
+	 * @return {Object} Default options.
 	 */
 	get defaultOptions () {
 		return {
@@ -60,7 +65,7 @@ export default class Dungeon {
 
 	/**
 	 * Get the array of rooms.
-	 * @readonly
+	 * @readOnly
 	 * @return {array} List of rooms.
 	 */
 	get rooms () {
@@ -69,7 +74,7 @@ export default class Dungeon {
 
 	/**
 	 * Get the array of corridors.
-	 * @readonly
+	 * @readOnly
 	 * @return {array} List of corridors.
 	 */
 	get corridors () {
@@ -78,7 +83,7 @@ export default class Dungeon {
 
 	/**
 	 * Get the array of all builds.
-	 * @readonly
+	 * @readOnly
 	 * @return {array} List of builds (rooms & corridors).
 	 */
 	get builds () {
@@ -87,7 +92,7 @@ export default class Dungeon {
 
 	/**
 	 * Get the width of dungeon.
-	 * @readonly
+	 * @readOnly
 	 * @return {number} The dungeon width (number of tiles).
 	 */
 	get width () {
@@ -96,7 +101,7 @@ export default class Dungeon {
 
 	/**
 	 * Get the height of dungeon.
-	 * @readonly
+	 * @readOnly
 	 * @return {number} The dungeon height (number of tiles).
 	 */
 	get height () {
@@ -119,7 +124,7 @@ export default class Dungeon {
 	}
 
 	isFloor () {
-		return !this.isWall.call(this, ...arguments);
+		return !this.isWall.apply(this, arguments);
 	}
 
 	/**
@@ -174,7 +179,6 @@ export default class Dungeon {
 		this._rooms[0].children = [];
 
 		// main loop
-		let lastType = 'room';
 		while (this._rooms.length < roomsAmount) {
 			// configure new room and corridor relative to random room from list
 			const lastRoom = this._rooms[random(0, this._rooms.length - 1)],
@@ -239,22 +243,28 @@ export default class Dungeon {
 		}
 	}
 
-	_isSuitableBuilds () {
-		const newBuilds = Array.from(arguments);
-		return newBuilds.every(newBuild => {
-			return !this.builds
-				.filter(build => {
-					return build.parent !== newBuild.parent
-					&& build !== newBuild.parent
-					&& build !== newBuild.children
-					&& !build.children.includes(newBuild.parent)
-				})
-				.some(build => this._isCollide(build, newBuild));
-		});
+	/**
+	 * Chack that all arguments is suitable builds for create dungeon.
+	 * @param  {...Rectangle} newBuilds Builds.
+	 * @return {boolean} Is all arguments suitable builds for create dungeon?
+	 */
+	_isSuitableBuilds (...newBuilds) {
+		return newBuilds.every(newBuild => this._isSuitableBuild(newBuild));
 	}
 
-	_isCollide (build1, build2) {
-		return build1.collides(build2)
+	/**
+	 * Check that build is suitable to place in dungeon.
+	 * @param  {Rectangle} newBuild Checking build.
+	 * @return {boolean} Build is suitable?
+	 */
+	_isSuitableBuild (newBuild) {
+		const checkingBuilds = this.builds.filter(build => {
+			return build.parent !== newBuild.parent
+				&& build !== newBuild.parent
+				&& build !== newBuild.children
+				&& !build.children.includes(newBuild.parent)
+		});
+		return !checkingBuilds.some(build => build.collides(newBuild));
 	}
 
 	/**
@@ -356,7 +366,7 @@ export default class Dungeon {
 	}
 
 	/**
-	 * Fill rectagle: fill rectangle area on map.
+	 * fill rectangle area on map.
 	 * @private
 	 * @param {number} startX - Left border position of rectangle.
 	 * @param {number} startY - Top border position of rectangle.
