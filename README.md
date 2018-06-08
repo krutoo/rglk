@@ -8,7 +8,7 @@ npm install --save rglk
 ```
 
 ## Features
-List of constructors in **rglk**.
+Constructors in **rglk** namespace allows to build simple 2d dungeons, define field of view, search path between two points and generates pseudo random numbers.
 
 ### Dungeon 🏗️
 
@@ -17,6 +17,7 @@ Object of class Dungeon can generate a random two-dimensional map consisting of 
 ```javascript
 import { Dungeon } from 'rglk';
 
+// create a new generated dungeon
 const dungeon = new Dungeon({
     roomsAmount: 64,
     roomMinSize: 5,
@@ -26,16 +27,17 @@ const dungeon = new Dungeon({
     seed: 12345,
 });
 
-// each call returns new random dungeon
+// each call rebuilds dungeon
 dungeon.generate();
 
-// for generated dungeon
+// process each tile
 dungeon.forEachTile((x, y, isFloor) => {
     // ...draw wall or floor
 });
 
-// check tile, returns Boolean
+// check tile type (returns boolean)
 dungeon.isWall(x, y);
+dungeon.isFloor(x, y);
 ```
 
 ### Explorer 👁️
@@ -44,10 +46,11 @@ Object of class Explorer allows to define FOV based on **raycasting** algorytm.
 import { Explorer } from 'rglk';
 
 const explorer = new Explorer((x, y) => {
-    // return true if tile is transparent
+    // should return true if tile is transparent
 });
 
-explorer.calculate(centerX, centerY, radius, (x, y) => {
+// get array of visible tile positions
+const fov = explorer.calculate(centerX, centerY, radius, (x, y) => {
     // this code will be executed if tile is visible
 });
 ```
@@ -58,10 +61,11 @@ The work of Pathfinder is based on an algorithm __A*__.
 import { Explorer } from 'rglk';
 
 const pathfinder = new Pathfinder((x, y) => {
-    // return true if tile is can be visited
+    // should return true if tile is can be visited
 });
 
-pathfinder.search(x1, y1, x2, y2); // returns Array of points
+// returns Array of points
+pathfinder.search(x1, y1, x2, y2);
 ```
 
 ### PRNG 💾
@@ -72,5 +76,5 @@ import { PRNG } from 'rglk';
 const prng1 = new PRNG(123),
       prng2 = new PRNG(123);
 
-prng1.getRandom(min, max) === prng1.getRandom(min, max); // true
+prng1.getRandom(2, 24) === prng1.getRandom(2, 24); // true
 ```
