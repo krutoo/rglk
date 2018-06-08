@@ -134,7 +134,7 @@ export default class Dungeon {
 	 * @return {boolean}
 	 */
 	isWall (x, y) {
-		let result = false;
+		let result = true;
 		if (Array.isArray(this._tiles[y]) && this._tiles[y].hasOwnProperty(x)) {
 			result = !this._tiles[y][x];
 		}
