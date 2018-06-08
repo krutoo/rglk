@@ -33,6 +33,8 @@ initSection('.js-section-labyrinth', canvas => {
 	});
 });
 
+let mousePosition = {x: 0, y: 0};
+
 initSection('.js-section-explorer', canvas => {
 	const dungeon = new rglk.Dungeon({
 			roomsAmount: 6,
@@ -42,12 +44,35 @@ initSection('.js-section-explorer', canvas => {
 			corridorMaxLength: 1,
 			seed: Math.random(),
 		}),
-		explorer = new rglk.Explorer((x, y) => !dungeon.isWall(x, y));
+		explorer = new rglk.Explorer((x, y) => dungeon.isFloor(x, y));
+	const tileSize = calculateTileSize(dungeon, canvas);
 	const fov = explorer.calculate(
-		parseInt(dungeon.rooms[0].center.x, 10),
-		parseInt(dungeon.rooms[0].center.y, 10),
-		12,
-	);
+			parseInt(dungeon.rooms[0].center.x, 10),
+			parseInt(dungeon.rooms[0].center.y, 10),
+			12,
+		);
+	canvas.onmousemove = event => {
+		mousePosition = getMousePosition(event);
+		const inDungeonPosition = {
+				x: Math.round(mousePosition.x / tileSize),
+				y: Math.round(mousePosition.y / tileSize),
+			},
+			newFov = explorer.calculate(
+				inDungeonPosition.x,
+				inDungeonPosition.y,
+				12,
+			);
+		if (dungeon.isFloor(inDungeonPosition.x, inDungeonPosition.y)) {
+			draw(canvas, {
+				fov: newFov,
+				dungeon,
+				radius: 12,
+				roomColor: '#222',
+				corridorColor: '#222',
+				center: inDungeonPosition,
+			});
+		}
+	};
 	draw(canvas, {
 		fov,
 		dungeon,
@@ -168,7 +193,7 @@ function drawFOV (context, data) {
 		tileSize,
 	} = data;
 	fov.forEach(tile => {
-		const distance = center.distanceTo(tile),
+		const distance = Math.sqrt((center.x - tile.x)**2 + (center.y - tile.y)**2),
 			proportion = 1 - (distance / radius);
 		context.fillStyle = `rgba(255,210,150,${proportion})`;
 		context.globalAlpha = 0.7;
@@ -189,6 +214,7 @@ function drawPath (context, data) {
 		tileSize,
 	} = data;
 	context.strokeStyle = '#0e0';
+	context.fillStyle = '#0e0';
 	context.lineWidth = Math.ceil(tileSize / 3);
 	if (path.length) {
 		context.beginPath();
@@ -196,7 +222,15 @@ function drawPath (context, data) {
 			path[0].x * tileSize + (tileSize / 2),
 			path[0].y * tileSize + (tileSize / 2)
 		);
-		path.forEach(point => {
+		path.forEach((point, index) => {
+			if (index === 0 || index === path.length - 1) {
+				context.fillRect(
+					point.x * tileSize,
+					point.y * tileSize,
+					tileSize,
+					tileSize,
+				)
+			}
 			context.lineTo(
 				point.x * tileSize + (tileSize / 2),
 				point.y * tileSize + (tileSize / 2)
@@ -211,4 +245,17 @@ function calculateTileSize (dungeon, canvas) {
 	const canvasMinSide = Math.min(canvas.width, canvas.height),
 		dungeonMaxSide = Math.max(dungeon.width, dungeon.height);
 	return Math.floor(canvasMinSide / dungeonMaxSide) || 8;
+}
+
+function getMousePosition (event) {
+	const mousePosition = {
+		x: 0,
+		y: 0,
+	};
+	if (event instanceof Event) {
+		const rect = event.target.getBoundingClientRect();
+		mousePosition.x = event.clientX - rect.left;
+		mousePosition.y = event.clientY - rect.top;
+	}
+	return mousePosition;
 }
