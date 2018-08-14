@@ -3,7 +3,7 @@ Simple library for development roguelike games, designed for training purposes. 
 
 ## Using
 In Node.js use this command:
-```
+```bash
 npm install --save rglk
 ```
 
@@ -76,5 +76,5 @@ import { PRNG } from 'rglk';
 const prng1 = new PRNG(123),
       prng2 = new PRNG(123);
 
-prng1.getRandom(2, 24) === prng1.getRandom(2, 24); // true
+prng1.generate() === prng2.generate(); // true
 ```
