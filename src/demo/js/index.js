@@ -1,13 +1,13 @@
 import rglk from 'rglk';
-
+window.prng = new rglk.PRNG(123);
 initSection('.js-section-dungeon', canvas => {
 	const dungeon = new rglk.Dungeon({
 		roomsAmount: 24,
 		roomMinSize: 3,
-		roomMaxSize: 10,
+		roomMaxSize: 8,
 		corridorMinLength: 1,
-		corridorMaxLength: Math.random() * 10,
-		seed: Math.random(),
+		corridorMaxLength: 8,
+		corridorComplexity: 4,
 	});
 	draw(canvas, {
 		dungeon,
@@ -19,12 +19,12 @@ initSection('.js-section-dungeon', canvas => {
 
 initSection('.js-section-labyrinth', canvas => {
 	const dungeon = new rglk.Dungeon({
-		roomsAmount: 128,
+		roomsAmount: 64,
 		roomMinSize: 1,
 		roomMaxSize: 1,
 		corridorMinLength: 1,
 		corridorMaxLength: 1,
-		seed: Math.random(),
+		corridorComplexity: 1,
 	});
 	draw(canvas, {
 		dungeon,
@@ -33,18 +33,18 @@ initSection('.js-section-labyrinth', canvas => {
 	});
 });
 
-let mousePosition = {x: 0, y: 0};
+let mousePosition = { x: 0, y: 0 };
 
 initSection('.js-section-explorer', canvas => {
 	const dungeon = new rglk.Dungeon({
-			roomsAmount: 6,
-			roomMinSize: 3,
-			roomMaxSize: 12,
-			corridorMinLength: 1,
-			corridorMaxLength: 1,
-			seed: Math.random(),
-		}),
-		explorer = new rglk.Explorer((x, y) => dungeon.isFloor(x, y));
+		roomsAmount: 3,
+		roomMinSize: 6,
+		roomMaxSize: 12,
+		corridorMinLength: 2,
+		corridorMaxLength: 3,
+		corridorComplexity: 1,
+	});
+	const explorer = new rglk.Explorer((x, y) => dungeon.isFloor(x, y));
 	const tileSize = calculateTileSize(dungeon, canvas);
 	const fov = explorer.calculate(
 			parseInt(dungeon.rooms[0].center.x, 10),
@@ -85,14 +85,14 @@ initSection('.js-section-explorer', canvas => {
 
 initSection('.js-section-pathfinder', canvas => {
 	const dungeon = new rglk.Dungeon({
-			roomsAmount: 24,
-			roomMinSize: 4,
-			roomMaxSize: 12,
-			corridorMinLength: 1,
-			corridorMaxLength: 5,
-			seed: Math.random(),
-		}),
-		pathfinder = new rglk.Pathfinder((x, y) => dungeon.isFloor(x, y));
+		roomsAmount: 16,
+		roomMinSize: 4,
+		roomMaxSize: 12,
+		corridorMinLength: 1,
+		corridorMaxLength: 4,
+		corridorComplexity: 1,
+	});
+	const pathfinder = new rglk.Pathfinder((x, y) => dungeon.isFloor(x, y));
 	const path = pathfinder.search(
 		parseInt(dungeon.rooms[0].center.x, 10),
 		parseInt(dungeon.rooms[0].center.y, 10),
@@ -173,7 +173,7 @@ function drawMap (context, data) {
 	});
 
 	// draw corridors
-	dungeon.corridors.forEach(corridor => {
+	dungeon.corridors.concat(dungeon.connectors).forEach(corridor => {
 		context.fillStyle = corridorColor;
 		context.fillRect(
 		corridor.x * tileSize,
@@ -193,8 +193,8 @@ function drawFOV (context, data) {
 		tileSize,
 	} = data;
 	fov.forEach(tile => {
-		const distance = Math.sqrt((center.x - tile.x)**2 + (center.y - tile.y)**2),
-			proportion = 1 - (distance / radius);
+		const distance = Math.sqrt((center.x - tile.x) ** 2 + (center.y - tile.y) ** 2);
+		const proportion = 1 - (distance / radius);
 		context.fillStyle = `rgba(255,210,150,${proportion})`;
 		context.globalAlpha = 0.7;
 		context.fillRect(
