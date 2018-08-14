@@ -1,19 +1,25 @@
 import Point from './Point';
 
 /**
- * Represents a Rectangle
+ * Rectangles private data.
+ * @type {WeakMap}
+ */
+const rectanglesData = new WeakMap();
+
+/**
+ * Represents a 2D Rectangle.
  * @extends Point
  */
 export default class Rectangle extends Point {
 	/**
-	 * Create a Rectangle.
-	 * @param {number} x - Left border position of rectangle.
-	 * @param {number} y - Top border position of rectangle.
-	 * @param {number} width - Width of rectangle.
-	 * @param {number} height - Height of rectangle.
+	 * @param {number} x Left border position of rectangle.
+	 * @param {number} y Top border position of rectangle.
+	 * @param {number} width Width of rectangle.
+	 * @param {number} height Height of rectangle.
 	 */
 	constructor (x, y, width, height) {
 		super(x, y);
+		rectanglesData.set(this, {});
 		this.width = width;
 		this.height = height;
 	}
@@ -23,7 +29,7 @@ export default class Rectangle extends Point {
 	 * @return {number} The width of Rectangle.
 	 */
 	get width () {
-		return Number(this._width) || 0;
+		return Number(rectanglesData.get(this).width) || 0;
 	}
 
 	/**
@@ -32,7 +38,7 @@ export default class Rectangle extends Point {
 	 */
 	set width (value) {
 		if (!isNaN(value)) {
-			this._width = Number(value);
+			rectanglesData.get(this).width = Number(value);
 		}
 	}
 
@@ -41,7 +47,7 @@ export default class Rectangle extends Point {
 	 * @return {number} The height of Rectangle.
 	 */
 	get height () {
-		return Number(this._height) || 0;
+		return Number(rectanglesData.get(this).height) || 0;
 	}
 
 	/**
@@ -50,32 +56,8 @@ export default class Rectangle extends Point {
 	 */
 	set height (value) {
 		if (!isNaN(value)) {
-			this._height = Number(value);
+			rectanglesData.get(this).height = Number(value);
 		}
-	}
-
-	/**
-	 * Get top of Rectangle.
-	 * @return {number} The top border of Rectangle.
-	 */
-	get top () {
-		return this.y;
-	}
-
-	/**
-	 * Get right of Rectangle.
-	 * @return {number} The right border of Rectangle.
-	 */
-	get right () {
-		return this.x + this.width;
-	}
-
-	/**
-	 * Get bottom of Rectangle.
-	 * @return {number} The bottom border of Rectangle.
-	 */
-	get bottom () {
-		return this.y + this.height;
 	}
 
 	/**
@@ -87,36 +69,88 @@ export default class Rectangle extends Point {
 	}
 
 	/**
+	 * Set left of Rectangle.
+	 * @param {number} The left border of Rectangle.
+	 */
+	set left (value) {
+		this.x = value;
+	}
+
+	/**
+	 * Get bottom of Rectangle.
+	 * @return {number} The bottom border of Rectangle.
+	 */
+	get bottom () {
+		return this.y + this.height;
+	}
+
+	/**
+	 * Set bottom of Rectangle.
+	 * @param {number} The bottom border of Rectangle.
+	 */
+	set bottom (value) {
+		this.y = value - this.height;
+	}
+
+	/**
+	 * Get right of Rectangle.
+	 * @return {number} The right border of Rectangle.
+	 */
+	get right () {
+		return this.x + this.width;
+	}
+
+	/**
+	 * Set right of Rectangle.
+	 * @param {number} The right border of Rectangle.
+	 */
+	set right (value) {
+		this.x = value - this.width;
+	}
+
+	/**
+	 * Get top of Rectangle.
+	 * @return {number} The top border of Rectangle.
+	 */
+	get top () {
+		return this.y;
+	}
+
+	/**
+	 * Set top of Rectangle.
+	 * @param {number} The top border of Rectangle.
+	 */
+	set top (value) {
+		this.y = value;
+	}
+
+	/**
 	 * Get center of Rectangle.
 	 * @return {Point} Point with coordinates to center of Rectangle.
 	 */
 	get center () {
 		return new Point(
 			this.x + (this.width / 2),
-			this.y + (this.height / 2)
+			this.y + (this.height / 2),
 		);
 	}
 
 	/**
 	 * Check collides with other Rectangle.
-	 * @param {Object} rectangle Object with x, y, width and height properties.
+	 * @param {Rectangle} rectangle to check.
 	 * @return {boolean} Rectangles collides?.
 	 */
 	collides (rectangle) {
 		rectangle = rectangle || {};
-		let result = false;
+		let result = true;
 		if (
-			!isNaN(rectangle.x + rectangle.y + rectangle.width + rectangle.height)
-			&& rectangle.x <= this.x + this.width
-			&& rectangle.x + rectangle.width >= this.x
-			&& rectangle.y <= this.y + this.height
-			&& rectangle.height + rectangle.y >= this.y
+			this.left > rectangle.right
+			|| this.right < rectangle.left
+			|| this.top > rectangle.bottom
+			|| this.bottom < rectangle.top
 		) {
-			result = true;
+			result = false;
 		}
 		return result;
 	}
-
-	// @TODO complete!
-	forEachPoint (callback) {}
 }

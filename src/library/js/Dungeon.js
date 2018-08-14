@@ -3,55 +3,139 @@ import Point from './Point';
 import Rectangle from './Rectangle';
 
 /**
- * Represents a Dungeon class.
+ * Builds types.
+ * @type {Object}
+ */
+const BUILDS_TYPES = Object.freeze({
+	room: 1,
+	corridor: 2,
+	connector: 3,
+});
+
+/**
+ * Dungeons private data.
+ * @type {Object}
+ */
+const DIRECTIONS = Object.freeze({
+	left: 0,
+	bottom: 1,
+	right: 2,
+	top: 3,
+});
+
+/**
+ * Dungeons private data.
+ * @type {WeakMap}
+ */
+const dungeonsData = new WeakMap();
+
+/**
+ * Represents a dungeon generator.
  */
 export default class Dungeon {
 	/**
-	 * Create a dungeon.
-	 * @param {Object} [options] Dungeon generation options.
-	 * @param {number} options.seed The seed to pseudorandom number generator.
-	 * @param {number} options.roomsAmount The amount of rooms.
-	 * @param {number} options.roomMinSize Min size of room.
-	 * @param {number} options.roomMaxSize Max size of room.
-	 * @param {number} options.corridorMinLength Min length of corridors.
-	 * @param {number} options.corridorMaxLength Max length of corridors.
-	 * @param {number} options.corridorComplexity Complexity corridors.
+	 * @param {Object} options Options of dungeon.
+	 * @param {number} options.roomsAmount Amount of rooms.
+	 * @param {number} options.roomMinSize Minimum room size.
+	 * @param {number} options.roomMaxSize Maximum room size.
+	 * @param {number} options.corridorMinLength Minimum corridor length.
+	 * @param {number} options.corridorMaxLength Maximum corridor length.
+	 * @param {number} options.corridorComplexity Amount of corridors turns.
+	 * @param {number} options.seed Seed for pseudo random number generator.
 	 */
 	constructor (options) {
-		// @TODO this.map = new Rectangle()?
-		this._tiles = [];
-		this._rooms = [];
-		this._corridors = [];
-		this._prng = new PRNG(options.seed);
-		this._options = this.validateOptions(options);
+		dungeonsData.set(this, {});
+		this.setOptions(options);
 		this.generate();
 	}
 
 	/**
-	 * Returns validated options.
-	 * @param  {Object} options Options.
-	 * @return {Object} validated options.
+	 * Width of generated  in tiles.
+	 * @readOnly
 	 */
-	validateOptions (options) {
+	get width () {
+		return parseInt(dungeonsData.get(this).width, 10) || 0;
+	}
+
+	/**
+	 * Returns height of generated dungeon in tiles.
+	 * @readOnly
+	 */
+	get height () {
+		return parseInt(dungeonsData.get(this).height, 10) || 0;
+	}
+
+	/**
+	 * Returns rooms of generated dungeon.
+	 * @readOnly
+	 */
+	get rooms () {
+		return this.builds.filter(build => build.type === BUILDS_TYPES.room);
+	}
+
+	/**
+	 * Returns corridors of generated dungeon.
+	 * @readOnly
+	 */
+	get corridors () {
+		return this.builds.filter(build => build.type === BUILDS_TYPES.corridor);
+	}
+
+	/**
+	 * Returns connectors of generated dungeon.
+	 * @readOnly
+	 */
+	get connectors () {
+		return this.builds.filter(build => build.type === BUILDS_TYPES.connector);
+	}
+
+	/**
+	 * Returns all builds of generated dungeon.
+	 * @readOnly
+	 */
+	get builds () {
+		const privateBuilds = dungeonsData.get(this).builds || [];
+		return [...privateBuilds];
+	}
+
+	/**
+	 * Update some options.
+	 * @param {Object} newOptions New options.
+	 * @see constructor
+	 */
+	setOptions (newOptions) {
+		dungeonsData.get(this).options = this.validateOptions(newOptions, this.getDefaultOptions());
+	}
+
+	validateOptions (options, defaultOptions) {
 		options = options || {};
 		const resultOptions = {};
-		Object.keys(this.defaultOptions).forEach(key => {
-			const option = options[key];
-			if (isNaN(option) || !isFinite(option) || option < 1) {
-				resultOptions[key] = parseInt(this.defaultOptions[key], 10) || 1;
+		Object.keys(defaultOptions).forEach(key => {
+			const value = options[key];
+			const defaultValue = defaultOptions[key];
+			const minimalValue = this.getMininalOptions()[key];
+			if (isNaN(value) || !isFinite(value) || value < minimalValue) {
+				resultOptions[key] = defaultValue;
 			} else {
-				resultOptions[key] = parseInt(option, 10);
+				resultOptions[key] = parseInt(value, 10);
 			}
 		});
 		return resultOptions;
 	}
 
-	/**
-	 * Get a default options.
-	 * @readOnly
-	 * @return {Object} Default options.
-	 */
-	get defaultOptions () {
+	getMininalOptions () {
+		return {
+			seed: -Infinity,
+			roomsAmount: 1,
+			roomMinSize: 1,
+			roomMaxSize: 1,
+			corridorMinLength: 1,
+			corridorMaxLength: 1,
+			corridorComplexity: 1,
+		};
+	}
+
+	getDefaultOptions () {
 		return {
 			seed: Math.random(),
 			roomsAmount: 7,
@@ -59,239 +143,217 @@ export default class Dungeon {
 			roomMaxSize: 10,
 			corridorMinLength: 3,
 			corridorMaxLength: 7,
-			corridorComplexity: 3,
+			corridorComplexity: 2,
 		};
 	}
 
 	/**
-	 * Get the array of rooms.
-	 * @readOnly
-	 * @return {array} List of rooms.
-	 */
-	get rooms () {
-		return this._rooms.slice();
-	}
-
-	/**
-	 * Get the array of corridors.
-	 * @readOnly
-	 * @return {array} List of corridors.
-	 */
-	get corridors () {
-		return this._corridors.slice();
-	}
-
-	/**
-	 * Get the array of all builds.
-	 * @readOnly
-	 * @return {array} List of builds (rooms & corridors).
-	 */
-	get builds () {
-		return this.rooms.concat(this.corridors);
-	}
-
-	/**
-	 * Get the width of dungeon.
-	 * @readOnly
-	 * @return {number} The dungeon width (number of tiles).
-	 */
-	get width () {
-		return Array.isArray(this._tiles[0]) ? this._tiles[0].length : 0;
-	}
-
-	/**
-	 * Get the height of dungeon.
-	 * @readOnly
-	 * @return {number} The dungeon height (number of tiles).
-	 */
-	get height () {
-		return Array.isArray(this._tiles) ? this._tiles.length : 0;
-	}
-
-	/**
-	 * Run callback for each tile of generated map.
-	 * @param {Function} callback Function called fo each tile.
+	 * Calls callback for each tile in dungeon area.
+	 * @param {Function} callback Callback that was called for each tile.
 	 */
 	forEachTile (callback) {
-		if (this._tiles && callback instanceof Function) {
-			for (var y = 0; y < this._tiles.length; y++) {
-				for (var x = 0; x < this._tiles[y].length; x++) {
-					callback(x, y, this._tiles[y][x]);
+		if (callback instanceof Function) {
+			for (let x = 0; x < this.height; x++) {
+				for (let y = 0; y < this.width; y++) {
+					callback(x, y, this.isFloor(x, y));
 				}
 			}
 		}
 		return this;
 	}
 
-	isFloor () {
-		return !this.isWall.apply(this, arguments);
-	}
-
 	/**
-	 * Get type of tile.
-	 * @param {number} x - The y of tile position.
-	 * @param {number} y - The x of tile position.
-	 * @return {boolean}
+	 * Is wall tile?
+	 * @param {number} x X coordinate of tile.
+	 * @param {number} y Y coordinate of tile.
 	 */
 	isWall (x, y) {
-		let result = true;
-		if (Array.isArray(this._tiles[y]) && this._tiles[y].hasOwnProperty(x)) {
-			result = !this._tiles[y][x];
-		}
-		return result;
+		return !this.isFloor(x, y);
 	}
 
 	/**
-	 * Generate dungeon. Generate arrays of rooms and corridors, matrix of tiles
+	 * Is floor tile?
+	 * @param {number} x X coordinate of tile.
+	 * @param {number} y Y coordinate of tile.
+	 */
+	isFloor (x, y) {
+		let isFloor = false;
+		const buffer = dungeonsData.get(this).buffer || [];
+		if (x <= this.width && y <= this.height) {
+			isFloor = Boolean(buffer[this.getBufferIndex(x, y, this.height)]);
+		}
+		return isFloor;
+	}
+
+	/**
+	 * Generate new dungeon map.
 	 */
 	generate () {
-		this._generateBuilds();
-		this._optimizeBuilds();
-		this._createMap();
+		const options = this.getOptions();
+		dungeonsData.get(this).prng = new PRNG(options.seed);
+		dungeonsData.get(this).builds = this.optimizeBuilds(this.generateBuilds(options));
+		dungeonsData.get(this).buffer = this.createBuffer(this.builds);
+		return this;
 	}
 
-	/**
-	 * Generate builds (rooms & corridors).
-	 * @private
-	 * @TODO need decomposition!
-	 */
-	_generateBuilds () {
-		const random = (max, min) => Math.floor(this._prng.generate(min, max));
-		const {
-			roomsAmount,
-			roomMinSize,
-			roomMaxSize,
-			corridorMinLength,
-			corridorMaxLength
-		} = this._options;
+	generateBuilds (options) {
+		const initialRoom = this.createRoom({ x: 0, y: 0 });
+		const builds = [initialRoom];
+		while (builds.filter(build => build.type === BUILDS_TYPES.room).length < this.getOptions().roomsAmount) {
+			builds.push(...this.tryBuild(builds, options));
+		}
+		return builds;
+	}
 
-		// set default
-		this._rooms = [];
-		this._corridors = [];
+	tryBuild (readyBuilds, options) {
+		const extensibleBuilds = readyBuilds.filter(build => build.type !== BUILDS_TYPES.corridor);
+		const startingBuild = extensibleBuilds[this.getRandom(0, extensibleBuilds.length - 1)];
+		let newBuilds = this.createBranch(startingBuild, options.corridorComplexity);
+		if (newBuilds.some(build => !this.isSuitableBuild(build, readyBuilds.concat(newBuilds)))) {
+			startingBuild.children.pop();
+			newBuilds = [];
+		}
+		return newBuilds;
+	}
 
-		// add first room
-		this._rooms.push(new Rectangle(
-			1,
-			1,
-			random(roomMinSize, roomMaxSize),
-			random(roomMinSize, roomMaxSize),
-		));
-		this._rooms[0].children = [];
-
-		// main loop
-		while (this._rooms.length < roomsAmount) {
-			// configure new room and corridor relative to random room from list
-			const lastRoom = this._rooms[random(0, this._rooms.length - 1)],
-				newRoomWidth = random(roomMinSize, roomMaxSize),
-				newRoomHeight = random(roomMinSize, roomMaxSize),
-				newRoom = new Rectangle(0, 0, newRoomWidth, newRoomHeight),
-				newCorridorLength = random(corridorMinLength, corridorMaxLength),
-				newCorridor = new Rectangle(0, 0, 1, 1),
-				direction = parseInt(Math.random() * 4, 10);
-			lastRoom.children.push(newCorridor);
-			newRoom.parent = newCorridor;
-			newRoom.children = [];
-			newCorridor.parent = lastRoom;
-			newCorridor.children = [newRoom];
-
-			// configure new corridor and room
-			if (direction === 0 || direction === 2) {
-				newRoom.y = lastRoom.bottom - 1 - random(
-					0,
-					Math.abs(newRoom.height + lastRoom.height) - 1,
-				);
-				newCorridor.y = random(
-					Math.max(lastRoom.top, newRoom.top),
- 					Math.min(lastRoom.bottom, newRoom.bottom) - 1
-				);
-				newCorridor.width = newCorridorLength;
+	createBranch (parent, length) {
+		const branch = [];
+		let partParent = parent;
+		for (let index = 0; index < length; index++) {
+			const corridor = this.createCorridor({ parent: partParent });
+			let closure = null;
+			if (index < length - 1) {
+				closure = this.createConnector({ parent: corridor });
 			} else {
-				newRoom.x = lastRoom.right - 1 - random(
-					0,
-					Math.abs(newRoom.width + lastRoom.width) - 1,
-				);
-				newCorridor.height = newCorridorLength;
-				newCorridor.x = random(
-					Math.max(lastRoom.left, newRoom.left),
-					Math.min(lastRoom.right, newRoom.right),
-				);
+				closure = this.createRoom({ parent: corridor });
 			}
+			branch.push(corridor, closure);
+			partParent = closure;
+		}
+		return branch;
+	}
 
-			// configure new corridor and room
-			if (direction === 0) { // left
-				newRoom.x = lastRoom.right + newCorridorLength;
-				newCorridor.x = lastRoom.right;
-			} else if (direction === 1) { // bottom
-				newRoom.y = lastRoom.bottom + newCorridorLength;
-				newCorridor.y = lastRoom.bottom;
-			} else if (direction === 2) { // right
-				newRoom.x = lastRoom.left - newCorridorLength - newRoom.width;
-				newCorridor.x = lastRoom.left - newCorridor.width;
-			} else { // top
-				newRoom.y = lastRoom.top - newCorridorLength - newRoom.height;
-				newCorridor.y = lastRoom.top - newCorridor.height;
-			}
+	createConnector ({ parent }) {
+		const connector = this.createRoom({ parent, width: 1, height: 1 });
+		connector.type = BUILDS_TYPES.connector;
+		return connector;
+	}
 
-			// if new builds is suitable - save it
-			if (this._isSuitableBuilds(newRoom, newCorridor)) {
-				this._rooms.push(newRoom);
-				this._corridors.push(newCorridor);
+	createRoom ({ x, y, width, height, parent }) {
+		const { roomMinSize, roomMaxSize } = this.getOptions();
+		const room = this.createBuild(BUILDS_TYPES.room, {
+			parent,
+			x,
+			y,
+			width: width || this.getRandom(roomMinSize, roomMaxSize),
+			height: height || this.getRandom(roomMinSize, roomMaxSize),
+		});
+		if (parent) {
+			const direction = parent.direction || 0;
+			this.placeBuild(room, parent);
+		}
+		return room;
+	}
+
+	createCorridor ({ x, y, width, height, parent }) {
+		const { corridorMinLength, corridorMaxLength } = this.getOptions();
+		const corridor = this.createBuild(BUILDS_TYPES.corridor, {
+			parent,
+			width: 1,
+			height: 1,
+		});
+		const corridorLength = this.getRandom(corridorMinLength, corridorMaxLength);
+		if (parent) {
+			if (corridor.direction === DIRECTIONS.left || corridor.direction === DIRECTIONS.right) {
+				corridor.width = corridorLength;
 			} else {
-				lastRoom.children = lastRoom.children.filter(child => child !== newCorridor);
-				newCorridor.children = newCorridor.children.filter(child => child !== newRoom);
+				corridor.height = corridorLength;
 			}
+			this.placeBuild(corridor, parent);
+		}
+		return corridor;
+	}
+
+	placeBuild (build, parent) {
+		const direction = build.type === BUILDS_TYPES.corridor
+			? build.direction || 0
+			: parent.direction || 0;
+		if (direction === DIRECTIONS.left || direction === DIRECTIONS.right) {
+			build.y = this.getRandom(
+				parent.top - build.height + 1,
+				parent.bottom - 1,
+			);
+		} else {
+			build.x = this.getRandom(
+				parent.left - build.width + 1,
+				parent.right - 1,
+			);
+		}
+		switch (direction) {
+			case DIRECTIONS.left:
+				build.x = parent.right;
+				break;
+			case DIRECTIONS.bottom:
+				build.y = parent.bottom;
+				break;
+			case DIRECTIONS.right:
+				build.x = parent.left - build.width;
+				break;
+			case DIRECTIONS.top:
+				build.y = parent.top - build.height;
+				break;
 		}
 	}
 
-	/**
-	 * Chack that all arguments is suitable builds for create dungeon.
-	 * @param  {...Rectangle} newBuilds Builds.
-	 * @return {boolean} Is all arguments suitable builds for create dungeon?
-	 */
-	_isSuitableBuilds (...newBuilds) {
-		return newBuilds.every(newBuild => this._isSuitableBuild(newBuild));
+	getOptions () {
+		return { ...this.getDefaultOptions(), ...dungeonsData.get(this).options };
 	}
 
-	/**
-	 * Check that build is suitable to place in dungeon.
-	 * @param  {Rectangle} newBuild Checking build.
-	 * @return {boolean} Build is suitable?
-	 */
-	_isSuitableBuild (newBuild) {
-		const checkingBuilds = this.builds.filter(build => {
-			return build.parent !== newBuild.parent
-				&& build !== newBuild.parent
-				&& build !== newBuild.children
-				&& !build.children.includes(newBuild.parent)
+	createBuild (type, { x, y, width, height, parent }) {
+		const build = new Rectangle(x, y, width, height);
+		build.type = type;
+		build.children = [];
+		if (parent) {
+			build.parent = parent;
+			parent.children.push(build);
+			build.direction = parent.direction;
+		}
+		if (type === BUILDS_TYPES.corridor) {
+			build.direction = this.getRandom(0, 3);
+		}
+		return build;
+	}
+
+	getRandom (min, max) {
+		const seededRandom = dungeonsData.get(this).prng.generate();
+		return Math.floor(min + seededRandom * (max + 1 - min));
+	}
+
+	isSuitableBuild (newBuild, readyBuilds) {
+		const checkingBuilds = readyBuilds.filter(build => {
+			const isSelf = build === newBuild;
+			const isParent = build === newBuild.parent;
+			const isChildren = newBuild.children.includes(build);
+			const isConnected = build.children.includes(newBuild.parent) || newBuild.children.includes(build.parent);
+			return !isSelf && !isParent && !isChildren && !isConnected;
 		});
 		return !checkingBuilds.some(build => build.collides(newBuild));
 	}
 
-	/**
-	 * Translates all builds to positive coordinates.
-	 * @private
-	 */
-	_optimizeBuilds () {
-		// leftmost top point search
-		const topLeft = this._getTopLeft();
-
-		// translate rooms to leftmost top position (1, 1)
+	optimizeBuilds (builds) {
+		const topLeft = this.getTopLeftPoint(builds);
 		if (topLeft.x < 1) {
-			this._translateBuilds(1 - topLeft.x, 0);
+			this.translateBuilds(builds, 1 - topLeft.x, 0);
 		}
 		if (topLeft.y < 1) {
-			this._translateBuilds(0, 1 - topLeft.y);
+			this.translateBuilds(builds, 0, 1 - topLeft.y);
 		}
+		return builds;
 	}
 
-	/**
-	 * Returns the point of leftmost top position among all builds.
-	 * @private
-	 * @return {Object} The point.
-	 */
-	_getTopLeft () {
+	getTopLeftPoint (builds) {
 		const topLeft = new Point(Infinity, Infinity);
-		this.builds.forEach(build => {
+		builds.forEach(build => {
 			if (build.x < topLeft.x) {
 				topLeft.x = build.x;
 			}
@@ -302,14 +364,26 @@ export default class Dungeon {
 		return topLeft;
 	}
 
-	/**
-	 * Get the point of rightmost bottom position among all builds.
-	 * @private
-	 * @return {Object} The point.
-	 */
-	_getBottomRight () {
+	translateBuilds (builds, offsetX, offsetY) {
+		return builds.forEach(build => {
+			build.x += offsetX;
+			build.y += offsetY;
+		});
+	}
+
+	createBuffer (builds) {
+		const bottomRight = this.getBottomRightPoint(builds);
+		dungeonsData.get(this).width = bottomRight.x + 1;
+		dungeonsData.get(this).height = bottomRight.y + 1;
+		const buffer = Array(this.width * this.height);
+		buffer.fill(false);
+		builds.forEach(build => this.fillRectangle(buffer, this.height, build));
+		return buffer;
+	}
+
+	getBottomRightPoint (builds) {
 		const bottomRight = new Point(-Infinity, -Infinity);
-		this.builds.forEach(build => {
+		builds.forEach(build => {
 			if (build.right > bottomRight.x) {
 				bottomRight.x = build.right;
 			}
@@ -320,65 +394,15 @@ export default class Dungeon {
 		return bottomRight;
 	}
 
-	/**
-	 * Translate all builds.
-	 * @private
-	 * @param {number} offsetX - Offset by x axis.
-	 * @param {number} offsetY - Offset by y axis.
-	 */
-	_translateBuilds (offsetX, offsetY) {
-		this.builds.forEach(build => {
-			build.x += offsetX;
-			build.y += offsetY;
-		});
-	}
-
-	/**
-	 * Create map: generate array of arrays of tiles.
-	 * @private
-	 */
-	_createMap () {
-		let bottomRight = this._getBottomRight();
-		this._fillMap(bottomRight.x + 2, bottomRight.y + 2);
-		this.builds.forEach(build => {
-			this._fillRectangle(build.x, build.y, build.width, build.height);
-		});
-	}
-
-	/**
-	 * Fill map: generate matrix (array of arrays) with needed size.
-	 * @private
-	 * @param {number} width - The width of matrix.
-	 * @param {number} height - The height of matrix.
-	 * @TODO new Rectangle
-	 */
-	_fillMap (width, height) {
-		// set default
-		this._tiles = [];
-
-		// this._tiles[y][x] === true (floor) || false (wall)
-		for (var y = 0; y < height; y++) {
-			this._tiles.push([]);
-			for (var x = 0; x < width; x++) {
-				this._tiles[y].push(false);
+	fillRectangle (buffer, height, { left, bottom, right, top }) {
+		for (let y = top; y < bottom; y++) {
+			for (let x = left; x < right; x++) {
+				buffer[this.getBufferIndex(x, y)] = true;
 			}
 		}
 	}
 
-	/**
-	 * fill rectangle area on map.
-	 * @private
-	 * @param {number} startX - Left border position of rectangle.
-	 * @param {number} startY - Top border position of rectangle.
-	 * @param {number} width - Width of rectangle.
-	 * @param {number} height - Height of rectangle.
-	 * @TODO move to Rectangle (forEachPoint)?
-	 */
-	_fillRectangle(startX, startY, width, height) {
-		for (var y = startY; y <= startY + height - 1; y++) {
-			for (var x = startX; x <= startX + width - 1; x++) {
-				this._tiles[y][x] = true;
-			}
-		}
+	getBufferIndex (x, y) {
+		return (x * this.height) + y;
 	}
 }

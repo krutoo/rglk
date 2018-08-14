@@ -1,15 +1,21 @@
 import Point from './Point';
 
 /**
- * Represents a Explorer (FOV calculation) class.
+ * Explorers private data.
+ * @type {WeakMap}
+ */
+const explorersData = new WeakMap();
+
+/**
+ * Represents a Explorer (FOV calculation).
  */
 export default class Explorer {
 	/**
-	 * Create a Explorer.
 	 * @param {Function} isTransparent Callback which must determine that tile is transparent.
 	 */
 	constructor (isTransparent) {
 		if (isTransparent instanceof Function) {
+			explorersData.set(this, { isTransparent });
 			this._isTransparent = isTransparent;
 		}
 	}
@@ -24,25 +30,27 @@ export default class Explorer {
 	 */
 	calculate (centerX, centerY, radius, checkExplored) {
 		const visiblePoints = {};
-		if (this._checkArguments(...arguments)) {
-			const squareRadius = radius**2,
-				center = new Point(centerX, centerY),
-				minX = center.x - radius,
-				maxX = center.x + radius,
-				minY = center.y - radius,
-				maxY = center.y + radius,
-				canCheck = checkExplored instanceof Function;
+		if (this.checkArguments(...arguments)) {
+			const squareRadius = radius ** 2;
+			const center = new Point(centerX, centerY);
+			const minX = center.x - radius;
+			const maxX = center.x + radius;
+			const minY = center.y - radius;
+			const maxY = center.y + radius;
+			const canCheck = checkExplored instanceof Function;
+			const isTransparent = explorersData.get(this).isTransparent;
 
 			// check floors in radius
 			for (let y = minY; y <= maxY; y++) {
 				for (let x = minX; x <= maxX; x++) {
 					// if x or y equals to bound of square area
-					if ([minX, maxX].includes(x) || [minY, maxY].includes(y)) {
+					if (minX === x || maxX === x || minY === y || maxY === y) {
 						const points = this.getPointsOfLine(center, new Point(x, y));
 						line: for (let i = 0; i < points.length; i++) {
-							const point = points[i],
-								squareDistance = (center.x - point.x)**2 + (center.y - point.y)**2;
-							if (squareDistance <= squareRadius && this._isTransparent(point.x, point.y)) {
+							const point = points[i];
+							const squareDistance = (center.x - point.x) ** 2 + (center.y - point.y) ** 2;
+							const isTransparentTile = isTransparent(point.x, point.y);
+							if (squareDistance <= squareRadius && isTransparentTile) {
 								if (canCheck) {
 									checkExplored(point.x, point.y);
 								}
@@ -58,7 +66,7 @@ export default class Explorer {
 		return Object.values(visiblePoints);
 	}
 
-	_checkArguments (centerX, centerY, radius, checkExplored) {
+	checkArguments (centerX, centerY, radius, checkExplored) {
 		return !isNaN(centerX + centerY + radius)
 			&& isFinite(centerX + centerY + radius);
 	}
@@ -78,7 +86,7 @@ export default class Explorer {
 			p = new Point(point0.x, point0.y),
 			points = [new Point(p.x, p.y)];
 		for (let ix = 0, iy = 0; ix < nx || iy < ny;) {
-			if ((0.5 + ix) / nx == (0.5 + iy) / ny) {
+			if ((0.5 + ix) / nx === (0.5 + iy) / ny) {
 				p.x += sx;
 				p.y += sy;
 				ix++;

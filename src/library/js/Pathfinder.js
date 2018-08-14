@@ -1,14 +1,13 @@
 import Node from './Node';
 
 /**
- * Represents a Pathfinder class.
+ * Represents a Pathfinder.
  */
 export default class Pathfinder {
 	/**
-	 * Create a Pathfinder.
 	 * @param {Function} isOpen Callback, defines that point is open.
 	 */
-	constructor(isOpen) {
+	constructor (isOpen) {
 		if (isOpen instanceof Function) {
 			this._isOpen = isOpen;
 		} else {
@@ -23,9 +22,8 @@ export default class Pathfinder {
 	 * @param {number} x2 Second point x.
 	 * @param {number} y2 Second point y.
 	 * @return {Array} List of path points.
-	 * @TODO Make calculation can be async?
 	 */
-	search(x1, y1, x2, y2) {
+	search (x1, y1, x2, y2) {
 		let start = new Node({
 				x: x1,
 				y: y1,
@@ -60,7 +58,7 @@ export default class Pathfinder {
 				break;
 			}
 
-			let neighbors = this._getNeighbors(currentNode); // @TODO check length before run cycle
+			let neighbors = this.getNeighbors(currentNode); // @TODO check length before run cycle
 			for (let i = 0; i < neighbors.length; i++) {
 				let neighbor = neighbors[i];
 
@@ -71,7 +69,7 @@ export default class Pathfinder {
 
 				// if neighbor not in open list, add him to open list, update h
 				if (!unvisitedNodes.find(node => node.isEqualTo(neighbor))) {
-					neighbor.h = this._getHeuristic(neighbor.x, neighbor.y, end.x, end.y);
+					neighbor.h = this.getHeuristic(neighbor.x, neighbor.y, end.x, end.y);
 					unvisitedNodes.push(neighbor);
 				}
 			}
@@ -81,14 +79,13 @@ export default class Pathfinder {
 
 	/**
 	 * Returns heuristic value (Manhattan distance) between two nodes.
-	 * @readOnly
-	 * @param  {number} x1 First node x.
-	 * @param  {number} y1 First node y.
-	 * @param  {number} x2 Second node x.
-	 * @param  {number} y2 Second node y.
+	 * @param {number} x1 First node x.
+	 * @param {number} y1 First node y.
+	 * @param {number} x2 Second node x.
+	 * @param {number} y2 Second node y.
 	 * @return {number} heuristic value.
 	 */
-	_getHeuristic (x1, y1, x2, y2) {
+	getHeuristic (x1, y1, x2, y2) {
 		const d1 = Math.abs(x2 - x1),
 			d2 = Math.abs(y2 - y1);
 		return d1 + d2;
@@ -96,12 +93,11 @@ export default class Pathfinder {
 
 	/**
 	 * Returns list of node neighbors.
-	 * @readOnly
-	 * @param  {Node} node Node to get a neighbors.
+	 * @param {Node} node Node to get a neighbors.
 	 * @return {Array} List of neighbors.
 	 * @TODO move to Node class?
 	 */
-	_getNeighbors (node) {
+	getNeighbors (node) {
 		let neighbors = [];
 		for (let y = -1; y <= 1; y++) {
 			for (let x = -1; x <= 1; x++) {

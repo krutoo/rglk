@@ -1,52 +1,34 @@
 /**
+ * Seeds for generators
+ * @type {WeakMap}
+ */
+const seeds = new WeakMap();
+
+/**
  * Represents a Pseudo Random Number Generator.
  * Thanks for author of this article: http://indiegamr.com/generate-repeatable-random-numbers-in-js/
  */
 export default class PRNG {
 	/**
 	 * Create a PRNG.
-	 * @param  {number} seed Seed - number which will the base for generate numbers.
+	 * @param {number} seed Seed - number which will the base for generate numbers.
 	 */
 	constructor (seed) {
-		this.seed = seed;
-	}
-
-	/**
-	 * Get a seed
-	 * @return {number} Seed.
-	 */
-	get seed () {
-		return this._seed;
-	}
-
-	/**
-	 * Set a seed.
-	 * @param {number} value Finite number.
-	 */
-	set seed (value) {
-		this._seed = isNaN(value) || !isFinite(value)
-			? Math.random()
-			: Number(value);
+		if (isNaN(seed) && !isFinite(seed)) {
+			throw new TypeError('PRNG.constructor: first argument must be a finite number');
+		}
+		seeds.set(this, Number(seed));
 	}
 
 	/**
 	 * Returns random number between min and max.
-	 * @param  {number} [min=0] Lower bound.
-	 * @param  {number} [max=1] Upper bound.
-	 * @return {number} Float between min and max.
+	 * @return {number} Float number between 0 and 1.
 	 */
 	generate (min, max) {
-		max = isNaN(max) ? 1 : Number(max);
-		min = isNaN(min) ? 0 : Number(min);
-		const random = this._updateSeed() / 233280;
-		return min + random * (max - min);
-	}
-
-	/**
-	 * Update seed.
-	 * @return {number} Updated seed.
-	 */
-	_updateSeed () {
-		return this._seed = (this._seed * 9301 + 49297) % 233280;
+		const oldSeed = seeds.get(this);
+		const newSeed = (oldSeed * 9301 + 49297) % 233280
+		const random = newSeed / 233280;
+		seeds.set(this, newSeed);
+		return random;
 	}
 }

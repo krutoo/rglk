@@ -3,15 +3,15 @@ import Dungeon from './Dungeon';
 import Explorer from './Explorer';
 import Pathfinder from './Pathfinder';
 
-const rglk = {
+const rglk = Object.freeze({
 	PRNG,
 	Dungeon,
 	Explorer,
 	Pathfinder,
-};
-Object.freeze(rglk);
+});
 
 export default rglk;
+
 export {
 	PRNG,
 	Dungeon,
