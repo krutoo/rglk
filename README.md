@@ -58,7 +58,7 @@ const fov = explorer.calculate(centerX, centerY, radius, (x, y) => {
 ### Pathfinder 🏃
 The work of Pathfinder is based on an algorithm __A*__.
 ```javascript
-import { Explorer } from 'rglk';
+import { Pathfinder } from 'rglk';
 
 const pathfinder = new Pathfinder((x, y) => {
     // should return true if tile is can be visited
