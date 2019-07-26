@@ -18,22 +18,13 @@
   },
   "main": "./src/library/index.js",
   "scripts": {
-    "build": "webpack --mode production",
-    "watch": "webpack --mode development"
+    "test": "jest"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-register": "^6.26.0",
-    "css-loader": "^0.28.11",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
-    "node-sass": "^4.9.2",
-    "optimize-css-assets-webpack-plugin": "^4.0.2",
-    "sass-loader": "^7.0.2",
-    "style-loader": "^0.21.0",
-    "webpack": "^4.10.1",
-    "webpack-cli": "^2.1.4"
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@types/jest": "^24.0.15",
+    "babel-jest": "^24.8.0",
+    "jest": "^24.8.0"
   }
 }

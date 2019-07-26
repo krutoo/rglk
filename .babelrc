@@ -1,4 +1,12 @@
 {
-	"presets": ["env"],
-	"plugins": ["transform-object-rest-spread"]
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "current",
+        },
+      },
+    ],
+  ],
 }
