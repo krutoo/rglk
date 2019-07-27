@@ -1,18 +1,16 @@
-import rglk from 'rglk';
-window.prng = new rglk.PRNG(123);
+import * as rglk from '../../library/js/index.js';
+
 initSection('.js-section-dungeon', canvas => {
 	const dungeon = new rglk.Dungeon({
-		roomsAmount: 24,
+		roomsAmount: 12,
 		roomMinSize: 3,
 		roomMaxSize: 8,
 		corridorMinLength: 1,
-		corridorMaxLength: 8,
-		corridorComplexity: 4,
+		corridorMaxLength: 4,
+		corridorComplexity: 3,
 	});
 	draw(canvas, {
 		dungeon,
-		roomColor: '#445',
-		corridorColor: '#223',
 		needRoomsNumbers: true,
 	});
 });
@@ -28,8 +26,7 @@ initSection('.js-section-labyrinth', canvas => {
 	});
 	draw(canvas, {
 		dungeon,
-		roomColor: '#445',
-		corridorColor: '#445',
+		corridorColor: '#c8d6e5',
 	});
 });
 
@@ -67,8 +64,8 @@ initSection('.js-section-explorer', canvas => {
 				fov: newFov,
 				dungeon,
 				radius: 12,
-				roomColor: '#222',
-				corridorColor: '#222',
+				roomColor: '#000',
+				corridorColor: '#000',
 				center: inDungeonPosition,
 			});
 		}
@@ -77,8 +74,8 @@ initSection('.js-section-explorer', canvas => {
 		fov,
 		dungeon,
 		radius: 12,
-		roomColor: '#222',
-		corridorColor: '#222',
+		roomColor: '#000',
+		corridorColor: '#000',
 		center: dungeon.rooms[0].center,
 	});
 });
@@ -90,10 +87,10 @@ initSection('.js-section-pathfinder', canvas => {
 		roomMaxSize: 12,
 		corridorMinLength: 1,
 		corridorMaxLength: 4,
-		corridorComplexity: 1,
+		corridorComplexity: 2,
 	});
-	const pathfinder = new rglk.Pathfinder((x, y) => dungeon.isFloor(x, y));
-	const path = pathfinder.search(
+	const findPath = rglk.createPathfinder((x, y) => dungeon.isFloor(x, y));
+	const path = findPath(
 		parseInt(dungeon.rooms[0].center.x, 10),
 		parseInt(dungeon.rooms[0].center.y, 10),
 		parseInt(dungeon.rooms[dungeon.rooms.length - 1].center.x, 10),
@@ -102,6 +99,8 @@ initSection('.js-section-pathfinder', canvas => {
 	draw(canvas, {
 		path,
 		dungeon,
+		roomColor: '#576574',
+		corridorColor: '#576574',
 	});
 });
 
@@ -112,7 +111,7 @@ function initSection (sectionSelector, render) {
 			button = section.querySelector('.js-reload-button')
 		if (canvas) {
 			canvas.width = canvas.clientWidth;
-			canvas.height = canvas.width / 4 * 3;
+			canvas.height = canvas.width / 16 * 9;
 			render(canvas);
 		}
 		if (button) {
@@ -145,8 +144,8 @@ function drawMap (context, data) {
 	data = data || {};
 	const {
 		dungeon,
-		roomColor = '#445',
-		corridorColor = '#223',
+		roomColor = '#c8d6e5',
+		corridorColor = '#8395a7',
 		tileSize,
 	} = data;
 
@@ -159,17 +158,6 @@ function drawMap (context, data) {
 			room.width * tileSize,
 			room.height * tileSize,
 		);
-		if (data.needRoomsNumbers) {
-			context.fillStyle = 'rgba(255,255,255,.5)';
-			context.textBaseline = 'middle';
-			context.textAlign = 'center';
-			context.font = `${tileSize}px Arial`;
-			context.fillText(
-				index,
-				room.center.x * tileSize,
-				room.center.y * tileSize,
-			);
-		}
 	});
 
 	// draw corridors
@@ -213,8 +201,8 @@ function drawPath (context, data) {
 		dungeon,
 		tileSize,
 	} = data;
-	context.strokeStyle = '#0e0';
-	context.fillStyle = '#0e0';
+	context.strokeStyle = '#1dd1a1';
+	context.fillStyle = '#1dd1a1';
 	context.lineWidth = Math.ceil(tileSize / 3);
 	if (path.length) {
 		context.beginPath();
