@@ -1,0 +1,62 @@
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.17rem;
+}
+
+h4 {
+  font-size: 1rem;
+}
+
+h5 {
+  font-size: .83rem;
+}
+
+h6 {
+  font-size: .67em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: #54a0ff;
+  text-decoration: none;
+}
+
+a:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+hr {
+  display: block;
+  width: auto;
+  height: 1px;
+  background-color: #aaa;
+  margin: 1rem 0;
+}
+
+p {
+  margin: .5rem 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background-color: #222f3e;
+}
