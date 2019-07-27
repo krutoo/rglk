@@ -1,7 +1,10 @@
 # ⚔️ rglk.js 🐉
-Simple library for development roguelike games, designed for training purposes. Inspired by [rot.js](http://ondras.github.io/rot.js/hp/).
+
+Simple library for development roguelike games, designed for training purposes.
+Inspired by [rot.js](http://ondras.github.io/rot.js/hp/).
 
 ## Using
+
 In Node.js use this command:
 
 ```bash
@@ -9,6 +12,7 @@ npm install --save rglk
 ```
 
 ## Features
+
 Constructors in **rglk** namespace allows to build simple 2d dungeons, define field of view, search path between two points and generates pseudo random numbers.
 
 ### Dungeon 🏗️
@@ -41,8 +45,9 @@ dungeon.isWall(x, y);
 dungeon.isFloor(x, y);
 ```
 
-### Explorer 👁️
-Object of class Explorer allows to define FOV based on **raycasting** algorytm.
+### createExplorer 👁️
+
+`createExplorer` returns function that allows to define 2d FOV based on **raycasting** algorytm.
 
 ```javascript
 import { createExplorer } from 'rglk';
@@ -57,8 +62,9 @@ const fov = explorer.calculate(centerX, centerY, radius, (x, y) => {
 });
 ```
 
-### Pathfinder 🏃
-The work of Pathfinder is based on an algorithm __A*__.
+### createPathfinder 🏃
+
+`createPathfinder` returns function which works based on an algorithm __A*__.
 
 ```javascript
 import { createPathfinder } from 'rglk';
@@ -71,7 +77,8 @@ const findPath = createPathfinder((x, y) => {
 findPath(x1, y1, x2, y2);
 ```
 
-### PRNG 💾
+### createPRNG 💾
+
 `createPRNG` (Pseudo Random Number Generator) allows you to get random numbers based on the seed.
 
 ```javascript
