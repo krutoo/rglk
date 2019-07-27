@@ -3,6 +3,7 @@ Simple library for development roguelike games, designed for training purposes. 
 
 ## Using
 In Node.js use this command:
+
 ```bash
 npm install --save rglk
 ```
@@ -12,8 +13,8 @@ Constructors in **rglk** namespace allows to build simple 2d dungeons, define fi
 
 ### Dungeon 🏗️
 
-
 Object of class Dungeon can generate a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and length of corridors between rooms. Dungeon map can be restored by seed.
+
 ```javascript
 import { Dungeon } from 'rglk';
 
@@ -42,39 +43,42 @@ dungeon.isFloor(x, y);
 
 ### Explorer 👁️
 Object of class Explorer allows to define FOV based on **raycasting** algorytm.
-```javascript
-import { Explorer } from 'rglk';
 
-const explorer = new Explorer((x, y) => {
-    // should return true if tile is transparent
+```javascript
+import { createExplorer } from 'rglk';
+
+const explorer = createExplorer((x, y) => {
+    // should return boolean depends on tile is transparent
 });
 
 // get array of visible tile positions
 const fov = explorer.calculate(centerX, centerY, radius, (x, y) => {
-    // this code will be executed if tile is visible
+    // this callback will be executed if tile is visible
 });
 ```
 
 ### Pathfinder 🏃
 The work of Pathfinder is based on an algorithm __A*__.
-```javascript
-import { Pathfinder } from 'rglk';
 
-const pathfinder = new Pathfinder((x, y) => {
-    // should return true if tile is can be visited
+```javascript
+import { createPathfinder } from 'rglk';
+
+const findPath = createPathfinder((x, y) => {
+  // should return true if tile is can be visited
 });
 
 // returns Array of points
-pathfinder.search(x1, y1, x2, y2);
+findPath(x1, y1, x2, y2);
 ```
 
 ### PRNG 💾
-Object of class PRNG (Pseudo Random Number Generator) allows you to get numbers based on the seed.
+`createPRNG` (Pseudo Random Number Generator) allows you to get random numbers based on the seed.
+
 ```javascript
-import { PRNG } from 'rglk';
+import { createPRNG } from 'rglk';
 
-const prng1 = new PRNG(123),
-      prng2 = new PRNG(123);
+const first = createPRNG(123);
+const second = createPRNG(123);
 
-prng1.generate() === prng2.generate(); // true
+first() === second(); // true
 ```
