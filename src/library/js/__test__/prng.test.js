@@ -1,7 +1,7 @@
 import { createGenerator } from '../prng.js';
 
 describe('createGenerator', () => {
-  it('should throw when argument is not a finite number', () => {
+  test('should throw when argument is not a finite number', () => {
     const invalidValues = [
       '1',
       true,
@@ -15,7 +15,7 @@ describe('createGenerator', () => {
       expect(() => createGenerator(value)).toThrow('First argument "seed" must be a finite number.');
     });
   });
-  it('should number generators that based on seed', () => {
+  test('should number generators that based on seed', () => {
     const firstGen = createGenerator(123);
     const secondGen = createGenerator(123);
 

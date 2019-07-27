@@ -3,81 +3,84 @@ import { isFunction } from '../utils.js';
 
 /**
  * Returns a 2d pathfinder function.
- * @return {function(number, number, number, number): Array} List of path points.
+ * @param {function(number, number): boolean} isOpen Should determine that position is open.
+ * @param {Object} [options] Options.
+ * @param {Function} [options.getHeuristic=getManhattanDistance] Heuristic function.
+ * @return {function(number, number, number, number): Array<Node>} List of path points.
  */
 export const createPathfinder = (isOpen, options = {}) => {
-	if (!isFunction(isOpen)) {
-		throw new TypeError('First argument "isOpen" must be a function');
-	}
+  if (!isFunction(isOpen)) {
+    throw new TypeError('First argument "isOpen" must be a function');
+  }
 
-	const { getHeuristic = getManhattanDistance } = options || {};
-	const getNeighbors = createNeighborsFinder(isOpen);
+  const { getHeuristic = getManhattanDistance } = options || {};
+  const getNeighbors = createNeighborsFinder(isOpen);
 
-	/**
-	 * Search path between two points.
-	 * @param {number} x1 First point x.
-	 * @param {number} y1 First point y.
-	 * @param {number} x2 Second point x.
-	 * @param {number} y2 Second point y.
-	 * @return {Array} List of path points.
-	 */
-	return (x1, y1, x2, y2) => {
-		const visitedNodes = [];
-		const unvisitedNodes = [];
-		const end = new Node({
-			x: x2,
-			y: y2,
-		});
-		let start = new Node({
-			x: x1,
-			y: y1,
-		});
-		let resultPath = [];
-		unvisitedNodes.push(start);
+  /**
+   * Search path between two points.
+   * @param {number} x1 First point x.
+   * @param {number} y1 First point y.
+   * @param {number} x2 Second point x.
+   * @param {number} y2 Second point y.
+   * @return {Array} List of path points.
+   */
+  return (x1, y1, x2, y2) => {
+    const visitedNodes = [];
+    const unvisitedNodes = [];
+    const end = new Node({
+      x: x2,
+      y: y2,
+    });
+    const start = new Node({
+      x: x1,
+      y: y1,
+    });
+    let resultPath = [];
+    unvisitedNodes.push(start);
 
-		// main loop
-		while (unvisitedNodes.length > 0) {
-			// search in open list node with lowest value f = g + h
-			let currentNodeIndex = 0;
-			let currentNode = unvisitedNodes[0];
+    // main loop
+    while (unvisitedNodes.length > 0) {
+      // search in open list node with lowest value f = g + h
+      let currentNodeIndex = 0;
+      let currentNode = unvisitedNodes[0];
 
-			unvisitedNodes.forEach((node, index) => {
-				if (node.f < currentNode.f) {
-					currentNode = node;
-					currentNodeIndex = index;
-				}
-			});
+      unvisitedNodes.forEach((node, index) => {
+        if (node.f < currentNode.f) {
+          currentNode = node;
+          currentNodeIndex = index;
+        }
+      });
 
-			// add found node to closed list, delete it from open list
-			unvisitedNodes.splice(currentNodeIndex, 1);
-			visitedNodes.push(currentNode);
+      // add found node to closed list, delete it from open list
+      unvisitedNodes.splice(currentNodeIndex, 1);
+      visitedNodes.push(currentNode);
 
-			// if current node is target then create path and break
-			if (currentNode.isEqualTo(end)) {
-				resultPath = currentNode.createPathToRoot();
-				break;
-			}
+      // if current node is target then create path and break
+      if (currentNode.isEqualTo(end)) {
+        resultPath = currentNode.createPathToRoot();
+        break;
+      }
 
-			let neighbors = getNeighbors(currentNode, isOpen); // @TODO check length before run cycle
+      const neighbors = getNeighbors(currentNode, isOpen); // @TODO check length before run cycle
 
-			for (let i = 0; i < neighbors.length; i++) {
-				let neighbor = neighbors[i];
+      for (let i = 0; i < neighbors.length; i++) {
+        const neighbor = neighbors[i];
 
-				// ignore neighbor node if it is already visited
-				if (visitedNodes.some(node => node.isEqualTo(neighbor))) {
-					continue;
-				}
+        // ignore neighbor node if it is already visited
+        if (visitedNodes.some(node => node.isEqualTo(neighbor))) {
+          continue;
+        }
 
-				// if neighbor not in open list, add him to open list, update h
-				if (!unvisitedNodes.some(node => node.isEqualTo(neighbor))) {
-					neighbor.h = getHeuristic(neighbor.x, neighbor.y, end.x, end.y);
-					unvisitedNodes.push(neighbor);
-				}
-			}
-		}
+        // if neighbor not in open list, add him to open list, update h
+        if (!unvisitedNodes.some(node => node.isEqualTo(neighbor))) {
+          neighbor.h = getHeuristic(neighbor.x, neighbor.y, end.x, end.y);
+          unvisitedNodes.push(neighbor);
+        }
+      }
+    }
 
-		return resultPath;
-	};
+    return resultPath;
+  };
 };
 
 /**
@@ -86,38 +89,38 @@ export const createPathfinder = (isOpen, options = {}) => {
  * @param {number} y1 First position y.
  * @param {number} x2 Second position x.
  * @param {number} y2 Second position y.
- * @return {number} heuristic value.
+ * @return {number} Heuristic value.
  */
 export const getManhattanDistance = (x1, y1, x2, y2) => {
-	const horizontal = Math.abs(x2 - x1);
-	const vertical = Math.abs(y2 - y1);
+  const horizontal = Math.abs(x2 - x1);
+  const vertical = Math.abs(y2 - y1);
 
-	return horizontal + vertical;
+  return horizontal + vertical;
 };
 
 /**
- * Returns list of node neighbors.
- * @param {Node} node Node to get a neighbors.
- * @return {Array} List of neighbors.
- * @TODO move to Node class?
+ * Returns function that creates list of node neighbors.
+ * @param {Function} isOpen Should determines that neighbor is open.
+ * @param {boolean} withDiagonal True if diagonal.
+ * @return {function(Node): Array<Node>} Function that creates list of node neighbors.
  */
-const createNeighborsFinder = (isOpen, withHorizontal = false) => node => {
-	let neighbors = [];
+const createNeighborsFinder = (isOpen, withDiagonal = false) => node => {
+  const neighbors = [];
 
-	for (let y = -1; y <= 1; y++) {
-		for (let x = -1; x <= 1; x++) {
-			// if is not diagonal neighbor
-			if (Math.abs(x + y) === 1) {
-				if (isOpen(node.x + x, node.y + y)) {
-					neighbors.push(new Node({
-						x: node.x + x,
-						y: node.y + y,
-						g: node.g + 1,
-						parent: node,
-					}));
-				}
-			}
-		}
-	}
-	return neighbors;
-}
+  for (let y = -1; y <= 1; y++) {
+    for (let x = -1; x <= 1; x++) {
+      const isDiagonal = Math.abs(x + y) !== 1;
+      if (withDiagonal || !isDiagonal) {
+        if (isOpen(node.x + x, node.y + y)) {
+          neighbors.push(new Node({
+            x: node.x + x,
+            y: node.y + y,
+            g: node.g + (isDiagonal ? Math.sqrt(2) : 1),
+            parent: node,
+          }));
+        }
+      }
+    }
+  }
+  return neighbors;
+};
