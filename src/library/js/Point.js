@@ -74,4 +74,8 @@ export default class Point {
     point = point || {};
     return point.x === this.x && point.y === this.y;
   }
+
+  clone () {
+    return new Point(this.x, this.y);
+  }
 }
