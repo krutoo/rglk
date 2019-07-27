@@ -63,9 +63,7 @@ export const createPathfinder = (isOpen, options = {}) => {
 
       const neighbors = getNeighbors(currentNode, isOpen); // @TODO check length before run cycle
 
-      for (let i = 0; i < neighbors.length; i++) {
-        const neighbor = neighbors[i];
-
+      for (const neighbor of neighbors) {
         // ignore neighbor node if it is already visited
         if (visitedNodes.some(node => node.isEqualTo(neighbor))) {
           continue;
