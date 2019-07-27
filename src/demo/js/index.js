@@ -1,9 +1,13 @@
-import * as rglk from '../../library/js/index.js';
+import {
+  Dungeon,
+  createExplorer,
+  createPathfinder,
+} from '../../library/js/index.js';
 
 let mousePosition = { x: 0, y: 0 };
 
 initSection('.js-section-dungeon', canvas => {
-  const dungeon = new rglk.Dungeon({
+  const dungeon = new Dungeon({
     roomsAmount: 12,
     roomMinSize: 3,
     roomMaxSize: 8,
@@ -16,7 +20,7 @@ initSection('.js-section-dungeon', canvas => {
 });
 
 initSection('.js-section-labyrinth', canvas => {
-  const dungeon = new rglk.Dungeon({
+  const dungeon = new Dungeon({
     roomsAmount: 64,
     roomMinSize: 1,
     roomMaxSize: 1,
@@ -31,17 +35,19 @@ initSection('.js-section-labyrinth', canvas => {
 });
 
 initSection('.js-section-explorer', canvas => {
-  const dungeon = new rglk.Dungeon({
+  const dungeon = new Dungeon({
     roomsAmount: 3,
-    roomMinSize: 6,
-    roomMaxSize: 12,
-    corridorMinLength: 2,
-    corridorMaxLength: 3,
+    roomMinSize: 5,
+    roomMaxSize: 7,
+    corridorMinLength: 1,
+    corridorMaxLength: 1,
     corridorComplexity: 1,
   });
-  const explorer = new rglk.Explorer((x, y) => dungeon.isFloor(x, y));
+  const explore = createExplorer(
+    (x, y) => dungeon.isFloor(x, y)
+  );
   const tileSize = calculateTileSize(dungeon, canvas);
-  const fov = explorer.calculate(
+  const fov = explore(
     parseInt(dungeon.rooms[0].center.x),
     parseInt(dungeon.rooms[0].center.y),
     12
@@ -52,7 +58,7 @@ initSection('.js-section-explorer', canvas => {
       x: Math.round(mousePosition.x / tileSize),
       y: Math.round(mousePosition.y / tileSize),
     };
-    const newFov = explorer.calculate(
+    const newFov = explore(
       inDungeonPosition.x,
       inDungeonPosition.y,
       12
@@ -79,7 +85,7 @@ initSection('.js-section-explorer', canvas => {
 });
 
 initSection('.js-section-pathfinder', canvas => {
-  const dungeon = new rglk.Dungeon({
+  const dungeon = new Dungeon({
     roomsAmount: 16,
     roomMinSize: 4,
     roomMaxSize: 12,
@@ -87,7 +93,7 @@ initSection('.js-section-pathfinder', canvas => {
     corridorMaxLength: 4,
     corridorComplexity: 2,
   });
-  const findPath = rglk.createPathfinder((x, y) => dungeon.isFloor(x, y));
+  const findPath = createPathfinder((x, y) => dungeon.isFloor(x, y));
   const path = findPath(
     parseInt(dungeon.rooms[0].center.x),
     parseInt(dungeon.rooms[0].center.y),
