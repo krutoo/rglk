@@ -65,7 +65,7 @@ export default class Explorer {
 
   checkArguments (centerX, centerY, radius) {
     return !isNaN(centerX + centerY + radius)
-			&& isFinite(centerX + centerY + radius);
+      && isFinite(centerX + centerY + radius);
   }
 
   /**

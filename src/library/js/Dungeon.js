@@ -8,9 +8,9 @@ import { isFunction } from './utils.js';
  * @type {Object}
  */
 const BUILDS_TYPES = Object.freeze({
-  room: 1,
-  corridor: 2,
-  connector: 3,
+  room: Symbol('room'),
+  corridor: Symbol('corridor'),
+  connector: Symbol('connector'),
 });
 
 /**
@@ -18,11 +18,15 @@ const BUILDS_TYPES = Object.freeze({
  * @type {Object}
  */
 const DIRECTIONS = Object.freeze({
-  left: 0,
-  bottom: 1,
-  right: 2,
-  top: 3,
+  left: Symbol('left'),
+  bottom: Symbol('bottom'),
+  right: Symbol('right'),
+  top: Symbol('top'),
 });
+
+const directionsList = Object.values(DIRECTIONS);
+
+const isHorizontal = direction => [DIRECTIONS.left, DIRECTIONS.right].includes(direction);
 
 /**
  * Dungeons private data.
@@ -120,7 +124,7 @@ export default class Dungeon {
     Object.keys(defaultOptions).forEach(key => {
       const value = options[key];
       const defaultValue = defaultOptions[key];
-      const minimalValue = this.getMininalOptions()[key];
+      const minimalValue = this.getMinimalOptions()[key];
       if (isNaN(value) || !isFinite(value) || value < minimalValue) {
         resultOptions[key] = defaultValue;
       } else {
@@ -130,7 +134,7 @@ export default class Dungeon {
     return resultOptions;
   }
 
-  getMininalOptions () {
+  getMinimalOptions () {
     return {
       seed: -Infinity,
       roomsAmount: 1,
@@ -187,11 +191,13 @@ export default class Dungeon {
    * @return {boolean} Is floor tile?
    */
   isFloor (x, y) {
-    let isFloor = false;
     const buffer = dungeonsData.get(this).buffer || [];
+    let isFloor = false;
+
     if (x <= this.width && y <= this.height) {
       isFloor = Boolean(buffer[this.getBufferIndex(x, y, this.height)]);
     }
+
     return isFloor;
   }
 
@@ -201,9 +207,11 @@ export default class Dungeon {
    */
   generate () {
     const options = this.getOptions();
+
     dungeonsData.get(this).prng = createGenerator(options.seed);
     dungeonsData.get(this).builds = this.optimizeBuilds(this.generateBuilds(options));
-    dungeonsData.get(this).buffer = this.createBuffer(this.builds);
+    dungeonsData.get(this).buffer = this.createBuffer(this.builds); // @todo getBoundRect
+
     return this;
   }
 
@@ -220,20 +228,24 @@ export default class Dungeon {
     const extensibleBuilds = readyBuilds.filter(build => build.type !== BUILDS_TYPES.corridor);
     const startingBuild = extensibleBuilds[this.getRandom(0, extensibleBuilds.length - 1)];
     let newBuilds = this.createBranch(startingBuild, options.corridorComplexity);
+
     if (newBuilds.some(build => !this.isSuitableBuild(build, readyBuilds.concat(newBuilds)))) {
       startingBuild.children.pop();
       newBuilds = [];
     }
+
     return newBuilds;
   }
 
-  createBranch (parent, length) {
+  createBranch (parent, branchLength = 1) {
     const branch = [];
     let partParent = parent;
-    for (let index = 0; index < length; index++) {
+
+    for (let index = 0; index < branchLength; index++) {
       const corridor = this.createCorridor({ parent: partParent });
       let closure = null;
-      if (index < length - 1) {
+
+      if (index < branchLength - 1) {
         closure = this.createConnector({ parent: corridor });
       } else {
         closure = this.createRoom({ parent: corridor });
@@ -241,12 +253,14 @@ export default class Dungeon {
       branch.push(corridor, closure);
       partParent = closure;
     }
+
     return branch;
   }
 
   createConnector ({ parent }) {
     const connector = this.createRoom({ parent, width: 1, height: 1 });
     connector.type = BUILDS_TYPES.connector;
+
     return connector;
   }
 
@@ -259,9 +273,11 @@ export default class Dungeon {
       width: width || this.getRandom(roomMinSize, roomMaxSize),
       height: height || this.getRandom(roomMinSize, roomMaxSize),
     });
+
     if (parent) {
       this.placeBuild(room, parent);
     }
+
     return room;
   }
 
@@ -273,22 +289,27 @@ export default class Dungeon {
       height: 1,
     });
     const corridorLength = this.getRandom(corridorMinLength, corridorMaxLength);
+
     if (parent) {
-      if (corridor.direction === DIRECTIONS.left || corridor.direction === DIRECTIONS.right) {
+      if (isHorizontal(corridor.direction)) {
         corridor.width = corridorLength;
       } else {
         corridor.height = corridorLength;
       }
       this.placeBuild(corridor, parent);
     }
+
     return corridor;
   }
 
   placeBuild (build, parent) {
-    const direction = build.type === BUILDS_TYPES.corridor
-      ? build.direction || 0
-      : parent.direction || 0;
-    if (direction === DIRECTIONS.left || direction === DIRECTIONS.right) {
+    const direction = (
+      build.type === BUILDS_TYPES.corridor
+        ? build.direction
+        : parent.direction
+    ) || DIRECTIONS.left;
+
+    if (isHorizontal(direction)) {
       build.y = this.getRandom(
         parent.top - build.height + 1,
         parent.bottom - 1
@@ -299,6 +320,7 @@ export default class Dungeon {
         parent.right - 1
       );
     }
+
     switch (direction) {
       case DIRECTIONS.left:
         build.x = parent.right;
@@ -323,20 +345,23 @@ export default class Dungeon {
     const build = new Rectangle(x, y, width, height);
     build.type = type;
     build.children = [];
+
     if (parent) {
       build.parent = parent;
       parent.children.push(build);
       build.direction = parent.direction;
     }
+
     if (type === BUILDS_TYPES.corridor) {
-      build.direction = this.getRandom(0, 3);
+      build.direction = directionsList[this.getRandom(0, directionsList.length - 1)];
     }
+
     return build;
   }
 
   getRandom (min, max) {
     const seededRandom = dungeonsData.get(this).prng();
-    return Math.floor((min + seededRandom) * (max + 1 - min));
+    return Math.floor(min + (seededRandom * (max + 1 - min)));
   }
 
   isSuitableBuild (newBuild, readyBuilds) {
@@ -345,8 +370,10 @@ export default class Dungeon {
       const isParent = build === newBuild.parent;
       const isChildren = newBuild.children.includes(build);
       const isConnected = build.children.includes(newBuild.parent) || newBuild.children.includes(build.parent);
+
       return !isSelf && !isParent && !isChildren && !isConnected;
     });
+
     return !checkingBuilds.some(build => build.collides(newBuild));
   }
 
@@ -383,8 +410,10 @@ export default class Dungeon {
 
   createBuffer (builds) {
     const bottomRight = this.getBottomRightPoint(builds);
+
     dungeonsData.get(this).width = bottomRight.x + 1;
     dungeonsData.get(this).height = bottomRight.y + 1;
+
     const buffer = Array(this.width * this.height);
     buffer.fill(false);
     builds.forEach(build => this.fillRectangle(buffer, this.height, build));
@@ -393,6 +422,7 @@ export default class Dungeon {
 
   getBottomRightPoint (builds) {
     const bottomRight = new Point(-Infinity, -Infinity);
+
     builds.forEach(build => {
       if (build.right > bottomRight.x) {
         bottomRight.x = build.right;
@@ -401,6 +431,7 @@ export default class Dungeon {
         bottomRight.y = build.bottom;
       }
     });
+
     return bottomRight;
   }
 

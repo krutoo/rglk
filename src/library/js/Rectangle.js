@@ -149,20 +149,21 @@ export default class Rectangle extends Point {
 
   /**
    * Check collides with other Rectangle.
-   * @param {Rectangle} rectangle To check.
-   * @return {boolean} Rectangles collides?.
+   * @param {Rectangle} rectangle Rectangle to check.
+   * @return {boolean} Rectangles collides?
    */
   collides (rectangle) {
-    rectangle = rectangle || {};
     let result = true;
+
     if (
       this.left > rectangle.right
-			|| this.right < rectangle.left
-			|| this.top > rectangle.bottom
-			|| this.bottom < rectangle.top
+      || this.right < rectangle.left
+      || this.top > rectangle.bottom
+      || this.bottom < rectangle.top
     ) {
       result = false;
     }
+
     return result;
   }
 }

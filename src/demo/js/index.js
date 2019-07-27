@@ -1,5 +1,7 @@
 import * as rglk from '../../library/js/index.js';
 
+let mousePosition = { x: 0, y: 0 };
+
 initSection('.js-section-dungeon', canvas => {
   const dungeon = new rglk.Dungeon({
     roomsAmount: 12,
@@ -9,10 +11,8 @@ initSection('.js-section-dungeon', canvas => {
     corridorMaxLength: 4,
     corridorComplexity: 3,
   });
-  draw(canvas, {
-    dungeon,
-    needRoomsNumbers: true,
-  });
+  window.dungeon = dungeon;
+  draw(canvas, { dungeon });
 });
 
 initSection('.js-section-labyrinth', canvas => {
@@ -29,8 +29,6 @@ initSection('.js-section-labyrinth', canvas => {
     corridorColor: '#c8d6e5',
   });
 });
-
-let mousePosition = { x: 0, y: 0 };
 
 initSection('.js-section-explorer', canvas => {
   const dungeon = new rglk.Dungeon({
