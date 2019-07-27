@@ -1,10 +1,5 @@
-import Point from './Point';
-
-/**
- * Explorers private data.
- * @type {WeakMap}
- */
-const explorersData = new WeakMap();
+import Point from './Point.js';
+import { isFunction } from './utils.js';
 
 /**
  * Represents a Explorer (FOV calculation).
@@ -14,9 +9,8 @@ export default class Explorer {
 	 * @param {Function} isTransparent Callback which must determine that tile is transparent.
 	 */
 	constructor (isTransparent) {
-		if (isTransparent instanceof Function) {
-			explorersData.set(this, { isTransparent });
-			this._isTransparent = isTransparent;
+		if (isFunction(isTransparent)) {
+			this.isTransparent = isTransparent;
 		}
 	}
 
@@ -29,16 +23,18 @@ export default class Explorer {
 	 * @return {Array} Visible points array.
 	 */
 	calculate (centerX, centerY, radius, checkExplored) {
+		// @todo change "visiblePoints" object on array (transform coords to index)
 		const visiblePoints = {};
+
 		if (this.checkArguments(...arguments)) {
+			const { isTransparent } = this;
 			const squareRadius = radius ** 2;
 			const center = new Point(centerX, centerY);
 			const minX = center.x - radius;
 			const maxX = center.x + radius;
 			const minY = center.y - radius;
 			const maxY = center.y + radius;
-			const canCheck = checkExplored instanceof Function;
-			const isTransparent = explorersData.get(this).isTransparent;
+			const canCheck = isFunction(checkExplored);
 
 			// check floors in radius
 			for (let y = minY; y <= maxY; y++) {
@@ -63,6 +59,7 @@ export default class Explorer {
 				}
 			}
 		}
+
 		return Object.values(visiblePoints);
 	}
 
@@ -73,18 +70,20 @@ export default class Explorer {
 
 	/**
 	 * Get line on a grid. Based on Bresenham's line algorithm.
-	 * @param {Point} point0 Start position.
-	 * @param {Point} point1 End position.
+	 * @param {Point} point1 Start position.
+	 * @param {Point} point2 End position.
 	 */
-	getPointsOfLine (point0, point1) {
-		let dx = point1.x - point0.x,
-			dy = point1.y - point0.y,
-			nx = Math.abs(dx),
-			ny = Math.abs(dy),
-			sx = (dx > 0) ? 1 : -1,
-			sy = (dy > 0) ? 1 : -1,
-			p = new Point(point0.x, point0.y),
-			points = [new Point(p.x, p.y)];
+	getPointsOfLine (point1, point2) {
+		const dx = point2.x - point1.x;
+		const dy = point2.y - point1.y;
+		const nx = Math.abs(dx);
+		const ny = Math.abs(dy);
+		const sx = (dx > 0) ? 1 : -1;
+		const sy = (dy > 0) ? 1 : -1;
+		let p = new Point(point1.x, point1.y);
+		let points = [new Point(p.x, p.y)];
+
+		// when current position non in target
 		for (let ix = 0, iy = 0; ix < nx || iy < ny;) {
 			if ((0.5 + ix) / nx === (0.5 + iy) / ny) {
 				p.x += sx;
@@ -100,6 +99,7 @@ export default class Explorer {
 			}
 			points.push(new Point(p.x, p.y));
 		}
+
 		return points;
 	}
 }

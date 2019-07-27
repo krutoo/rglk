@@ -1,4 +1,4 @@
-import { isNumber } from './utils';
+import { isNumber } from './utils.js';
 
 /**
  * Returns a Pseudo Random Number Generator based on seed from first argument.

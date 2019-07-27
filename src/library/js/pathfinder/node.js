@@ -1,4 +1,4 @@
-import Point from '../Point';
+import Point from '../Point.js';
 
 export default class Node extends Point {
 	constructor(options) {
@@ -45,13 +45,15 @@ export default class Node extends Point {
 		return (this.g + this.h);
 	}
 
-	getPathToRoot () {
+	createPathToRoot () {
 		const path = [];
 		let currentNode = this;
+
 		while (currentNode.parent) {
-			path.push(currentNode);
+			path.unshift(currentNode);
 			currentNode = currentNode.parent;
 		}
-		return path.reverse();
+
+		return path;
 	}
 }

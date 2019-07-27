@@ -1,20 +1,11 @@
-import PRNG from './PRNG';
-import Dungeon from './Dungeon';
-import Explorer from './Explorer';
-import Pathfinder from './Pathfinder';
-
-const rglk = Object.freeze({
-	PRNG,
-	Dungeon,
-	Explorer,
-	Pathfinder,
-});
-
-export default rglk;
+import * as PRNG from './prng.js';
+import Dungeon from './Dungeon.js';
+import Explorer from './Explorer.js';
+import { createPathfinder } from './pathfinder/pathfinder.js';
 
 export {
-	PRNG,
-	Dungeon,
-	Explorer,
-	Pathfinder,
+  PRNG,
+  Dungeon,
+  Explorer,
+  createPathfinder,
 };

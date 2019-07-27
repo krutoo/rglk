@@ -1,6 +1,7 @@
-import PRNG from './PRNG';
-import Point from './Point';
-import Rectangle from './Rectangle';
+import { createGenerator } from './prng.js';
+import Point from './Point.js';
+import Rectangle from './Rectangle.js';
+import { isFunction } from './utils.js';
 
 /**
  * Builds types.
@@ -152,7 +153,7 @@ export default class Dungeon {
 	 * @param {Function} callback Callback that was called for each tile.
 	 */
 	forEachTile (callback) {
-		if (callback instanceof Function) {
+		if (isFunction(callback)) {
 			for (let x = 0; x < this.height; x++) {
 				for (let y = 0; y < this.width; y++) {
 					callback(x, y, this.isFloor(x, y));
@@ -190,7 +191,7 @@ export default class Dungeon {
 	 */
 	generate () {
 		const options = this.getOptions();
-		dungeonsData.get(this).prng = new PRNG(options.seed);
+		dungeonsData.get(this).prng = createGenerator(options.seed);
 		dungeonsData.get(this).builds = this.optimizeBuilds(this.generateBuilds(options));
 		dungeonsData.get(this).buffer = this.createBuffer(this.builds);
 		return this;
@@ -325,7 +326,7 @@ export default class Dungeon {
 	}
 
 	getRandom (min, max) {
-		const seededRandom = dungeonsData.get(this).prng.generate();
+		const seededRandom = dungeonsData.get(this).prng();
 		return Math.floor(min + seededRandom * (max + 1 - min));
 	}
 

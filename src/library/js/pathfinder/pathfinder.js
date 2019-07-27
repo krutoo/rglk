@@ -1,5 +1,5 @@
-import Node from './node';
-import { isFunction } from '../utils';
+import Node from './node.js';
+import { isFunction } from '../utils.js';
 
 /**
  * Returns a 2d pathfinder function.
@@ -41,10 +41,10 @@ export const createPathfinder = (isOpen, options = {}) => {
 			let currentNodeIndex = 0;
 			let currentNode = unvisitedNodes[0];
 
-			unvisitedNodes.forEach((item, i) => {
-				if (item.f < currentNode.f) {
-					currentNode = item;
-					currentNodeIndex = i;
+			unvisitedNodes.forEach((node, index) => {
+				if (node.f < currentNode.f) {
+					currentNode = node;
+					currentNodeIndex = index;
 				}
 			});
 
@@ -54,7 +54,7 @@ export const createPathfinder = (isOpen, options = {}) => {
 
 			// if current node is target then create path and break
 			if (currentNode.isEqualTo(end)) {
-				resultPath = currentNode.getPathToRoot();
+				resultPath = currentNode.createPathToRoot();
 				break;
 			}
 
@@ -63,7 +63,7 @@ export const createPathfinder = (isOpen, options = {}) => {
 			for (let i = 0; i < neighbors.length; i++) {
 				let neighbor = neighbors[i];
 
-				// ignore neighbor if he in closed list
+				// ignore neighbor node if it is already visited
 				if (visitedNodes.some(node => node.isEqualTo(neighbor))) {
 					continue;
 				}
