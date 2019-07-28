@@ -54,23 +54,23 @@ initSection('.js-section-explorer', canvas => {
   );
   canvas.onmousemove = event => {
     mousePosition = getMousePosition(event);
-    const inDungeonPosition = {
-      x: Math.round(mousePosition.x / tileSize),
-      y: Math.round(mousePosition.y / tileSize),
+    const dungeonPosition = {
+      x: Math.floor(mousePosition.x / tileSize),
+      y: Math.floor(mousePosition.y / tileSize),
     };
     const newFov = explore(
-      inDungeonPosition.x,
-      inDungeonPosition.y,
+      dungeonPosition.x,
+      dungeonPosition.y,
       12
     );
-    if (dungeon.isFloor(inDungeonPosition.x, inDungeonPosition.y)) {
+    if (dungeon.isFloor(dungeonPosition.x, dungeonPosition.y)) {
       draw(canvas, {
         fov: newFov,
         dungeon,
         radius: 12,
         roomColor: '#000',
         corridorColor: '#000',
-        center: inDungeonPosition,
+        center: dungeonPosition,
       });
     }
   };
