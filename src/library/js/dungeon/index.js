@@ -1,6 +1,7 @@
 import { createGenerator } from '../prng.js';
 import Point from '../Point.js';
 import Rectangle from './Rectangle.js';
+import { createMatrix } from './matrix.js';
 import { isObject, isFiniteNumber, isFunction } from '../utils.js';
 import { propEq, negate } from '../fp.js';
 
@@ -14,53 +15,38 @@ const BUILD_TYPES = Object.freeze({
   connector: Symbol('connector'),
 });
 
-const isRoom = propEq('type', BUILD_TYPES.room);
-const isCorridor = propEq('type', BUILD_TYPES.corridor);
-const isConnector = propEq('type', BUILD_TYPES.connector);
-
 /**
  * Dungeons private data.
  * @type {Object}
  */
 const DIRECTIONS = Object.freeze({
-  left: Symbol('left'),
-  bottom: Symbol('bottom'),
-  right: Symbol('right'),
   top: Symbol('top'),
+  right: Symbol('right'),
+  bottom: Symbol('bottom'),
+  left: Symbol('left'),
 });
 
 /**
  * Directions list.
  * @type {Array<symbol>}
  */
-const directionsList = Object.values(DIRECTIONS);
-
-/**
- * Determines that direction is horizontal.
- * @type {Function}
- * @param {symbol} direction Direction.
- * @return {boolean} Is direction horizontal?
- */
-const isHorizontal = (() => {
-  const horizontalDirections = [DIRECTIONS.left, DIRECTIONS.right];
-  return direction => horizontalDirections.includes(direction);
-})();
+const directionsList = Object.freeze(Object.values(DIRECTIONS));
 
 /**
  * Represents a dungeon generator.
  */
-export default class Dungeon {
+export class Dungeon {
   /**
-   * @param {Object} options Options of dungeon.
-   * @param {number} options.roomsAmount Amount of rooms.
-   * @param {number} options.roomMinSize Minimum room size.
-   * @param {number} options.roomMaxSize Maximum room size.
-   * @param {number} options.corridorMinLength Minimum corridor length.
-   * @param {number} options.corridorMaxLength Maximum corridor length.
-   * @param {number} options.corridorComplexity Amount of corridors turns.
-   * @param {number} options.seed Seed for pseudo random number generator.
+   * @param {Object} [options={}] Options of dungeon.
+   * @param {number} [options.roomsAmount=7] Amount of rooms.
+   * @param {number} [options.roomMinSize=5] Minimum room size.
+   * @param {number} [options.roomMaxSize=10] Maximum room size.
+   * @param {number} [options.corridorMinLength=3] Minimum corridor length.
+   * @param {number} [options.corridorMaxLength=7] Maximum corridor length.
+   * @param {number} [options.corridorComplexity=2] Amount of corridors turns.
+   * @param {number} [options.seed] Seed for pseudo random number generator, random by default.
    */
-  constructor (options) {
+  constructor (options = {}) {
     this.setOptions(options);
     this.generate();
   }
@@ -92,25 +78,22 @@ export default class Dungeon {
   /**
    * Width of generated  in tiles.
    * @return {number} Width.
-   * @readonly
    */
   get width () {
-    return parseInt(this._width) || 0;
+    return this._buffer.width;
   }
 
   /**
    * Returns height of generated dungeon in tiles.
    * @return {number} Height.
-   * @readonly
    */
   get height () {
-    return parseInt(this._height) || 0;
+    return this._buffer.height;
   }
 
   /**
    * Returns rooms of generated dungeon.
    * @return {Array} List of rooms.
-   * @readonly
    */
   get rooms () {
     return this.builds.filter(isRoom);
@@ -119,7 +102,6 @@ export default class Dungeon {
   /**
    * Returns corridors of generated dungeon.
    * @return {Array} List of corridors.
-   * @readonly
    */
   get corridors () {
     return this.builds.filter(isCorridor);
@@ -128,7 +110,6 @@ export default class Dungeon {
   /**
    * Returns connectors of generated dungeon.
    * @return {Array} List of corridor connectors.
-   * @readonly
    */
   get connectors () {
     return this.builds.filter(isConnector);
@@ -137,7 +118,6 @@ export default class Dungeon {
   /**
    * Returns all builds of generated dungeon.
    * @return {Array} List all builds.
-   * @readonly
    */
   get builds () {
     const privateBuilds = Array.isArray(this._builds) ? this._builds : [];
@@ -160,6 +140,7 @@ export default class Dungeon {
   }
 
   isValidOptions (options) {
+    const defaults = Dungeon.getMinimalOptions();
     const minimalOptions = Dungeon.getMinimalOptions();
     let isValid = true;
 
@@ -167,8 +148,9 @@ export default class Dungeon {
       isValid = false;
     } else {
       Object.keys(options).forEach(optionKey => {
-        const { [optionKey]: value } = options || {};
+        const { [optionKey]: defaultValue } = defaults;
         const { [optionKey]: minimalValue } = minimalOptions;
+        const { [optionKey]: value = defaultValue } = options || {};
 
         if (!isFiniteNumber(value) || value < minimalValue) {
           isValid = false;
@@ -215,7 +197,7 @@ export default class Dungeon {
     let isFloor = false;
 
     if (x <= this.width && y <= this.height) {
-      isFloor = Boolean(this._buffer && this._buffer[this.getBufferIndex(x, y, this.height)]);
+      isFloor = Boolean(this._buffer && this._buffer.get(x, y));
     }
 
     return isFloor;
@@ -223,55 +205,53 @@ export default class Dungeon {
 
   /**
    * Generate new dungeon map.
-   * @return {Dungeon} Instance.
    */
   generate () {
-    this._prng = createGenerator(this._options.seed);
-    this._builds = this.optimizeBuilds(this.generateBuilds(this._options));
-    this._buffer = this.createBuffer(this.builds); // @todo getBoundRect
-
-    return this;
+    this._rng = createGenerator(this._options.seed);
+    this._builds = optimizeBuilds(this._generateBuilds(this._options));
+    this._buffer = this._createBuffer(this._builds);
   }
 
-  generateBuilds (options) {
+  _generateBuilds (options) {
     const { roomsAmount } = this._options;
-    const initialRoom = this.createRoom({ x: 0, y: 0 });
+    const initialRoom = this._createRoom({ x: 0, y: 0 });
     const builds = [initialRoom];
 
     if (roomsAmount > 1) {
       while (builds.filter(isRoom).length < roomsAmount) {
-        builds.push(...this.tryBuild(builds, options));
+        builds.push(...this._tryBuild(builds, options));
       }
     }
 
     return builds;
   }
 
-  tryBuild (readyBuilds, options) {
+  _tryBuild (readyBuilds, options) {
     const extensibleBuilds = readyBuilds.filter(negate(isCorridor));
-    const startingBuild = extensibleBuilds[this.getRandom(0, extensibleBuilds.length - 1)];
-    let newBuilds = this.createBranch(startingBuild, options.corridorComplexity);
+    const branchRootBuild = extensibleBuilds[this._getRandom(0, extensibleBuilds.length - 1)];
+    let newBuilds = this._createBranch(branchRootBuild, options.corridorComplexity);
 
-    if (newBuilds.some(build => !this.isSuitableBuild(build, readyBuilds.concat(newBuilds)))) {
-      startingBuild.children.pop();
+    // if some build from new builds list collides with ready other
+    if (newBuilds.some(build => !canAddBuild(build, readyBuilds.concat(newBuilds)))) {
+      branchRootBuild.children.pop(); // remove created branch
       newBuilds = [];
     }
 
     return newBuilds;
   }
 
-  createBranch (parent, branchLength = 1) {
+  _createBranch (parentRoom, branchLength = 1) {
     const branch = [];
-    let partParent = parent;
+    let partParent = parentRoom;
 
     for (let index = 0; index < branchLength; index++) {
-      const corridor = this.createCorridor({ parent: partParent });
+      const corridor = this._createCorridor({ parent: partParent });
       let closure = null;
 
       if (index < branchLength - 1) {
-        closure = this.createConnector({ parent: corridor });
+        closure = this._createConnector({ parent: corridor });
       } else {
-        closure = this.createRoom({ parent: corridor });
+        closure = this._createRoom({ parent: corridor });
       }
       branch.push(corridor, closure);
       partParent = closure;
@@ -280,30 +260,30 @@ export default class Dungeon {
     return branch;
   }
 
-  createRoom ({ x, y, width, height, parent }) {
+  _createRoom ({ x, y, width, height, parent }) {
     const { roomMinSize, roomMaxSize } = this._options;
-    const room = this.createBuild(BUILD_TYPES.room, {
+    const room = this._createBuild(BUILD_TYPES.room, {
       parent,
       x,
       y,
-      width: width || this.getRandom(roomMinSize, roomMaxSize),
-      height: height || this.getRandom(roomMinSize, roomMaxSize),
+      width: width || this._getRandom(roomMinSize, roomMaxSize),
+      height: height || this._getRandom(roomMinSize, roomMaxSize),
     });
 
-    parent && this.placeBuild(room, parent);
+    parent && this._placeBuild(room, parent);
     return room;
   }
 
-  createCorridor ({ parent }) {
+  _createCorridor ({ parent }) {
     const { corridorMinLength, corridorMaxLength } = this._options;
-    const corridorLength = this.getRandom(corridorMinLength, corridorMaxLength);
-    const corridor = this.createBuild(BUILD_TYPES.corridor, {
+    const corridorLength = this._getRandom(corridorMinLength, corridorMaxLength);
+    const corridor = this._createBuild(BUILD_TYPES.corridor, {
       parent,
       width: 1,
       height: 1,
     });
 
-    corridor.direction = directionsList[this.getRandom(0, directionsList.length - 1)];
+    corridor.direction = directionsList[this._getRandom(0, directionsList.length - 1)];
 
     if (parent) {
       if (isHorizontal(corridor.direction)) {
@@ -311,24 +291,24 @@ export default class Dungeon {
       } else {
         corridor.height = corridorLength;
       }
-      this.placeBuild(corridor, parent);
+      this._placeBuild(corridor, parent);
     }
 
     return corridor;
   }
 
-  createConnector ({ parent }) {
-    const connector = this.createBuild(BUILD_TYPES.connector, {
+  _createConnector ({ parent }) {
+    const connector = this._createBuild(BUILD_TYPES.connector, {
       parent,
       width: 1,
       height: 1,
     });
 
-    parent && this.placeBuild(connector, parent);
+    parent && this._placeBuild(connector, parent);
     return connector;
   }
 
-  createBuild (type, { x, y, width, height, parent }) {
+  _createBuild (type, { x, y, width, height, parent }) {
     const build = new Rectangle(x, y, width, height);
 
     build.type = type;
@@ -343,7 +323,7 @@ export default class Dungeon {
     return build;
   }
 
-  placeBuild (build, parent) {
+  _placeBuild (build, parent) {
     const direction = (
       build.type === BUILD_TYPES.corridor
         ? build.direction
@@ -351,12 +331,12 @@ export default class Dungeon {
     ) || DIRECTIONS.left;
 
     if (isHorizontal(direction)) {
-      build.y = this.getRandom(
+      build.y = this._getRandom(
         parent.top - build.height + 1,
         parent.bottom - 1
       );
     } else {
-      build.x = this.getRandom(
+      build.x = this._getRandom(
         parent.left - build.width + 1,
         parent.right - 1
       );
@@ -378,93 +358,103 @@ export default class Dungeon {
     }
   }
 
-  getRandom (min, max) {
-    const seededRandom = this._prng();
+  _getRandom (min, max) {
+    const seededRandom = this._rng();
     return Math.floor(min + (seededRandom * (max + 1 - min)));
   }
 
-  isSuitableBuild (newBuild, readyBuilds) {
-    const checkingBuilds = readyBuilds.filter(build => {
-      const isSelf = build === newBuild;
-      const isParent = build === newBuild.parent;
-      const isChildren = newBuild.children.includes(build);
-      const isConnected = build.children.includes(newBuild.parent) || newBuild.children.includes(build.parent);
+  _createBuffer (builds) {
+    const bottomRight = getBottomRightBound(builds);
+    const buffer = createMatrix(
+      bottomRight.x + 1,
+      bottomRight.y + 1,
+      false
+    );
 
-      return !isSelf && !isParent && !isChildren && !isConnected;
-    });
-
-    return !checkingBuilds.some(build => build.collides(newBuild));
-  }
-
-  optimizeBuilds (builds) {
-    const topLeft = this.getTopLeftPoint(builds);
-    if (topLeft.x < 1) {
-      this.translateBuilds(builds, 1 - topLeft.x, 0);
-    }
-    if (topLeft.y < 1) {
-      this.translateBuilds(builds, 0, 1 - topLeft.y);
-    }
-    return builds;
-  }
-
-  getTopLeftPoint (builds) {
-    const topLeft = new Point(Infinity, Infinity);
     builds.forEach(build => {
-      if (build.x < topLeft.x) {
-        topLeft.x = build.x;
-      }
-      if (build.y < topLeft.y) {
-        topLeft.y = build.y;
-      }
+      buffer.forEachInRect(build.x, build.y, build.width, build.height, (x, y) => {
+        buffer.set(x, y, true);
+      });
     });
-    return topLeft;
-  }
-
-  translateBuilds (builds, offsetX, offsetY) {
-    return builds.forEach(build => {
-      build.x += offsetX;
-      build.y += offsetY;
-    });
-  }
-
-  createBuffer (builds) {
-    const bottomRight = this.getBottomRightPoint(builds);
-
-    this._width = bottomRight.x + 1;
-    this._height = bottomRight.y + 1;
-
-    const buffer = Array(this._width * this._height);
-
-    buffer.fill(false);
-    builds.forEach(build => this.fillRectangle(buffer, this.height, build));
 
     return buffer;
   }
-
-  getBottomRightPoint (builds) {
-    const bottomRight = new Point(-Infinity, -Infinity);
-
-    builds.forEach(build => {
-      if (build.right > bottomRight.x) {
-        bottomRight.x = build.right;
-      }
-      if (build.bottom > bottomRight.y) {
-        bottomRight.y = build.bottom;
-      }
-    });
-
-    return bottomRight;
-  }
-
-  fillRectangle (buffer, height, { left, bottom, right, top }) {
-    for (let y = top; y < bottom; y++) {
-      for (let x = left; x < right; x++) {
-        buffer[this.getBufferIndex(x, y)] = true;
-      }
-    }
-  }
-
-  getBufferIndex (x, y) {
-    return (x * this.height) + y;
-  }
 }
+
+const isRoom = propEq('type', BUILD_TYPES.room);
+const isCorridor = propEq('type', BUILD_TYPES.corridor);
+const isConnector = propEq('type', BUILD_TYPES.connector);
+
+/**
+ * Determines that direction is horizontal.
+ * @type {Function}
+ * @param {symbol} direction Direction.
+ * @return {boolean} Is direction horizontal?
+ */
+const isHorizontal = (() => {
+  const horizontalDirections = [DIRECTIONS.left, DIRECTIONS.right];
+  return direction => horizontalDirections.includes(direction);
+})();
+
+const canAddBuild = (newBuild, readyBuilds) => {
+  // builds list to check collides with new build
+  const checkingBuilds = readyBuilds.filter(build => {
+    const isSelf = build === newBuild;
+    const isParent = build === newBuild.parent;
+    const isChildren = newBuild.children.includes(build);
+    const isConnected = build.children.includes(newBuild.parent) || newBuild.children.includes(build.parent);
+
+    return !isSelf && !isParent && !isChildren && !isConnected;
+  });
+
+  return !checkingBuilds.some(build => build.collides(newBuild));
+};
+
+const optimizeBuilds = builds => {
+  const topLeft = getTopLeftBound(builds);
+
+  translateBuilds(
+    builds,
+    topLeft.x < 1 ? 1 - topLeft.x : 0,
+    topLeft.y < 1 ? 1 - topLeft.y : 0
+  );
+
+  return builds;
+};
+
+const translateBuilds = (builds, offsetX, offsetY) => {
+  builds.forEach(build => {
+    build.x += offsetX;
+    build.y += offsetY;
+  });
+};
+
+const getTopLeftBound = builds => {
+  const topLeft = new Point(Infinity, Infinity);
+
+  builds.forEach(build => {
+    if (build.x < topLeft.x) {
+      topLeft.x = build.x;
+    }
+    if (build.y < topLeft.y) {
+      topLeft.y = build.y;
+    }
+  });
+
+  return topLeft;
+};
+
+const getBottomRightBound = builds => {
+  const bottomRight = new Point(-Infinity, -Infinity);
+
+  builds.forEach(build => {
+    if (build.right > bottomRight.x) {
+      bottomRight.x = build.right;
+    }
+    if (build.bottom > bottomRight.y) {
+      bottomRight.y = build.bottom;
+    }
+  });
+
+  return bottomRight;
+};
