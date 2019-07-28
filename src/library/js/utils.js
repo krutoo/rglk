@@ -10,6 +10,10 @@ export function isNumber (value) {
   return typeof value === 'number' || getTag(value) === 'Number';
 }
 
+export function isObject (value) {
+  return value === Object(value);
+}
+
 export function getTag (value) {
   return Object.prototype.toString.call(value).slice(8, -1);
 }
