@@ -1,17 +1,22 @@
 import { createGenerator } from './prng.js';
 import Point from './Point.js';
 import Rectangle from './Rectangle.js';
-import { isFunction } from './utils.js';
+import { isObject, isFiniteNumber, isFunction } from './utils.js';
+import { propEq, negate } from './fp.js';
 
 /**
  * Builds types.
  * @type {Object}
  */
-const BUILDS_TYPES = Object.freeze({
+const BUILD_TYPES = Object.freeze({
   room: Symbol('room'),
   corridor: Symbol('corridor'),
   connector: Symbol('connector'),
 });
+
+const isRoom = propEq('type', BUILD_TYPES.room);
+const isCorridor = propEq('type', BUILD_TYPES.corridor);
+const isConnector = propEq('type', BUILD_TYPES.connector);
 
 /**
  * Dungeons private data.
@@ -24,15 +29,22 @@ const DIRECTIONS = Object.freeze({
   top: Symbol('top'),
 });
 
+/**
+ * Directions list.
+ * @type {Array<symbol>}
+ */
 const directionsList = Object.values(DIRECTIONS);
 
-const isHorizontal = direction => [DIRECTIONS.left, DIRECTIONS.right].includes(direction);
-
 /**
- * Dungeons private data.
- * @type {WeakMap}
+ * Determines that direction is horizontal.
+ * @type {Function}
+ * @param {symbol} direction Direction.
+ * @return {boolean} Is direction horizontal?
  */
-const dungeonsData = new WeakMap();
+const isHorizontal = (() => {
+  const horizontalDirections = [DIRECTIONS.left, DIRECTIONS.right];
+  return direction => horizontalDirections.includes(direction);
+})();
 
 /**
  * Represents a dungeon generator.
@@ -49,92 +61,11 @@ export default class Dungeon {
    * @param {number} options.seed Seed for pseudo random number generator.
    */
   constructor (options) {
-    dungeonsData.set(this, {});
     this.setOptions(options);
     this.generate();
   }
 
-  /**
-   * Width of generated  in tiles.
-   * @return {number} Width.
-   * @readonly
-   */
-  get width () {
-    return parseInt(dungeonsData.get(this).width) || 0;
-  }
-
-  /**
-   * Returns height of generated dungeon in tiles.
-   * @return {number} Height.
-   * @readonly
-   */
-  get height () {
-    return parseInt(dungeonsData.get(this).height) || 0;
-  }
-
-  /**
-   * Returns rooms of generated dungeon.
-   * @return {Array} List of rooms.
-   * @readonly
-   */
-  get rooms () {
-    return this.builds.filter(build => build.type === BUILDS_TYPES.room);
-  }
-
-  /**
-   * Returns corridors of generated dungeon.
-   * @return {Array} List of corridors.
-   * @readonly
-   */
-  get corridors () {
-    return this.builds.filter(build => build.type === BUILDS_TYPES.corridor);
-  }
-
-  /**
-   * Returns connectors of generated dungeon.
-   * @return {Array} List of corridor connectors.
-   * @readonly
-   */
-  get connectors () {
-    return this.builds.filter(build => build.type === BUILDS_TYPES.connector);
-  }
-
-  /**
-   * Returns all builds of generated dungeon.
-   * @return {Array} List all builds.
-   * @readonly
-   */
-  get builds () {
-    const privateBuilds = dungeonsData.get(this).builds || [];
-    return [...privateBuilds];
-  }
-
-  /**
-   * Update some options.
-   * @param {Object} newOptions New options.
-   * @see constructor
-   */
-  setOptions (newOptions) {
-    dungeonsData.get(this).options = this.validateOptions(newOptions, this.getDefaultOptions());
-  }
-
-  validateOptions (options, defaultOptions) {
-    options = options || {};
-    const resultOptions = {};
-    Object.keys(defaultOptions).forEach(key => {
-      const value = options[key];
-      const defaultValue = defaultOptions[key];
-      const minimalValue = this.getMinimalOptions()[key];
-      if (isNaN(value) || !isFinite(value) || value < minimalValue) {
-        resultOptions[key] = defaultValue;
-      } else {
-        resultOptions[key] = parseInt(value);
-      }
-    });
-    return resultOptions;
-  }
-
-  getMinimalOptions () {
+  static getMinimalOptions () {
     return {
       seed: -Infinity,
       roomsAmount: 1,
@@ -146,7 +77,7 @@ export default class Dungeon {
     };
   }
 
-  getDefaultOptions () {
+  static getDefaultOptions () {
     return {
       seed: Math.random(),
       roomsAmount: 7,
@@ -156,6 +87,96 @@ export default class Dungeon {
       corridorMaxLength: 7,
       corridorComplexity: 2,
     };
+  }
+
+  /**
+   * Width of generated  in tiles.
+   * @return {number} Width.
+   * @readonly
+   */
+  get width () {
+    return parseInt(this._width) || 0;
+  }
+
+  /**
+   * Returns height of generated dungeon in tiles.
+   * @return {number} Height.
+   * @readonly
+   */
+  get height () {
+    return parseInt(this._height) || 0;
+  }
+
+  /**
+   * Returns rooms of generated dungeon.
+   * @return {Array} List of rooms.
+   * @readonly
+   */
+  get rooms () {
+    return this.builds.filter(isRoom);
+  }
+
+  /**
+   * Returns corridors of generated dungeon.
+   * @return {Array} List of corridors.
+   * @readonly
+   */
+  get corridors () {
+    return this.builds.filter(isCorridor);
+  }
+
+  /**
+   * Returns connectors of generated dungeon.
+   * @return {Array} List of corridor connectors.
+   * @readonly
+   */
+  get connectors () {
+    return this.builds.filter(isConnector);
+  }
+
+  /**
+   * Returns all builds of generated dungeon.
+   * @return {Array} List all builds.
+   * @readonly
+   */
+  get builds () {
+    const privateBuilds = Array.isArray(this._builds) ? this._builds : [];
+    return [...privateBuilds];
+  }
+
+  /**
+   * Update some options.
+   * @param {Object} newOptions New options.
+   */
+  setOptions (newOptions) {
+    if (this.isValidOptions(newOptions)) {
+      this._options = {
+        ...Dungeon.getDefaultOptions(),
+        ...newOptions,
+      };
+    } else {
+      throw Error('First argument "options" is invalid: every option must be a positive integer (excluding "seed")');
+    }
+  }
+
+  isValidOptions (options) {
+    const minimalOptions = Dungeon.getMinimalOptions();
+    let isValid = true;
+
+    if (!isObject(options)) {
+      isValid = false;
+    } else {
+      Object.keys(options).forEach(optionKey => {
+        const { [optionKey]: value } = options || {};
+        const { [optionKey]: minimalValue } = minimalOptions;
+
+        if (!isFiniteNumber(value) || value < minimalValue) {
+          isValid = false;
+        }
+      });
+    }
+
+    return isValid;
   }
 
   /**
@@ -191,11 +212,10 @@ export default class Dungeon {
    * @return {boolean} Is floor tile?
    */
   isFloor (x, y) {
-    const buffer = dungeonsData.get(this).buffer || [];
     let isFloor = false;
 
     if (x <= this.width && y <= this.height) {
-      isFloor = Boolean(buffer[this.getBufferIndex(x, y, this.height)]);
+      isFloor = Boolean(this._buffer && this._buffer[this.getBufferIndex(x, y, this.height)]);
     }
 
     return isFloor;
@@ -206,26 +226,29 @@ export default class Dungeon {
    * @return {Dungeon} Instance.
    */
   generate () {
-    const options = this.getOptions();
-
-    dungeonsData.get(this).prng = createGenerator(options.seed);
-    dungeonsData.get(this).builds = this.optimizeBuilds(this.generateBuilds(options));
-    dungeonsData.get(this).buffer = this.createBuffer(this.builds); // @todo getBoundRect
+    this._prng = createGenerator(this._options.seed);
+    this._builds = this.optimizeBuilds(this.generateBuilds(this._options));
+    this._buffer = this.createBuffer(this.builds); // @todo getBoundRect
 
     return this;
   }
 
   generateBuilds (options) {
+    const { roomsAmount } = this._options;
     const initialRoom = this.createRoom({ x: 0, y: 0 });
     const builds = [initialRoom];
-    while (builds.filter(build => build.type === BUILDS_TYPES.room).length < this.getOptions().roomsAmount) {
-      builds.push(...this.tryBuild(builds, options));
+
+    if (roomsAmount > 1) {
+      while (builds.filter(isRoom).length < roomsAmount) {
+        builds.push(...this.tryBuild(builds, options));
+      }
     }
+
     return builds;
   }
 
   tryBuild (readyBuilds, options) {
-    const extensibleBuilds = readyBuilds.filter(build => build.type !== BUILDS_TYPES.corridor);
+    const extensibleBuilds = readyBuilds.filter(negate(isCorridor));
     const startingBuild = extensibleBuilds[this.getRandom(0, extensibleBuilds.length - 1)];
     let newBuilds = this.createBranch(startingBuild, options.corridorComplexity);
 
@@ -257,16 +280,9 @@ export default class Dungeon {
     return branch;
   }
 
-  createConnector ({ parent }) {
-    const connector = this.createRoom({ parent, width: 1, height: 1 });
-    connector.type = BUILDS_TYPES.connector;
-
-    return connector;
-  }
-
   createRoom ({ x, y, width, height, parent }) {
-    const { roomMinSize, roomMaxSize } = this.getOptions();
-    const room = this.createBuild(BUILDS_TYPES.room, {
+    const { roomMinSize, roomMaxSize } = this._options;
+    const room = this.createBuild(BUILD_TYPES.room, {
       parent,
       x,
       y,
@@ -274,21 +290,20 @@ export default class Dungeon {
       height: height || this.getRandom(roomMinSize, roomMaxSize),
     });
 
-    if (parent) {
-      this.placeBuild(room, parent);
-    }
-
+    parent && this.placeBuild(room, parent);
     return room;
   }
 
   createCorridor ({ parent }) {
-    const { corridorMinLength, corridorMaxLength } = this.getOptions();
-    const corridor = this.createBuild(BUILDS_TYPES.corridor, {
+    const { corridorMinLength, corridorMaxLength } = this._options;
+    const corridorLength = this.getRandom(corridorMinLength, corridorMaxLength);
+    const corridor = this.createBuild(BUILD_TYPES.corridor, {
       parent,
       width: 1,
       height: 1,
     });
-    const corridorLength = this.getRandom(corridorMinLength, corridorMaxLength);
+
+    corridor.direction = directionsList[this.getRandom(0, directionsList.length - 1)];
 
     if (parent) {
       if (isHorizontal(corridor.direction)) {
@@ -302,9 +317,35 @@ export default class Dungeon {
     return corridor;
   }
 
+  createConnector ({ parent }) {
+    const connector = this.createBuild(BUILD_TYPES.connector, {
+      parent,
+      width: 1,
+      height: 1,
+    });
+
+    parent && this.placeBuild(connector, parent);
+    return connector;
+  }
+
+  createBuild (type, { x, y, width, height, parent }) {
+    const build = new Rectangle(x, y, width, height);
+
+    build.type = type;
+    build.children = [];
+
+    if (parent) {
+      build.parent = parent;
+      parent.children.push(build);
+      build.direction = parent.direction;
+    }
+
+    return build;
+  }
+
   placeBuild (build, parent) {
     const direction = (
-      build.type === BUILDS_TYPES.corridor
+      build.type === BUILD_TYPES.corridor
         ? build.direction
         : parent.direction
     ) || DIRECTIONS.left;
@@ -337,30 +378,8 @@ export default class Dungeon {
     }
   }
 
-  getOptions () {
-    return { ...this.getDefaultOptions(), ...dungeonsData.get(this).options };
-  }
-
-  createBuild (type, { x, y, width, height, parent }) {
-    const build = new Rectangle(x, y, width, height);
-    build.type = type;
-    build.children = [];
-
-    if (parent) {
-      build.parent = parent;
-      parent.children.push(build);
-      build.direction = parent.direction;
-    }
-
-    if (type === BUILDS_TYPES.corridor) {
-      build.direction = directionsList[this.getRandom(0, directionsList.length - 1)];
-    }
-
-    return build;
-  }
-
   getRandom (min, max) {
-    const seededRandom = dungeonsData.get(this).prng();
+    const seededRandom = this._prng();
     return Math.floor(min + (seededRandom * (max + 1 - min)));
   }
 
@@ -411,12 +430,14 @@ export default class Dungeon {
   createBuffer (builds) {
     const bottomRight = this.getBottomRightPoint(builds);
 
-    dungeonsData.get(this).width = bottomRight.x + 1;
-    dungeonsData.get(this).height = bottomRight.y + 1;
+    this._width = bottomRight.x + 1;
+    this._height = bottomRight.y + 1;
 
-    const buffer = Array(this.width * this.height);
+    const buffer = Array(this._width * this._height);
+
     buffer.fill(false);
     builds.forEach(build => this.fillRectangle(buffer, this.height, build));
+
     return buffer;
   }
 
