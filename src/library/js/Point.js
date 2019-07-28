@@ -1,10 +1,4 @@
 /**
- * Points private data.
- * @type {WeakMap}
- */
-const pointsData = new WeakMap();
-
-/**
  * Represents 2D Point.
  */
 export default class Point {
@@ -13,7 +7,6 @@ export default class Point {
    * @param {number} y - The y of point.
    */
   constructor (x, y) {
-    pointsData.set(this, {});
     this.x = x;
     this.y = y;
   }
@@ -23,7 +16,7 @@ export default class Point {
    * @return {number} The x value.
    */
   get x () {
-    return Number(pointsData.get(this).x) || 0;
+    return Number(this._x) || 0;
   }
 
   /**
@@ -33,7 +26,7 @@ export default class Point {
    */
   set x (value) {
     if (!isNaN(value)) {
-      pointsData.get(this).x = Number(value);
+      this._x = Number(value);
     }
   }
 
@@ -42,7 +35,7 @@ export default class Point {
    * @return {number} The y value.
    */
   get y () {
-    return Number(pointsData.get(this).y) || 0;
+    return Number(this._y) || 0;
   }
 
   /**
@@ -51,7 +44,7 @@ export default class Point {
    */
   set y (value) {
     if (!isNaN(value)) {
-      pointsData.get(this).y = Number(value);
+      this._y = Number(value);
     }
   }
 
@@ -61,7 +54,6 @@ export default class Point {
    * @return {number} Distance.
    */
   getDistanceTo (point) {
-    point = point || {};
     return Math.sqrt(((point.x - this.x) ** 2) + ((point.y - this.y) ** 2));
   }
 
@@ -71,7 +63,6 @@ export default class Point {
    * @return {boolean} Are points is equal?
    */
   isEqualTo (point) {
-    point = point || {};
     return point.x === this.x && point.y === this.y;
   }
 
