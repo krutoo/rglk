@@ -274,6 +274,12 @@
         "no-new-object": "error",
         "no-new-wrappers": "error",
         "no-obj-calls": "error",
+        "no-restricted-globals": [
+            "error",
+            "name",
+            "event",
+            "parent"
+        ],
         "no-trailing-spaces": "error",
         "no-undef": "error",
         "no-unneeded-ternary": "error",
