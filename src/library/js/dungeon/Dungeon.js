@@ -1,8 +1,8 @@
-import { createGenerator } from './prng.js';
-import Point from './Point.js';
+import { createGenerator } from '../prng.js';
+import Point from '../Point.js';
 import Rectangle from './Rectangle.js';
-import { isObject, isFiniteNumber, isFunction } from './utils.js';
-import { propEq, negate } from './fp.js';
+import { isObject, isFiniteNumber, isFunction } from '../utils.js';
+import { propEq, negate } from '../fp.js';
 
 /**
  * Builds types.

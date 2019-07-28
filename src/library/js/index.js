@@ -1,5 +1,5 @@
 import { createGenerator as createPRNG } from './prng.js';
-import Dungeon from './Dungeon.js';
+import Dungeon from './dungeon/Dungeon.js';
 import { createExplorer } from './explorer/index.js';
 import { createPathfinder } from './pathfinder/index.js';
 

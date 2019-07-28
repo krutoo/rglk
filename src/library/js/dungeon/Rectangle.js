@@ -1,10 +1,4 @@
-import Point from './Point.js';
-
-/**
- * Rectangles private data.
- * @type {WeakMap}
- */
-const rectanglesData = new WeakMap();
+import Point from '../Point.js';
 
 /**
  * Represents a 2D Rectangle.
@@ -18,7 +12,6 @@ export default class Rectangle extends Point {
    */
   constructor (x, y, width, height) {
     super(x, y);
-    rectanglesData.set(this, {});
     this.width = width;
     this.height = height;
   }
@@ -29,7 +22,7 @@ export default class Rectangle extends Point {
    * @readonly
    */
   get width () {
-    return Number(rectanglesData.get(this).width) || 0;
+    return Number(this._width) || 0;
   }
 
   /**
@@ -39,7 +32,7 @@ export default class Rectangle extends Point {
    */
   set width (value) {
     if (!isNaN(value)) {
-      rectanglesData.get(this).width = Number(value);
+      this._width = Number(value);
     }
   }
 
@@ -49,7 +42,7 @@ export default class Rectangle extends Point {
    * @readonly
    */
   get height () {
-    return Number(rectanglesData.get(this).height) || 0;
+    return Number(this._height) || 0;
   }
 
   /**
@@ -59,7 +52,7 @@ export default class Rectangle extends Point {
    */
   set height (value) {
     if (!isNaN(value)) {
-      rectanglesData.get(this).height = Number(value);
+      this._height = Number(value);
     }
   }
 
