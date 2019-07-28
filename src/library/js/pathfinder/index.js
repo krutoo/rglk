@@ -61,7 +61,7 @@ export const createPathfinder = (isOpen, options = {}) => {
         break;
       }
 
-      const neighbors = getNeighbors(currentNode, isOpen); // @TODO check length before run cycle
+      const neighbors = getNeighbors(currentNode, isOpen);
 
       for (const neighbor of neighbors) {
         // ignore neighbor node if it is already visited
@@ -88,6 +88,7 @@ export const createPathfinder = (isOpen, options = {}) => {
  * @param {number} x2 Second position x.
  * @param {number} y2 Second position y.
  * @return {number} Heuristic value.
+ * @todo Move to separate file.
  */
 export const getManhattanDistance = (x1, y1, x2, y2) => {
   const horizontal = Math.abs(x2 - x1);
@@ -101,6 +102,7 @@ export const getManhattanDistance = (x1, y1, x2, y2) => {
  * @param {Function} isOpen Should determines that neighbor is open.
  * @param {boolean} withDiagonal True if diagonal.
  * @return {function(Node): Array<Node>} Function that creates list of node neighbors.
+ * @todo Move to separate file.
  */
 const createNeighborsFinder = (isOpen, withDiagonal = false) => node => {
   const neighbors = [];
