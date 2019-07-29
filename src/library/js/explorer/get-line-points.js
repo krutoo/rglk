@@ -1,4 +1,4 @@
-import Point from '../Point.js';
+import Point from '../point.js';
 
 /**
  * Get list of points 2d line on a grid. Based on Bresenham's line algorithm.

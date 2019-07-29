@@ -1,4 +1,4 @@
-import Point from '../Point.js';
+import Point from '../point.js';
 import { isFunction, isFiniteNumber } from '../utils.js';
 import getLinePoints from './get-line-points.js';
 

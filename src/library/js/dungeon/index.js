@@ -1,6 +1,6 @@
 import { createGenerator } from '../prng.js';
-import Point from '../Point.js';
-import Rectangle from './Rectangle.js';
+import Point from '../point.js';
+import Rectangle from './rectangle.js';
 import { createMatrix } from './matrix.js';
 import { isObject, isFiniteNumber, isFunction } from '../utils.js';
 import { propEq, negate } from '../fp.js';

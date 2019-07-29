@@ -1,4 +1,4 @@
-import Point from '../Point.js';
+import Point from '../point.js';
 
 export default class Node extends Point {
   constructor (options) {
