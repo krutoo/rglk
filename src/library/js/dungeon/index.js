@@ -227,12 +227,13 @@ export class Dungeon {
   }
 
   _tryBuild (readyBuilds, options) {
-    const extensibleBuilds = readyBuilds.filter(negate(isCorridor));
+    const extensibleBuilds = readyBuilds.filter(isExtensible);
     const branchRootBuild = extensibleBuilds[this._getRandom(0, extensibleBuilds.length - 1)];
     let newBuilds = this._createBranch(branchRootBuild, options.corridorComplexity);
+    const checkingBuilds = readyBuilds.concat(newBuilds);
 
     // if some build from new builds list collides with ready other
-    if (newBuilds.some(build => !canAddBuild(build, readyBuilds.concat(newBuilds)))) {
+    if (newBuilds.some(build => !canAddBuild(build, checkingBuilds))) {
       branchRootBuild.children.pop(); // remove created branch
       newBuilds = [];
     }
@@ -240,11 +241,12 @@ export class Dungeon {
     return newBuilds;
   }
 
-  _createBranch (parentRoom, branchLength = 1) {
+  _createBranch (parent, branchLength = 1) {
     const branch = [];
-    let partParent = parentRoom;
+    let partParent = parent;
 
     for (let index = 0; index < branchLength; index++) {
+      // branch always starts with corridor, from room or from connector
       const corridor = this._createCorridor({ parent: partParent });
       let closure = null;
 
@@ -384,6 +386,7 @@ export class Dungeon {
 const isRoom = propEq('type', BUILD_TYPES.room);
 const isCorridor = propEq('type', BUILD_TYPES.corridor);
 const isConnector = propEq('type', BUILD_TYPES.connector);
+const isExtensible = negate(isCorridor);
 
 /**
  * Determines that direction is horizontal.
