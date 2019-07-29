@@ -1,5 +1,12 @@
+const functionTags = Object.freeze([
+  'Function',
+  'AsyncFunction',
+  'GeneratorFunction',
+  'Proxy',
+]);
+
 export function isFunction (value) {
-  return value && typeof value === 'function';
+  return functionTags.includes(getTag(value));
 }
 
 export function isFiniteNumber (value) {

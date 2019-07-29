@@ -3,8 +3,8 @@
  */
 export default class Point {
   /**
-   * @param {number} x - The x of point.
-   * @param {number} y - The y of point.
+   * @param {number} x The x of point.
+   * @param {number} y The y of point.
    */
   constructor (x, y) {
     this.x = x;
@@ -54,7 +54,9 @@ export default class Point {
    * @return {number} Distance.
    */
   getDistanceTo (point) {
-    return Math.sqrt(((point.x - this.x) ** 2) + ((point.y - this.y) ** 2));
+    return Math.sqrt(
+      ((point.x - this.x) ** 2) + ((point.y - this.y) ** 2)
+    );
   }
 
   /**
@@ -63,7 +65,9 @@ export default class Point {
    * @return {boolean} Are points is equal?
    */
   isEqualTo (point) {
-    return point.x === this.x && point.y === this.y;
+    return Boolean(point)
+      && point.x === this.x
+      && point.y === this.y;
   }
 
   clone () {

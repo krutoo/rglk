@@ -17,6 +17,8 @@ export const createExplorer = isTransparent => {
     const hasExploredHandler = isFunction(handleExplored);
     const squareRadius = radius ** 2;
     const center = new Point(centerX, centerY);
+
+    // checking square area bounds
     const minX = center.x - radius;
     const maxX = center.x + radius;
     const minY = center.y - radius;
@@ -35,7 +37,10 @@ export const createExplorer = isTransparent => {
             if (!checkedPoints.has(pointKey)) {
               const squareDistance = ((center.x - point.x) ** 2) + ((center.y - point.y) ** 2);
 
-              if (squareDistance <= squareRadius && isTransparent(point.x, point.y)) {
+              if (
+                squareDistance <= squareRadius
+                && isTransparent(point.x, point.y)
+              ) {
                 visiblePoints.push(point);
                 hasExploredHandler && handleExplored(point.x, point.y);
               } else {

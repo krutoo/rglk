@@ -13,10 +13,10 @@ export const propEq = (key, value) => {
   return source => isEqual(getProp(source));
 };
 
-export const negate = fn => {
-  if (!isFunction(fn)) {
+export const negate = predicate => {
+  if (!isFunction(predicate)) {
     throw TypeError('First argument must be a function');
   }
 
-  return (...args) => !fn(...args);
+  return (...args) => !predicate(...args);
 };

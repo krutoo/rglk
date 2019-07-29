@@ -10,7 +10,9 @@ import { isFunction } from '../utils.js';
  */
 export const createPathfinder = (isOpen, options = {}) => {
   if (!isFunction(isOpen)) {
-    throw new TypeError('First argument "isOpen" must be a function');
+    throw new TypeError(
+      'First argument "isOpen" must be a function'
+    );
   }
 
   const { getHeuristic = getManhattanDistance } = options || {};
@@ -71,7 +73,12 @@ export const createPathfinder = (isOpen, options = {}) => {
 
         // if neighbor not in open list, add him to open list, update h
         if (!unvisitedNodes.some(node => node.isEqualTo(neighbor))) {
-          neighbor.h = getHeuristic(neighbor.x, neighbor.y, end.x, end.y);
+          neighbor.h = getHeuristic(
+            neighbor.x,
+            neighbor.y,
+            end.x,
+            end.y
+          );
           unvisitedNodes.push(neighbor);
         }
       }
@@ -122,5 +129,6 @@ const createNeighborsFinder = (isOpen, withDiagonal = false) => node => {
       }
     }
   }
+
   return neighbors;
 };
