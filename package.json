@@ -21,6 +21,11 @@
     "lint": "eslint src",
     "test": "jest"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
@@ -31,6 +36,7 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^22.14.0",
     "eslint-plugin-jsdoc": "^15.7.2",
+    "husky": "^3.0.1",
     "jest": "^24.8.0"
   }
 }
