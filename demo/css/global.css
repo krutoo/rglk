@@ -4,8 +4,7 @@
   border: 0;
   outline: 0;
   box-sizing: border-box;
-  font-size: inherit;
-  font-family: inherit;
+  font: inherit;
 }
 
 *::before,
@@ -27,6 +26,7 @@ body {
 .main-container {
   padding: 1rem;
   width: 100%;
+  min-width: 480px;
   max-width: 640px;
   margin: auto;
 }
@@ -37,7 +37,7 @@ body {
 
 .canvas-wrapper {
   position: relative;
-  border-radius: .2rem;
+  border-radius: .25rem;
   overflow: hidden;
 }
 
@@ -46,7 +46,7 @@ body {
   top: .5rem;
   right: .5rem;
   padding: .5rem 1rem;
-  background-color: #c8d6e5;
+  background-color: #d4dae0;
   border-radius: .1rem;
   opacity: .5;
   z-index: 1;
@@ -54,8 +54,4 @@ body {
 
 .canvas-wrapper .reload-button:hover {
   opacity: 1;
-}
-
-.canvas-wrapper .reload-button:hover {
-  cursor: pointer;
 }

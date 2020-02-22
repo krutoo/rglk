@@ -1,21 +1,21 @@
 h1 {
-  font-size: 2rem;
+  font-size: 2em;
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 1.5em;
 }
 
 h3 {
-  font-size: 1.17rem;
+  font-size: 1.17em;
 }
 
 h4 {
-  font-size: 1rem;
+  font-size: 1em;
 }
 
 h5 {
-  font-size: .83rem;
+  font-size: .83em;
 }
 
 h6 {
@@ -29,7 +29,7 @@ h4,
 h5,
 h6 {
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 1em;
 }
 
 a {
@@ -46,17 +46,16 @@ hr {
   display: block;
   width: auto;
   height: 1px;
-  background-color: #aaa;
+  background-color: #eee;
   margin: 1rem 0;
 }
 
 p {
-  margin: .5rem 0;
+  margin: .5em 0;
 }
 
 canvas {
   display: block;
   width: 100%;
   height: auto;
-  background-color: #222f3e;
 }

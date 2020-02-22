@@ -2,7 +2,7 @@ import {
   Dungeon,
   createExplorer,
   createPathfinder,
-} from '../../library/js/index.js';
+} from '../../src/index.js';
 
 let mousePosition = { x: 0, y: 0 };
 
@@ -15,8 +15,12 @@ initSection('.js-section-dungeon', canvas => {
     corridorMaxLength: 4,
     corridorComplexity: 3,
   });
-  window.dungeon = dungeon;
-  draw(canvas, { dungeon });
+
+  draw(canvas, {
+    dungeon,
+    roomColor: '#3c6382',
+    corridorColor: '#60a3bc',
+  });
 });
 
 initSection('.js-section-labyrinth', canvas => {
@@ -28,9 +32,11 @@ initSection('.js-section-labyrinth', canvas => {
     corridorMaxLength: 1,
     corridorComplexity: 1,
   });
+
   draw(canvas, {
     dungeon,
-    corridorColor: '#c8d6e5',
+    roomColor: '#4a69bd',
+    corridorColor: '#4a69bd',
   });
 });
 
@@ -43,15 +49,19 @@ initSection('.js-section-explorer', canvas => {
     corridorMaxLength: 1,
     corridorComplexity: 1,
   });
+
   const explore = createExplorer(
     (x, y) => dungeon.isFloor(x, y)
   );
+
   const tileSize = calculateTileSize(dungeon, canvas);
+
   const fov = explore(
     parseInt(dungeon.rooms[0].center.x),
     parseInt(dungeon.rooms[0].center.y),
     12
   );
+
   canvas.onmousemove = event => {
     mousePosition = getMousePosition(event);
     const dungeonPosition = {
@@ -68,18 +78,19 @@ initSection('.js-section-explorer', canvas => {
         fov: newFov,
         dungeon,
         radius: 12,
-        roomColor: '#000',
-        corridorColor: '#000',
+        roomColor: '#1e272e',
+        corridorColor: '#1e272e',
         center: dungeonPosition,
       });
     }
   };
+
   draw(canvas, {
     fov,
     dungeon,
     radius: 12,
-    roomColor: '#000',
-    corridorColor: '#000',
+    roomColor: '#1e272e',
+    corridorColor: '#1e272e',
     center: dungeon.rooms[0].center,
   });
 });
@@ -93,31 +104,37 @@ initSection('.js-section-pathfinder', canvas => {
     corridorMaxLength: 4,
     corridorComplexity: 2,
   });
+
   const findPath = createPathfinder((x, y) => dungeon.isFloor(x, y));
+
   const path = findPath(
     parseInt(dungeon.rooms[0].center.x),
     parseInt(dungeon.rooms[0].center.y),
     parseInt(dungeon.rooms[dungeon.rooms.length - 1].center.x),
     parseInt(dungeon.rooms[dungeon.rooms.length - 1].center.y)
   );
+
   draw(canvas, {
     path,
     dungeon,
-    roomColor: '#576574',
-    corridorColor: '#576574',
+    roomColor: '#d4dae0',
+    corridorColor: '#d4dae0',
   });
 });
 
 function initSection (sectionSelector, render) {
   const section = document.querySelector(sectionSelector);
+
   if (section) {
     const canvas = section.querySelector('canvas');
     const button = section.querySelector('.js-reload-button');
+
     if (canvas) {
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.width / 16 * 9;
       render(canvas);
     }
+
     if (button) {
       button.addEventListener('click', () => render(canvas));
     }
@@ -125,35 +142,27 @@ function initSection (sectionSelector, render) {
 }
 
 function draw (canvas, data) {
-  data = data || {};
-  const context = canvas.getContext('2d'); const {
-    fov,
-    path,
-    dungeon,
-  } = data;
+  const context = canvas.getContext('2d');
+  const { fov, path, dungeon } = data;
+
   data.tileSize = calculateTileSize(dungeon, canvas);
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  if (dungeon) {
-    drawMap(context, data);
-    if (fov) {
-      drawFOV(context, data);
-    }
-    if (path) {
-      drawPath(context, data);
-    }
-  }
+  context.fillStyle = '#f4f5f7';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  dungeon && drawMap(context, data);
+  fov && drawFOV(context, data);
+  path && drawPath(context, data);
 }
 
 function drawMap (context, data) {
-  data = data || {};
   const {
     dungeon,
-    roomColor = '#c8d6e5',
-    corridorColor = '#8395a7',
+    roomColor = '#82ccdd',
+    corridorColor = '#82ccdd',
     tileSize,
   } = data;
 
-  // draw rooms
+  // rooms
   dungeon.rooms.forEach(room => {
     context.fillStyle = roomColor;
     context.fillRect(
@@ -164,7 +173,7 @@ function drawMap (context, data) {
     );
   });
 
-  // draw corridors
+  // corridors
   dungeon.corridors.concat(dungeon.connectors).forEach(corridor => {
     context.fillStyle = corridorColor;
     context.fillRect(
@@ -183,6 +192,7 @@ function drawFOV (context, data) {
     radius,
     tileSize,
   } = data;
+
   fov.forEach(tile => {
     const distance = Math.sqrt(((center.x - tile.x) ** 2) + ((center.y - tile.y) ** 2));
     const proportion = 1 - (distance / radius);
@@ -198,14 +208,11 @@ function drawFOV (context, data) {
   });
 }
 
-function drawPath (context, data) {
-  const {
-    path,
-    tileSize,
-  } = data;
-  context.strokeStyle = '#1dd1a1';
-  context.fillStyle = '#1dd1a1';
+function drawPath (context, { path, tileSize }) {
+  context.strokeStyle = '#e74c3c';
+  context.fillStyle = '#e74c3c';
   context.lineWidth = Math.ceil(tileSize / 3);
+
   if (path.length) {
     context.beginPath();
     context.moveTo(
@@ -234,18 +241,19 @@ function drawPath (context, data) {
 function calculateTileSize (dungeon, canvas) {
   const canvasMinSide = Math.min(canvas.width, canvas.height);
   const dungeonMaxSide = Math.max(dungeon.width, dungeon.height);
+
   return Math.floor(canvasMinSide / dungeonMaxSide) || 8;
 }
 
 function getMousePosition (event) {
-  const mousePosition = {
-    x: 0,
-    y: 0,
-  };
+  const mousePosition = { x: 0, y: 0 };
+
   if (event instanceof Event) {
     const rect = event.target.getBoundingClientRect();
+
     mousePosition.x = event.clientX - rect.left;
     mousePosition.y = event.clientY - rect.top;
   }
+
   return mousePosition;
 }
