@@ -24,12 +24,12 @@ import { Dungeon } from 'rglk';
 
 // create a new generated dungeon
 const dungeon = new Dungeon({
-    roomsAmount: 64,
-    roomMinSize: 5,
-    roomMaxSize: 11,
-    corridorMinLength: 1,
-    corridorMaxLength: 10,
-    seed: 12345,
+  roomsAmount: 64,
+  roomMinSize: 5,
+  roomMaxSize: 11,
+  corridorMinLength: 1,
+  corridorMaxLength: 10,
+  seed: 12345,
 });
 
 // each call rebuilds dungeon
@@ -37,7 +37,7 @@ dungeon.generate();
 
 // process each tile
 dungeon.forEachTile((x, y, isFloor) => {
-    // ...draw wall or floor
+  // ...draw wall or floor
 });
 
 // check tile type (returns boolean)
@@ -52,13 +52,13 @@ dungeon.isFloor(x, y);
 ```javascript
 import { createExplorer } from 'rglk';
 
-const explorer = createExplorer((x, y) => {
-    // should return boolean depends on tile is transparent
+const explore = createExplorer((x, y) => {
+  // should return boolean depends on tile is transparent
 });
 
 // get array of visible tile positions
-const fov = explorer.calculate(centerX, centerY, radius, (x, y) => {
-    // this callback will be executed if tile is visible
+const fov = explore(centerX, centerY, radius, (x, y) => {
+  // this callback will be executed if tile is visible
 });
 ```
 
@@ -84,6 +84,7 @@ findPath(x1, y1, x2, y2);
 ```javascript
 import { createPRNG } from 'rglk';
 
+// two generators with same seed
 const first = createPRNG(123);
 const second = createPRNG(123);
 
