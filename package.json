@@ -16,8 +16,9 @@
     "type": "git",
     "url": "https://github.com/krutoo/rglk.js.git"
   },
-  "main": "./src/library/index.js",
+  "main": "./src/index.js",
   "scripts": {
+    "demo:watch": "parcel demo/index.html",
     "lint": "eslint src",
     "test": "jest"
   },
@@ -37,6 +38,10 @@
     "eslint-plugin-jest": "^22.14.0",
     "eslint-plugin-jsdoc": "^15.7.2",
     "husky": "^3.0.1",
-    "jest": "^24.8.0"
+    "jest": "^24.8.0",
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
   }
 }
