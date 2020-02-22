@@ -1,9 +1,9 @@
-import Point from '../point.js';
+import { Point } from '../point';
 
 export default class Node extends Point {
-  constructor (options) {
-    options = options || {};
+  constructor (options = {}) {
     super(options.x, options.y);
+
     this.g = options.g;
     this.h = options.h;
     this.parent = options.parent;

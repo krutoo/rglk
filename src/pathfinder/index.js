@@ -1,5 +1,5 @@
-import Node from './node.js';
-import { isFunction } from '../utils.js';
+import Node from './node';
+import isFunction from 'lodash/isFunction';
 
 /**
  * Returns a 2d pathfinder function.

@@ -1,4 +1,4 @@
-import { isFunction } from '../utils.js';
+import isFunction from 'lodash/isFunction';
 
 /**
  * @typedef {Object} MatrixType Matrix.

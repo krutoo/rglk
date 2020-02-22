@@ -1,4 +1,4 @@
-import Point from '../point.js';
+import { Point } from '../point';
 
 /**
  * Get list of points 2d line on a grid. Based on Bresenham's line algorithm.
@@ -34,6 +34,7 @@ const getLinePoints = (x1, y1, x2, y2) => {
       currentPoint.y += sy;
       iy++;
     }
+
     points.push(currentPoint.clone());
   }
 

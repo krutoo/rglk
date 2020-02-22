@@ -1,7 +1,7 @@
 /**
  * Represents 2D Point.
  */
-export default class Point {
+export class Point {
   /**
    * @param {number} x The x of point.
    * @param {number} y The y of point.

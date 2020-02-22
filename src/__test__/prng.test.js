@@ -1,4 +1,4 @@
-import { createGenerator } from '../prng.js';
+import { createGenerator } from '../prng';
 
 describe('createGenerator', () => {
   test('should throw when argument is not a finite number', () => {

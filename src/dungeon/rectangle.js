@@ -1,9 +1,9 @@
-import Point from '../point.js';
+import { Point } from '../point';
 
 /**
  * Represents a 2D Rectangle.
  */
-export default class Rectangle extends Point {
+export class Rectangle extends Point {
   /**
    * @param {number} x Left border position of rectangle.
    * @param {number} y Top border position of rectangle.

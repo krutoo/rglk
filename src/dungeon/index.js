@@ -1,24 +1,19 @@
-import { createGenerator } from '../prng.js';
-import Point from '../point.js';
-import Rectangle from './rectangle.js';
-import { createMatrix } from './matrix.js';
-import { isObject, isFiniteNumber, isFunction } from '../utils.js';
-import { propEq, negate } from '../fp.js';
+import { createGenerator } from '../prng';
+import { Point } from '../point';
+import { Rectangle } from './rectangle';
+import { createMatrix } from './matrix';
+import __ from 'lodash/fp/__';
+import isFunction from 'lodash/isFunction';
+import includes from 'lodash/fp/includes';
+import negate from 'lodash/fp/negate';
+import propEq from 'lodash/fp/propEq';
 
-/**
- * Builds types.
- * @type {Object}
- */
 const BUILD_TYPES = Object.freeze({
   room: Symbol('room'),
   corridor: Symbol('corridor'),
   connector: Symbol('connector'),
 });
 
-/**
- * Dungeons private data.
- * @type {Object}
- */
 const DIRECTIONS = Object.freeze({
   top: Symbol('top'),
   right: Symbol('right'),
@@ -26,14 +21,10 @@ const DIRECTIONS = Object.freeze({
   left: Symbol('left'),
 });
 
-/**
- * Directions list.
- * @type {Array<symbol>}
- */
 const directionsList = Object.freeze(Object.values(DIRECTIONS));
 
 /**
- * Represents a dungeon generator.
+ * Dungeon.
  */
 export class Dungeon {
   /**
@@ -51,18 +42,6 @@ export class Dungeon {
     this.generate();
   }
 
-  static getMinimalOptions () {
-    return {
-      seed: -Infinity,
-      roomsAmount: 1,
-      roomMinSize: 1,
-      roomMaxSize: 1,
-      corridorMinLength: 1,
-      corridorMaxLength: 1,
-      corridorComplexity: 1,
-    };
-  }
-
   static getDefaultOptions () {
     return {
       seed: Math.random(),
@@ -72,6 +51,18 @@ export class Dungeon {
       corridorMinLength: 3,
       corridorMaxLength: 7,
       corridorComplexity: 2,
+    };
+  }
+
+  static getOptionsCheckers () {
+    return {
+      seed: Number.isFinite,
+      roomsAmount: isPositiveInteger,
+      roomMinSize: isPositiveInteger,
+      roomMaxSize: isPositiveInteger,
+      corridorMinLength: isPositiveInteger,
+      corridorMaxLength: isPositiveInteger,
+      corridorComplexity: isPositiveInteger,
     };
   }
 
@@ -132,31 +123,30 @@ export class Dungeon {
     if (this.isValidOptions(newOptions)) {
       this._options = {
         ...Dungeon.getDefaultOptions(),
+        ...this._options,
         ...newOptions,
       };
     } else {
-      throw Error('First argument "options" is invalid: every option must be a positive integer (excluding "seed")');
+      throw Error(
+        'First argument "options" is invalid: every option must be a positive integer (excluding "seed")'
+      );
     }
   }
 
   isValidOptions (options) {
-    const defaults = Dungeon.getMinimalOptions();
-    const minimalOptions = Dungeon.getMinimalOptions();
+    const defaults = Dungeon.getDefaultOptions();
+    const checkers = Dungeon.getOptionsCheckers();
     let isValid = true;
 
-    if (!isObject(options)) {
-      isValid = false;
-    } else {
-      Object.keys(options).forEach(optionKey => {
-        const { [optionKey]: defaultValue } = defaults;
-        const { [optionKey]: minimalValue } = minimalOptions;
-        const { [optionKey]: value = defaultValue } = options || {};
+    Object.keys(defaults).forEach(optionKey => {
+      const { [optionKey]: defaultValue } = defaults;
+      const { [optionKey]: isValidValue } = checkers;
+      const { [optionKey]: value = defaultValue } = options || {};
 
-        if (!isFiniteNumber(value) || value < minimalValue) {
-          isValid = false;
-        }
-      });
-    }
+      if (!isValidValue(value)) {
+        isValid = false;
+      }
+    });
 
     return isValid;
   }
@@ -168,12 +158,15 @@ export class Dungeon {
    */
   forEachTile (callback) {
     if (isFunction(callback)) {
-      for (let x = 0; x < this.height; x++) {
-        for (let y = 0; y < this.width; y++) {
+      const { width, height } = this;
+
+      for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
           callback(x, y, this.isFloor(x, y));
         }
       }
     }
+
     return this;
   }
 
@@ -388,16 +381,7 @@ const isCorridor = propEq('type', BUILD_TYPES.corridor);
 const isConnector = propEq('type', BUILD_TYPES.connector);
 const isExtensible = negate(isCorridor);
 
-/**
- * Determines that direction is horizontal.
- * @type {Function}
- * @param {symbol} direction Direction.
- * @return {boolean} Is direction horizontal?
- */
-const isHorizontal = (() => {
-  const horizontalDirections = [DIRECTIONS.left, DIRECTIONS.right];
-  return direction => horizontalDirections.includes(direction);
-})();
+const isHorizontal = includes(__, [DIRECTIONS.left, DIRECTIONS.right]);
 
 const canAddBuild = (newBuild, readyBuilds) => {
   // builds list to check collides with new build
@@ -410,7 +394,9 @@ const canAddBuild = (newBuild, readyBuilds) => {
     return !isSelf && !isParent && !isChildren && !isConnected;
   });
 
-  return !checkingBuilds.some(build => build.collides(newBuild));
+  return !checkingBuilds.some(
+    build => build.collides(newBuild)
+  );
 };
 
 const optimizeBuilds = builds => {
@@ -461,3 +447,5 @@ const getBottomRightBound = builds => {
 
   return bottomRight;
 };
+
+const isPositiveInteger = n => Number.isInteger(n) && n > 0;

@@ -1,15 +1,19 @@
-import Point from '../point.js';
-import { isFunction, isFiniteNumber } from '../utils.js';
-import getLinePoints from './get-line-points.js';
+import { Point } from '../point';
+import isFunction from 'lodash/isFunction';
+import getLinePoints from './get-line-points';
 
 export const createExplorer = isTransparent => {
   if (!isFunction(isTransparent)) {
-    throw TypeError('First argument "isTransparent" must be a function.');
+    throw TypeError(
+      'First argument "isTransparent" must be a function.'
+    );
   }
 
   return (centerX, centerY, radius, handleExplored) => {
-    if (!isFiniteNumber(centerX + centerY + radius)) {
-      throw TypeError('First three arguments (centerX, centerY, radius) must be finite numbers');
+    if (!Number.isFinite(centerX + centerY + radius)) {
+      throw TypeError(
+        'First three arguments (centerX, centerY, radius) must be finite numbers'
+      );
     }
 
     const checkedPoints = new Set();
