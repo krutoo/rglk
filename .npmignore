@@ -1,7 +1,5 @@
 /dist
 /build
 /node_modules
-.gitignore
-.npmignore
 .DS_Store
 .cache
