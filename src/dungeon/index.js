@@ -234,19 +234,19 @@ export class Dungeon {
     return newBuilds;
   }
 
-  _createBranch (parent, branchLength = 1) {
+  _createBranch (parentBuild, branchLength = 1) {
     const branch = [];
-    let partParent = parent;
+    let partParent = parentBuild;
 
     for (let index = 0; index < branchLength; index++) {
       // branch always starts with corridor, from room or from connector
-      const corridor = this._createCorridor({ parent: partParent });
+      const corridor = this._createCorridor({ parentBuild: partParent });
       let closure = null;
 
       if (index < branchLength - 1) {
-        closure = this._createConnector({ parent: corridor });
+        closure = this._createConnector({ parentBuild: corridor });
       } else {
-        closure = this._createRoom({ parent: corridor });
+        closure = this._createRoom({ parentBuild: corridor });
       }
       branch.push(corridor, closure);
       partParent = closure;
@@ -255,100 +255,100 @@ export class Dungeon {
     return branch;
   }
 
-  _createRoom ({ x, y, width, height, parent }) {
+  _createRoom ({ x, y, width, height, parentBuild }) {
     const { roomMinSize, roomMaxSize } = this._options;
     const room = this._createBuild(BUILD_TYPES.room, {
-      parent,
+      parentBuild,
       x,
       y,
       width: width || this._getRandom(roomMinSize, roomMaxSize),
       height: height || this._getRandom(roomMinSize, roomMaxSize),
     });
 
-    parent && this._placeBuild(room, parent);
+    parentBuild && this._placeBuild(room, parentBuild);
     return room;
   }
 
-  _createCorridor ({ parent }) {
+  _createCorridor ({ parentBuild }) {
     const { corridorMinLength, corridorMaxLength } = this._options;
     const corridorLength = this._getRandom(corridorMinLength, corridorMaxLength);
     const corridor = this._createBuild(BUILD_TYPES.corridor, {
-      parent,
+      parentBuild,
       width: 1,
       height: 1,
     });
 
     corridor.direction = directionsList[this._getRandom(0, directionsList.length - 1)];
 
-    if (parent) {
+    if (parentBuild) {
       if (isHorizontal(corridor.direction)) {
         corridor.width = corridorLength;
       } else {
         corridor.height = corridorLength;
       }
-      this._placeBuild(corridor, parent);
+      this._placeBuild(corridor, parentBuild);
     }
 
     return corridor;
   }
 
-  _createConnector ({ parent }) {
+  _createConnector ({ parentBuild }) {
     const connector = this._createBuild(BUILD_TYPES.connector, {
-      parent,
+      parentBuild,
       width: 1,
       height: 1,
     });
 
-    parent && this._placeBuild(connector, parent);
+    parentBuild && this._placeBuild(connector, parentBuild);
     return connector;
   }
 
-  _createBuild (type, { x, y, width, height, parent }) {
+  _createBuild (type, { x, y, width, height, parentBuild }) {
     const build = new Rectangle(x, y, width, height);
 
     build.type = type;
     build.children = [];
 
-    if (parent) {
-      build.parent = parent;
-      parent.children.push(build);
-      build.direction = parent.direction;
+    if (parentBuild) {
+      build.parent = parentBuild;
+      parentBuild.children.push(build);
+      build.direction = parentBuild.direction;
     }
 
     return build;
   }
 
-  _placeBuild (build, parent) {
+  _placeBuild (build, parentBuild) {
     const direction = (
       build.type === BUILD_TYPES.corridor
         ? build.direction
-        : parent.direction
+        : parentBuild.direction
     ) || DIRECTIONS.left;
 
     if (isHorizontal(direction)) {
       build.y = this._getRandom(
-        parent.top - build.height + 1,
-        parent.bottom - 1
+        parentBuild.top - build.height + 1,
+        parentBuild.bottom - 1
       );
     } else {
       build.x = this._getRandom(
-        parent.left - build.width + 1,
-        parent.right - 1
+        parentBuild.left - build.width + 1,
+        parentBuild.right - 1
       );
     }
 
     switch (direction) {
       case DIRECTIONS.left:
-        build.x = parent.right;
+        build.x = parentBuild.right;
         break;
       case DIRECTIONS.bottom:
-        build.y = parent.bottom;
+        build.y = parentBuild.bottom;
         break;
       case DIRECTIONS.right:
-        build.x = parent.left - build.width;
+        build.x = parentBuild.left - build.width;
         break;
       case DIRECTIONS.top:
-        build.y = parent.top - build.height;
+        build.y = parentBuild.top - build.height;
         break;
     }
   }
