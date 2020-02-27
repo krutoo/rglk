@@ -13,7 +13,7 @@ npm install --save rglk
 
 ## Features
 
-Constructors in **rglk** namespace allows to build simple 2d dungeons, define field of view, search path between two points and generates pseudo random numbers.
+**rglk** allows to build simple 2d dungeons, define field of view, search path between two points and generates pseudo random numbers.
 
 ### Dungeon 🏗️
 
