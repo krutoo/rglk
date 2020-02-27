@@ -6,14 +6,17 @@ before_script: npm i
 
 jobs:
   include:
-    - name: lint
+    - stage: lint
+      name: lint
       script:
         - npm run lint
 
     - stage: test
+      name: test
       script: npm run test
 
     - stage: deploy demo
+      name: deploy demo
       if: master = master AND tag IS present
       script: npm run demo:build
       deploy:
@@ -27,6 +30,7 @@ jobs:
           tags: true
 
     - stage: npm release
+      name: npm release
       if: master = master AND tag IS present
       deploy:
         provider: npm
