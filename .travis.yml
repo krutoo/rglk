@@ -17,7 +17,7 @@ jobs:
 
     - stage: deploy demo
       name: deploy demo
-      if: master = master AND tag IS present
+      if: branch = master AND tag IS present
       script: npm run demo:build
       deploy:
         provider: pages
@@ -31,7 +31,7 @@ jobs:
 
     - stage: npm release
       name: npm release
-      if: master = master AND tag IS present
+      if: branch = master AND tag IS present
       deploy:
         provider: npm
         email: $NPM_EMAIL
