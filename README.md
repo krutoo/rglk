@@ -90,3 +90,9 @@ const second = createPRNG(123);
 
 first() === second(); // true
 ```
+
+## To Do
+
+- more unit tests
+- remove many getters/setters
+- migrate to TypeScript (with build to JS + `*d.ts`)
