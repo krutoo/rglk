@@ -31,7 +31,7 @@ export class Rectangle extends Point {
    * @readonly
    */
   set width (value) {
-    if (!isNaN(value)) {
+    if (Number.isFinite(value)) {
       this._width = Number(value);
     }
   }
@@ -51,7 +51,7 @@ export class Rectangle extends Point {
    * @readonly
    */
   set height (value) {
-    if (!isNaN(value)) {
+    if (Number.isFinite(value)) {
       this._height = Number(value);
     }
   }

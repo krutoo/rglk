@@ -1,4 +1,5 @@
-import Node from './node';
+import { Node } from './node';
+import { Point } from '../point';
 import isFunction from 'lodash/isFunction';
 
 /**
@@ -8,14 +9,11 @@ import isFunction from 'lodash/isFunction';
  * @param {Function} [options.getHeuristic=getManhattanDistance] Heuristic function.
  * @return {function(number, number, number, number): Array<Node>} List of path points.
  */
-export const createPathfinder = (isOpen, options = {}) => {
+export const createPathfinder = (isOpen, { getHeuristic = getManhattanDistance } = {}) => {
   if (!isFunction(isOpen)) {
-    throw new TypeError(
-      'First argument "isOpen" must be a function'
-    );
+    throw new TypeError('First argument "isOpen" must be a function');
   }
 
-  const { getHeuristic = getManhattanDistance } = options || {};
   const getNeighbors = createNeighborsFinder(isOpen);
 
   /**
@@ -29,15 +27,12 @@ export const createPathfinder = (isOpen, options = {}) => {
   return (x1, y1, x2, y2) => {
     const visitedNodes = [];
     const unvisitedNodes = [];
-    const end = new Node({
-      x: x2,
-      y: y2,
-    });
-    const start = new Node({
-      x: x1,
-      y: y1,
-    });
+
+    const start = new Node({ x: x1, y: y1 });
+    const end = new Node({ x: x2, y: y2 });
+
     let resultPath = [];
+
     unvisitedNodes.push(start);
 
     // main loop
@@ -46,6 +41,7 @@ export const createPathfinder = (isOpen, options = {}) => {
       let currentNodeIndex = 0;
       let currentNode = unvisitedNodes[0];
 
+      // @todo optimize search (maybe use binary heap)
       unvisitedNodes.forEach((node, index) => {
         if (node.f < currentNode.f) {
           currentNode = node;
@@ -58,7 +54,7 @@ export const createPathfinder = (isOpen, options = {}) => {
       visitedNodes.push(currentNode);
 
       // if current node is target then create path and break
-      if (currentNode.isEqualTo(end)) {
+      if (Point.isEqual(currentNode, end)) {
         resultPath = currentNode.createPathToRoot();
         break;
       }
@@ -66,13 +62,15 @@ export const createPathfinder = (isOpen, options = {}) => {
       const neighbors = getNeighbors(currentNode, isOpen);
 
       for (const neighbor of neighbors) {
+        const likeNeighbor = Point.isEqual(neighbor);
+
         // ignore neighbor node if it is already visited
-        if (visitedNodes.some(node => node.isEqualTo(neighbor))) {
+        if (visitedNodes.some(likeNeighbor)) {
           continue;
         }
 
         // if neighbor not in open list, add him to open list, update h
-        if (!unvisitedNodes.some(node => node.isEqualTo(neighbor))) {
+        if (!unvisitedNodes.some(likeNeighbor)) {
           neighbor.h = getHeuristic(
             neighbor.x,
             neighbor.y,
@@ -95,7 +93,6 @@ export const createPathfinder = (isOpen, options = {}) => {
  * @param {number} x2 Second position x.
  * @param {number} y2 Second position y.
  * @return {number} Heuristic value.
- * @todo Move to separate file.
  */
 export const getManhattanDistance = (x1, y1, x2, y2) => {
   const horizontal = Math.abs(x2 - x1);
@@ -109,7 +106,6 @@ export const getManhattanDistance = (x1, y1, x2, y2) => {
  * @param {Function} isOpen Should determines that neighbor is open.
  * @param {boolean} withDiagonal True if diagonal.
  * @return {function(Node): Array<Node>} Function that creates list of node neighbors.
- * @todo Move to separate file.
  */
 const createNeighborsFinder = (isOpen, withDiagonal = false) => node => {
   const neighbors = [];
@@ -117,6 +113,7 @@ const createNeighborsFinder = (isOpen, withDiagonal = false) => node => {
   for (let y = -1; y <= 1; y++) {
     for (let x = -1; x <= 1; x++) {
       const isDiagonal = Math.abs(x + y) !== 1;
+
       if (withDiagonal || !isDiagonal) {
         if (isOpen(node.x + x, node.y + y)) {
           neighbors.push(new Node({

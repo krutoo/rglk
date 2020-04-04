@@ -1,12 +1,12 @@
 import { Point } from '../point';
 
-export default class Node extends Point {
-  constructor (options = {}) {
-    super(options.x, options.y);
+export class Node extends Point {
+  constructor ({ x, y, g, h, parent } = {}) {
+    super(x, y);
 
-    this.g = options.g;
-    this.h = options.h;
-    this.parent = options.parent;
+    this.g = g;
+    this.h = h;
+    this.parent = parent;
   }
 
   get g () {
@@ -14,7 +14,7 @@ export default class Node extends Point {
   }
 
   set g (value) {
-    if (!isNaN(value)) {
+    if (Number.isFinite(value)) {
       this._g = Number(value);
     }
   }
@@ -24,15 +24,13 @@ export default class Node extends Point {
   }
 
   set h (value) {
-    if (!isNaN(value)) {
+    if (Number.isFinite(value)) {
       this._h = Number(value);
     }
   }
 
   get parent () {
-    return this._parent instanceof Node
-      ? this._parent
-      : null;
+    return this._parent || null;
   }
 
   set parent (node) {

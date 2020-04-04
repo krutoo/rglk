@@ -1,3 +1,5 @@
+import curry from 'lodash/curry';
+
 /**
  * Represents 2D Point.
  */
@@ -25,7 +27,7 @@ export class Point {
    * @readonly
    */
   set x (value) {
-    if (!isNaN(value)) {
+    if (Number.isFinite(value)) {
       this._x = Number(value);
     }
   }
@@ -43,7 +45,7 @@ export class Point {
    * @param {number} value The Y value.
    */
   set y (value) {
-    if (!isNaN(value)) {
+    if (Number.isFinite(value)) {
       this._y = Number(value);
     }
   }
@@ -59,18 +61,14 @@ export class Point {
     );
   }
 
-  /**
-   * Check that argument point is equal to self.
-   * @param {Object} point Object with x and y properties.
-   * @return {boolean} Are points is equal?
-   */
-  isEqualTo (point) {
-    return Boolean(point)
-      && point.x === this.x
-      && point.y === this.y;
-  }
-
   clone () {
     return new Point(this.x, this.y);
   }
 }
+
+/**
+ * Check that tow arguments is equal 2d points.
+ * @param {Object} point Object with x and y properties.
+ * @return {boolean} Are points is equal?
+ */
+Point.isEqual = curry((a, b) => a && b && a.x === b.x && a.y === b.y);
