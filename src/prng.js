@@ -1,29 +1,23 @@
-// source: http://indiegamr.com/generate-repeatable-random-numbers-in-js/
+/**
+ * Returns a Pseudo Random Number Generator based on seed from first argument.
+ * Thanks for author of this article: http://indiegamr.com/generate-repeatable-random-numbers-in-js/.
+ * @param {number} seed Finite number seed.
+ * @return {function():number} Function that returns pseudo random number from 0 to 1.
+ */
+export const createGenerator = seed => {
+  if (!Number.isFinite(seed)) {
+    throw Error('First argument "seed" must be a finite number.');
+  }
 
-export default class PRNG {
-	constructor(seed) {
-		this._seed = isNaN(seed) ? 12345 : seed;
-	}
+  let currentSeed = seed;
 
-	getRandom(min, max) {
-		max = isNaN(max) ? 1 : max;
-		min = isNaN(min) ? 0 : min;
+  return () => {
+    // this values provides most random numbers
+    const newSeed = ((currentSeed * 9301) + 49297) % 233280;
+    const random = newSeed / 233280;
 
-		this._seed = (this._seed * 9301 + 49297) % 233280;
-		var rnd = this._seed / 233280;
+    currentSeed = newSeed;
 
-		return min + rnd * (max - min);
-	}
-
-	get seed() {
-		return this._seed;
-	}
-
-	set seed(value) {
-		if (isNaN(value)) {
-			return;
-		} else {
-			this._seed = value;
-		}
-	}
-}
+    return random;
+  };
+};

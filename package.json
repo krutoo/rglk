@@ -1,7 +1,8 @@
 {
   "name": "rglk",
   "version": "1.0.4",
-  "description": "Very simple JS library for development roguelike games",
+  "license": "MIT",
+  "description": "Simple JS library for development roguelike games",
   "author": "Dmitry Petrov <dima.krutoo@ya.ru>",
   "keywords": [
     "roguelike",
@@ -15,16 +16,31 @@
     "type": "git",
     "url": "https://github.com/krutoo/rglk.js.git"
   },
-  "main": "./dist/rglk.js",
+  "main": "./src/index.js",
   "scripts": {
-    "dev": "webpack -w",
-    "build": "webpack"
+    "demo:watch": "parcel demo/index.html",
+    "demo:build": "parcel build demo/index.html --public-url ./",
+    "lint": "eslint src",
+    "test": "jest"
   },
-  "license": "MIT",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
   "devDependencies": {
-    "babel-core": "^6.24.1",
-    "babel-loader": "^7.0.0",
-    "babel-preset-env": "^1.4.0",
-    "webpack": "^2.5.1"
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@types/jest": "^24.0.15",
+    "babel-eslint": "^10.0.2",
+    "babel-jest": "^24.8.0",
+    "eslint": "^6.8.0",
+    "eslint-config-krutoo": "0.0.5",
+    "husky": "^3.0.1",
+    "jest": "^24.8.0",
+    "parcel-bundler": "^1.12.4"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
   }
 }

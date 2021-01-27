@@ -1,59 +1,98 @@
-# rglk.js ⚔️
-Very simple library for development roguelike games, designed for training purposes. Inspired by [rot.js](http://ondras.github.io/rot.js/hp/).
+# ⚔️ rglk.js 🐉
+
+Simple library for development roguelike games, designed for training purposes.
+Inspired by [rot.js](http://ondras.github.io/rot.js/hp/).
+
+## Using
+
+In Node.js use this command:
+
+```bash
+npm install --save rglk
+```
 
 ## Features
-### Dungeon
-Object of class Dungeon generates a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and length of corridors between rooms.
+
+**rglk** allows to build simple 2d dungeons, define field of view, search path between two points and generates pseudo random numbers.
+
+### Dungeon 🏗️
+
+Object of class Dungeon can generate a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and length of corridors between rooms. Dungeon map can be restored by seed.
+
 ```javascript
-var dungeon = new rglk.Dungeon({
-	roomAmount: 64, 
-	roomMinSize: 5, 
-	roomMaxSize: 11, 
-	corridorMinLength: 1,
-	corridorMaxLength: 10,
-	seed: 12345
+import { Dungeon } from 'rglk';
+
+// create a new generated dungeon
+const dungeon = new Dungeon({
+  roomsAmount: 64,
+  roomMinSize: 5,
+  roomMaxSize: 11,
+  corridorMinLength: 1,
+  corridorMaxLength: 10,
+  seed: 12345,
 });
 
-// each call returns new random dungeon
+// each call rebuilds dungeon
 dungeon.generate();
 
-// for generated dungeon
-dungeon.forEachTile(function makeTile(x, y, isFloor) {
-	// ...draw tile?
+// process each tile
+dungeon.forEachTile((x, y, isFloor) => {
+  // ...draw wall or floor
 });
 
-// check tile, returns Boolean
+// check tile type (returns boolean)
 dungeon.isWall(x, y);
+dungeon.isFloor(x, y);
 ```
 
-### Explorer
-object of class Explorer allows to define FOV based on **raycasting** algorytm.
+### createExplorer 👁️
+
+`createExplorer` returns function that allows to define 2d FOV based on **raycasting** algorytm.
+
 ```javascript
-var explorer = new rglk.Explorer(function isTtransparentTile(x, y) {
-	// return Boolean
+import { createExplorer } from 'rglk';
+
+const explore = createExplorer((x, y) => {
+  // should return boolean depends on tile is transparent
 });
 
-explorer.calculate(centerX, centerY, radius, function isExploredCallback(x, y) {
-	// ...draw title?
+// get array of visible tile positions
+const fov = explore(centerX, centerY, radius, (x, y) => {
+  // this callback will be executed if tile is visible
 });
 ```
 
-### Pathfinder
-The work of Pathfinder is based on an algorithm __A*__.
+### createPathfinder 🏃
+
+`createPathfinder` returns function which works based on an algorithm __A*__.
+
 ```javascript
-var pathfinder = new rglk.Pathfinder(function isWalkable(x, y) {
-	// return Boolean
+import { createPathfinder } from 'rglk';
+
+const findPath = createPathfinder((x, y) => {
+  // should return true if tile is can be visited
 });
 
-pathfinder.search(x1, y1, x2, y2); // returns Array of points
+// returns Array of points
+findPath(x1, y1, x2, y2);
 ```
 
-### PRNG
-Constructor PRNG (Pseudo Random Number Generator) retuns object, which allows you to get numbers based on the seed.
+### createPRNG 💾
+
+`createPRNG` (Pseudo Random Number Generator) allows you to get random numbers based on the seed.
+
 ```javascript
-var prng = new rglk.PRNG(0);
+import { createPRNG } from 'rglk';
 
-prng.seed = 2;
+// two generators with same seed
+const first = createPRNG(123);
+const second = createPRNG(123);
 
-prng.getRandom(min, max); // returns Number
+first() === second(); // true
 ```
+
+## To Do
+
+- more unit tests
+- remove many getters/setters
+- migrate to TypeScript (with build to JS + `*d.ts`)
