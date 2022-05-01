@@ -1,8 +1,4 @@
-import {
-  Dungeon,
-  createExplorer,
-  createPathfinder,
-} from '../../src/index.js';
+import { Dungeon, createExplorer, createPathfinder } from '../../src';
 
 let mousePosition = { x: 0, y: 0 };
 
@@ -50,17 +46,11 @@ initSection('.js-section-explorer', canvas => {
     corridorComplexity: 1,
   });
 
-  const explore = createExplorer(
-    (x, y) => dungeon.isFloor(x, y)
-  );
+  const explore = createExplorer((x, y) => dungeon.isFloor(x, y));
 
   const tileSize = calculateTileSize(dungeon, canvas);
 
-  const fov = explore(
-    parseInt(dungeon.rooms[0].center.x),
-    parseInt(dungeon.rooms[0].center.y),
-    12
-  );
+  const fov = explore(parseInt(dungeon.rooms[0].center.x), parseInt(dungeon.rooms[0].center.y), 12);
 
   canvas.onmousemove = event => {
     mousePosition = getMousePosition(event);
@@ -68,11 +58,7 @@ initSection('.js-section-explorer', canvas => {
       x: Math.floor(mousePosition.x / tileSize),
       y: Math.floor(mousePosition.y / tileSize),
     };
-    const newFov = explore(
-      dungeonPosition.x,
-      dungeonPosition.y,
-      12
-    );
+    const newFov = explore(dungeonPosition.x, dungeonPosition.y, 12);
     if (dungeon.isFloor(dungeonPosition.x, dungeonPosition.y)) {
       draw(canvas, {
         fov: newFov,
@@ -111,7 +97,7 @@ initSection('.js-section-pathfinder', canvas => {
     parseInt(dungeon.rooms[0].center.x),
     parseInt(dungeon.rooms[0].center.y),
     parseInt(dungeon.rooms[dungeon.rooms.length - 1].center.x),
-    parseInt(dungeon.rooms[dungeon.rooms.length - 1].center.y)
+    parseInt(dungeon.rooms[dungeon.rooms.length - 1].center.y),
   );
 
   draw(canvas, {
@@ -122,7 +108,7 @@ initSection('.js-section-pathfinder', canvas => {
   });
 });
 
-function initSection (sectionSelector, render) {
+function initSection(sectionSelector, render) {
   const section = document.querySelector(sectionSelector);
 
   if (section) {
@@ -131,7 +117,7 @@ function initSection (sectionSelector, render) {
 
     if (canvas) {
       canvas.width = canvas.clientWidth;
-      canvas.height = canvas.width / 16 * 9;
+      canvas.height = (canvas.width / 16) * 9;
       render(canvas);
     }
 
@@ -141,7 +127,7 @@ function initSection (sectionSelector, render) {
   }
 }
 
-function draw (canvas, data) {
+function draw(canvas, data) {
   const context = canvas.getContext('2d');
   const { fov, path, dungeon } = data;
 
@@ -154,13 +140,8 @@ function draw (canvas, data) {
   path && drawPath(context, data);
 }
 
-function drawMap (context, data) {
-  const {
-    dungeon,
-    roomColor = '#82ccdd',
-    corridorColor = '#82ccdd',
-    tileSize,
-  } = data;
+function drawMap(context, data) {
+  const { dungeon, roomColor = '#82ccdd', corridorColor = '#82ccdd', tileSize } = data;
 
   // rooms
   dungeon.rooms.forEach(room => {
@@ -169,7 +150,7 @@ function drawMap (context, data) {
       room.x * tileSize,
       room.y * tileSize,
       room.width * tileSize,
-      room.height * tileSize
+      room.height * tileSize,
     );
   });
 
@@ -180,72 +161,51 @@ function drawMap (context, data) {
       corridor.x * tileSize,
       corridor.y * tileSize,
       corridor.width * tileSize,
-      corridor.height * tileSize
+      corridor.height * tileSize,
     );
   });
 }
 
-function drawFOV (context, data) {
-  const {
-    fov,
-    center,
-    radius,
-    tileSize,
-  } = data;
+function drawFOV(context, data) {
+  const { fov, center, radius, tileSize } = data;
 
   fov.forEach(tile => {
-    const distance = Math.sqrt(((center.x - tile.x) ** 2) + ((center.y - tile.y) ** 2));
-    const proportion = 1 - (distance / radius);
+    const distance = Math.sqrt((center.x - tile.x) ** 2 + (center.y - tile.y) ** 2);
+    const proportion = 1 - distance / radius;
     context.fillStyle = `rgba(255,210,150,${proportion})`;
     context.globalAlpha = 0.7;
-    context.fillRect(
-      tile.x * tileSize,
-      tile.y * tileSize,
-      tileSize,
-      tileSize
-    );
+    context.fillRect(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize);
     context.globalAlpha = 1;
   });
 }
 
-function drawPath (context, { path, tileSize }) {
+function drawPath(context, { path, tileSize }) {
   context.strokeStyle = '#e74c3c';
   context.fillStyle = '#e74c3c';
   context.lineWidth = Math.ceil(tileSize / 3);
 
   if (path.length) {
     context.beginPath();
-    context.moveTo(
-      (path[0].x * tileSize) + (tileSize / 2),
-      (path[0].y * tileSize) + (tileSize / 2)
-    );
+    context.moveTo(path[0].x * tileSize + tileSize / 2, path[0].y * tileSize + tileSize / 2);
     path.forEach((point, index) => {
       if (index === 0 || index === path.length - 1) {
-        context.fillRect(
-          point.x * tileSize,
-          point.y * tileSize,
-          tileSize,
-          tileSize
-        );
+        context.fillRect(point.x * tileSize, point.y * tileSize, tileSize, tileSize);
       }
-      context.lineTo(
-        (point.x * tileSize) + (tileSize / 2),
-        (point.y * tileSize) + (tileSize / 2)
-      );
+      context.lineTo(point.x * tileSize + tileSize / 2, point.y * tileSize + tileSize / 2);
     });
     context.stroke();
     context.closePath();
   }
 }
 
-function calculateTileSize (dungeon, canvas) {
+function calculateTileSize(dungeon, canvas) {
   const canvasMinSide = Math.min(canvas.width, canvas.height);
   const dungeonMaxSide = Math.max(dungeon.width, dungeon.height);
 
   return Math.floor(canvasMinSide / dungeonMaxSide) || 8;
 }
 
-function getMousePosition (event) {
+function getMousePosition(event) {
   const mousePosition = { x: 0, y: 0 };
 
   if (event instanceof Event) {

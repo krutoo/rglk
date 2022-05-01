@@ -15,11 +15,11 @@ h4 {
 }
 
 h5 {
-  font-size: .83em;
+  font-size: 0.83em;
 }
 
 h6 {
-  font-size: .67em;
+  font-size: 0.67em;
 }
 
 h1,
@@ -51,7 +51,7 @@ hr {
 }
 
 p {
-  margin: .5em 0;
+  margin: 0.5em 0;
 }
 
 canvas {

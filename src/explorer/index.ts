@@ -1,24 +1,24 @@
 import { Point } from '../point';
-import isFunction from 'lodash/isFunction';
-import getLinePoints from './get-line-points';
+import { getLinePoints } from './utils';
 
-export const createExplorer = isTransparent => {
-  if (!isFunction(isTransparent)) {
-    throw TypeError(
-      'First argument "isTransparent" must be a function.'
-    );
-  }
+interface PositionChecker {
+  (x: number, y: number): boolean;
+}
 
-  return (centerX, centerY, radius, handleExplored) => {
+export const createExplorer = (isTransparent: PositionChecker) => {
+  return (
+    centerX: number,
+    centerY: number,
+    radius: number,
+    handleExplored?: (x: number, y: number) => void,
+  ) => {
     if (!Number.isFinite(centerX + centerY + radius)) {
-      throw TypeError(
-        'First three arguments (centerX, centerY, radius) must be finite numbers'
-      );
+      throw TypeError('First three arguments (centerX, centerY, radius) must be finite numbers');
     }
 
     const checkedPoints = new Set();
     const visiblePoints = [];
-    const hasExploredHandler = isFunction(handleExplored);
+    const hasExploredHandler = typeof handleExplored === 'function';
     const squareRadius = radius ** 2;
     const center = new Point(centerX, centerY);
 
@@ -39,12 +39,9 @@ export const createExplorer = isTransparent => {
             const pointKey = `${point.x}x${point.y}`;
 
             if (!checkedPoints.has(pointKey)) {
-              const squareDistance = ((center.x - point.x) ** 2) + ((center.y - point.y) ** 2);
+              const squareDistance = (center.x - point.x) ** 2 + (center.y - point.y) ** 2;
 
-              if (
-                squareDistance <= squareRadius
-                && isTransparent(point.x, point.y)
-              ) {
+              if (squareDistance <= squareRadius && isTransparent(point.x, point.y)) {
                 visiblePoints.push(point);
                 hasExploredHandler && handleExplored(point.x, point.y);
               } else {
