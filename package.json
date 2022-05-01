@@ -29,9 +29,6 @@
     "build": "npm run build:before && npm run build:main",
     "prepare": "husky install"
   },
-  "dependencies": {
-    "lodash": "^4.17.21"
-  },
   "devDependencies": {
     "@swc/jest": "^0.2.20",
     "@types/jest": "^27.4.1",

@@ -16,9 +16,8 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install and Build
-        working-directory: ./example
+        working-directory: ./demo
         run: |
-          cd demo
           npm ci
           npm run build
       - name: Deploy
