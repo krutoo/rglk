@@ -37,18 +37,18 @@ body {
 
 .canvas-wrapper {
   position: relative;
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   overflow: hidden;
 }
 
 .canvas-wrapper .reload-button {
   position: absolute;
-  top: .5rem;
-  right: .5rem;
-  padding: .5rem 1rem;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.5rem 1rem;
   background-color: #d4dae0;
-  border-radius: .1rem;
-  opacity: .5;
+  border-radius: 0.1rem;
+  opacity: 0.5;
   z-index: 1;
 }
 

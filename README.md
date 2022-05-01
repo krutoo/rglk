@@ -64,7 +64,7 @@ const fov = explore(centerX, centerY, radius, (x, y) => {
 
 ### createPathfinder 🏃
 
-`createPathfinder` returns function which works based on an algorithm __A*__.
+`createPathfinder` returns function which works based on an algorithm **A\***.
 
 ```javascript
 import { createPathfinder } from 'rglk';

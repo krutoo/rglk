@@ -1,9 +1,15 @@
 {
   "name": "rglk",
-  "version": "1.0.4",
+  "version": "0.0.0",
   "license": "MIT",
   "description": "Simple JS library for development roguelike games",
-  "author": "Dmitry Petrov <dima.krutoo@ya.ru>",
+  "author": "Dmitry Petrov",
+  "files": [
+    "dist",
+    "src",
+    "readme.md"
+  ],
+  "main": "./dist/index.js",
   "keywords": [
     "roguelike",
     "game",
@@ -16,31 +22,26 @@
     "type": "git",
     "url": "https://github.com/krutoo/rglk.js.git"
   },
-  "main": "./src/index.js",
   "scripts": {
-    "demo:watch": "parcel demo/index.html",
-    "demo:build": "parcel build demo/index.html --public-url ./",
-    "lint": "eslint src",
-    "test": "jest"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
-  },
-  "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "@types/jest": "^24.0.15",
-    "babel-eslint": "^10.0.2",
-    "babel-jest": "^24.8.0",
-    "eslint": "^6.8.0",
-    "eslint-config-krutoo": "0.0.5",
-    "husky": "^3.0.1",
-    "jest": "^24.8.0",
-    "parcel-bundler": "^1.12.4"
+    "test": "jest",
+    "build:before": "rm -rf dist",
+    "build:main": "tsc --project tsconfig.build.json",
+    "build": "npm run build:before && npm run build:main",
+    "prepare": "husky install"
   },
   "dependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@swc/jest": "^0.2.20",
+    "@types/jest": "^27.4.1",
+    "husky": "^7.0.4",
+    "jest": "^28.0.3",
+    "lint-staged": "^12.4.1",
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.4"
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
   }
 }
