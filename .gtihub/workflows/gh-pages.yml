@@ -18,10 +18,11 @@ jobs:
       - name: Install and Build
         working-directory: ./example
         run: |
+          cd demo
           npm ci
           npm run build
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           branch: gh-pages
-          folder: example/dist
+          folder: demo/dist
