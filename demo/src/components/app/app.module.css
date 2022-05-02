@@ -1,0 +1,25 @@
+.wrapper {
+  padding: 0 32px;
+}
+
+.inner {
+  margin: 0 auto;
+  padding: 20px 0;
+  max-width: 800px;
+}
+
+.header {
+  padding: 40px 0;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.footer {
+  margin-top: 20px;
+  text-align: right;
+}

@@ -1,0 +1,22 @@
+.root {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #eee;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.button {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 8px 20px;
+  border-radius: 4px;
+  background: #d4dae0;
+  cursor: pointer;
+}

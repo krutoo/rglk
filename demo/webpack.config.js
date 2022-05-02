@@ -4,26 +4,43 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const config = {
-  entry: ['./js/index.js', './css/index.css'],
+  entry: './src/index.tsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js',
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
   module: {
     rules: [
       {
-        test: /\.(js|ts)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: {
           loader: 'swc-loader',
         },
       },
+
+      // css
       {
         test: /\.css$/i,
+        exclude: /\.module\.css$/i,
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
+
+      // css modules
+      {
+        test: /\.module\.css$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+            },
+          },
+        ],
       },
     ],
   },
@@ -33,7 +50,7 @@ const config = {
     }),
     new HtmlPlugin({
       publicPath: './',
-      template: path.resolve(__dirname, 'index.html'),
+      template: path.resolve(__dirname, 'src/index.html'),
     }),
   ],
   optimization: {
