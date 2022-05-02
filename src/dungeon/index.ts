@@ -23,7 +23,7 @@ export class Dungeon {
   private _options!: Required<DungeonOptions>;
 
   /**
-   * @param [options={}] Options of dungeon.
+   * @param [options] Building options.
    * @param [options.roomsAmount=7] Amount of rooms.
    * @param [options.roomMinSize=5] Minimum room size.
    * @param [options.roomMaxSize=10] Maximum room size.
@@ -149,8 +149,8 @@ export class Dungeon {
 
   /**
    * Calls callback for each tile in dungeon area.
-   * @param {Function} callback Callback that was called for each tile.
-   * @return {Dungeon} Instance.
+   * @param callback Callback that was called for each tile.
+   * @return Instance.
    */
   forEachTile(callback: (x: number, n: number, isFloor: boolean) => void) {
     const { width, height } = this;

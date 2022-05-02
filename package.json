@@ -27,6 +27,7 @@
     "build:before": "rm -rf dist",
     "build:main": "tsc --project tsconfig.build.json",
     "build": "npm run build:before && npm run build:main",
+    "type-check": "tsc -p . --noEmit",
     "prepare": "husky install"
   },
   "devDependencies": {

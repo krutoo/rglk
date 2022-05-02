@@ -60,7 +60,7 @@ export const createPathfinder = (
       visitedNodes.push(currentNode);
 
       // if current node is target then create path and break
-      if (Point.isEqual(currentNode, finish)) {
+      if (Point.equals(currentNode, finish)) {
         resultPath = currentNode.createPathToRoot();
         break;
       }
@@ -68,7 +68,7 @@ export const createPathfinder = (
       const neighbors = getNeighbors(currentNode);
 
       for (const neighbor of neighbors) {
-        const likeNeighbor = (p: Point) => Point.isEqual(p, neighbor);
+        const likeNeighbor = (p: Point) => Point.equals(p, neighbor);
 
         // ignore neighbor node if it is already visited
         if (visitedNodes.some(likeNeighbor)) {
