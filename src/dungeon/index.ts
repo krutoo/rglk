@@ -1,7 +1,7 @@
-import { createGenerator } from '../prng';
-import { Point } from '../point';
-import { Matrix } from './matrix';
-import { Build, BuildType, BUILD_TYPE, DIRECTION } from './build';
+import { createPRNG } from '../prng/index.js';
+import { Point } from '../point.js';
+import { Matrix } from './matrix.js';
+import { Build, BuildType, BUILD_TYPE, DIRECTION } from './build.js';
 
 export interface DungeonOptions {
   roomsAmount?: number;
@@ -194,7 +194,7 @@ export class Dungeon {
    * Generate new dungeon map.
    */
   generate() {
-    this._rng = createGenerator(this._options.seed);
+    this._rng = createPRNG(this._options.seed);
     this._builds = optimizeBuilds(this._generateBuilds(this._options));
     this._buffer = this._createBuffer(this._builds);
   }

@@ -1,21 +1,17 @@
-import { Point } from '../point';
-import { getLinePoints } from './utils';
+import { Point } from '../point.js';
+import { getLinePoints } from './utils.js';
 
 interface PositionChecker {
   (x: number, y: number): boolean;
 }
 
-export const createExplorer = (isTransparent: PositionChecker) => {
-  return function explore(
+export function createExplorer(isTransparent: PositionChecker) {
+  return (
     centerX: number,
     centerY: number,
     radius: number,
     handleExplored?: (x: number, y: number) => void,
-  ) {
-    if (!Number.isFinite(centerX + centerY + radius)) {
-      throw TypeError('First three arguments (centerX, centerY, radius) must be finite numbers');
-    }
-
+  ) => {
     const checkedPoints = new Set();
     const visiblePoints: Array<{ x: number; y: number }> = [];
     const hasExploredHandler = typeof handleExplored === 'function';
@@ -57,4 +53,4 @@ export const createExplorer = (isTransparent: PositionChecker) => {
 
     return visiblePoints;
   };
-};
+}

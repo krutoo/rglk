@@ -8,7 +8,7 @@ import { Point } from '../point';
  * @param y2 Second point y position.
  * @return List of positions with round coords between two points.
  */
-export const getLinePoints = (x1: number, y1: number, x2: number, y2: number): Point[] => {
+export function getLinePoints(x1: number, y1: number, x2: number, y2: number): Point[] {
   const point1 = new Point(x1, y1);
   const point2 = new Point(x2, y2);
   const deltaX = point2.x - point1.x;
@@ -39,4 +39,4 @@ export const getLinePoints = (x1: number, y1: number, x2: number, y2: number): P
   }
 
   return points;
-};
+}

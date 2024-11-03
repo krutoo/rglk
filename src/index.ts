@@ -1,6 +1,4 @@
-import { createGenerator as createPRNG } from './prng';
-import { Dungeon } from './dungeon';
-import { createExplorer } from './explorer';
-import { createPathfinder } from './pathfinder';
-
-export { Dungeon, createPRNG, createExplorer, createPathfinder };
+export { createPRNG } from './prng/index.js';
+export { Dungeon } from './dungeon/index.js';
+export { createExplorer } from './explorer/index.js';
+export { createPathfinder } from './pathfinder/index.js';

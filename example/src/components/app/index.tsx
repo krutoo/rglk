@@ -12,7 +12,7 @@ export function App() {
           <h1 className={styles.title}>rglk.js</h1>
           <p>
             Simple library for development roguelike games. <br /> Check API on{' '}
-            <a href="https://github.com/krutoo/rglk">GitHub</a>.
+            <a href='https://github.com/krutoo/rglk'>GitHub</a>.
           </p>
         </header>
 

@@ -1,4 +1,4 @@
-import { Rectangle } from './rectangle';
+import { Rectangle } from './rectangle.js';
 
 export const BUILD_TYPE = {
   room: Symbol('room'),
@@ -13,9 +13,9 @@ export const DIRECTION = {
   left: Symbol('left'),
 } as const;
 
-export type BuildType = typeof BUILD_TYPE[keyof typeof BUILD_TYPE];
+export type BuildType = (typeof BUILD_TYPE)[keyof typeof BUILD_TYPE];
 
-export type Direction = typeof DIRECTION[keyof typeof DIRECTION];
+export type Direction = (typeof DIRECTION)[keyof typeof DIRECTION];
 
 export class Build extends Rectangle {
   readonly type: BuildType;

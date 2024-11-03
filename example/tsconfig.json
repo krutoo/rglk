@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "target": "es2020",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "rglk": ["../src/index.ts"]
+    }
   },
-  "include": ["src"],
   "exclude": ["node_modules"]
 }

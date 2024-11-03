@@ -1,0 +1,25 @@
+{
+  "name": "rglk-example",
+  "type": "module",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Demo page of rglk library",
+  "scripts": {
+    "check": "tsc -p . --noEmit",
+    "dev": "npx --node-options='--import=tsimp/import' rspack serve",
+    "build": "npx --node-options='--import=tsimp/import' rspack"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@rspack/cli": "^1.0.14",
+    "@rspack/core": "^1.0.14",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "css-loader": "^7.1.2",
+    "tsimp": "^2.0.12",
+    "typescript": "^5.6.3"
+  }
+}

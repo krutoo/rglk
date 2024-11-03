@@ -19,7 +19,7 @@ npm install --save rglk
 
 Object of class Dungeon can generate a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and length of corridors between rooms. Dungeon map can be restored by seed.
 
-```javascript
+```js
 import { Dungeon } from 'rglk';
 
 // create a new generated dungeon
@@ -49,7 +49,7 @@ dungeon.isFloor(x, y);
 
 `createExplorer` returns function that allows to define 2d FOV based on **raycasting** algorytm.
 
-```javascript
+```js
 import { createExplorer } from 'rglk';
 
 const explore = createExplorer((x, y) => {
@@ -66,7 +66,7 @@ const fov = explore(centerX, centerY, radius, (x, y) => {
 
 `createPathfinder` returns function which works based on an algorithm **A\***.
 
-```javascript
+```js
 import { createPathfinder } from 'rglk';
 
 const findPath = createPathfinder((x, y) => {
@@ -74,14 +74,14 @@ const findPath = createPathfinder((x, y) => {
 });
 
 // returns Array of points
-findPath(x1, y1, x2, y2);
+const points = findPath(x1, y1, x2, y2);
 ```
 
 ### createPRNG 💾
 
 `createPRNG` (Pseudo Random Number Generator) allows you to get random numbers based on the seed.
 
-```javascript
+```js
 import { createPRNG } from 'rglk';
 
 // two generators with same seed
