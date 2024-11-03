@@ -9,19 +9,20 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version: 20
           registry-url: https://registry.npmjs.org/
 
       - name: Install and Build
-        working-directory: ./demo
+        working-directory: ./example
         run: |
           npm ci
           npm run build
+
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: demo/dist
+          folder: example/dist

@@ -5,5 +5,5 @@
     "declaration": true,
     "sourceMap": true
   },
-  "exclude": ["node_modules", "./src/**/__test__/*"]
+  "exclude": ["node_modules", "example", "./src/**/__test__/*"]
 }

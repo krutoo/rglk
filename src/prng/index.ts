@@ -4,11 +4,7 @@
  * @param seed Finite number seed.
  * @return Function that returns pseudo random number from 0 to 1.
  */
-export const createGenerator = (seed: number) => {
-  if (!Number.isFinite(seed)) {
-    throw Error('First argument "seed" must be a finite number.');
-  }
-
+export function createPRNG(seed: number): () => number {
   let currentSeed = seed;
 
   return (): number => {
@@ -20,4 +16,4 @@ export const createGenerator = (seed: number) => {
 
     return random;
   };
-};
+}

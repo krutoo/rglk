@@ -9,38 +9,38 @@ export function SectionFOV() {
   const viewRef = useRef<CanvasData>(null);
 
   useEffect(() => {
-    if (viewRef.current) {
-      const { canvas, context } = viewRef.current;
+    if (!viewRef.current) {
+      return;
+    }
 
-      const fovRadius = 24;
-      const map = createMap();
-      const explore = createExplorer((x, y) => map.tiles[x]?.[y] === 0);
+    const { canvas, context } = viewRef.current;
 
-      // draw
-      const tileSize = calculateFitFactor(map, canvas);
-      const center = {
-        x: Math.floor(mousePosition.x / tileSize),
-        y: Math.floor(mousePosition.y / tileSize),
-      };
+    const fovRadius = 24;
+    const map = createMap();
+    const explore = createExplorer((x, y) => map.tiles[x]?.[y] === 0);
 
-      context.fillStyle = '#252033';
-      context.fillRect(0, 0, canvas.width, canvas.height);
+    // draw
+    const tileSize = calculateFitFactor(map, canvas);
+    const center = {
+      x: Math.floor(mousePosition.x / tileSize),
+      y: Math.floor(mousePosition.y / tileSize),
+    };
 
-      for (const visibleTile of explore(center.x, center.y, fovRadius)) {
-        const distance = Math.sqrt(
-          (center.x - visibleTile.x) ** 2 + (center.y - visibleTile.y) ** 2,
-        );
+    context.fillStyle = '#252033';
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
-        context.fillStyle = `rgba(255, 210, 150, ${1 - distance / fovRadius})`;
-        context.globalAlpha = 0.7;
-        context.fillRect(visibleTile.x * tileSize, visibleTile.y * tileSize, tileSize, tileSize);
-        context.globalAlpha = 1;
-      }
+    for (const visibleTile of explore(center.x, center.y, fovRadius)) {
+      const distance = Math.sqrt((center.x - visibleTile.x) ** 2 + (center.y - visibleTile.y) ** 2);
+
+      context.fillStyle = `rgba(255, 210, 150, ${1 - distance / fovRadius})`;
+      context.globalAlpha = 0.7;
+      context.fillRect(visibleTile.x * tileSize, visibleTile.y * tileSize, tileSize, tileSize);
+      context.globalAlpha = 1;
     }
   }, [mousePosition]);
 
   return (
-    <Section title="Field of view">
+    <Section title='Field of view'>
       <Canvas ref={viewRef} onMouseMove={e => setState(getMousePosition(e))} />
     </Section>
   );

@@ -1,5 +1,5 @@
-import { Node } from './node';
-import { Point } from '../point';
+import { Node } from './node.js';
+import { Point } from '../point.js';
 
 interface PositionChecker {
   (x: number, y: number): boolean;
@@ -12,14 +12,10 @@ interface PositionChecker {
  * @param [options.getHeuristic=getManhattanDistance] Heuristic function.
  * @return List of path points.
  */
-export const createPathfinder = (
+export function createPathfinder(
   isOpen: PositionChecker,
   { getHeuristic = getManhattanDistance } = {},
-) => {
-  if (typeof isOpen !== 'function') {
-    throw new TypeError('First argument "isOpen" must be a function');
-  }
-
+) {
   const getNeighbors = createNeighborsFinder(isOpen);
 
   /**
@@ -85,7 +81,7 @@ export const createPathfinder = (
 
     return resultPath;
   };
-};
+}
 
 /**
  * Returns heuristic value (Manhattan distance) between two positions.
@@ -95,12 +91,12 @@ export const createPathfinder = (
  * @param y2 Second position y.
  * @return Heuristic value.
  */
-export const getManhattanDistance = (x1: number, y1: number, x2: number, y2: number) => {
+export function getManhattanDistance(x1: number, y1: number, x2: number, y2: number) {
   const horizontal = Math.abs(x2 - x1);
   const vertical = Math.abs(y2 - y1);
 
   return horizontal + vertical;
-};
+}
 
 /**
  * Returns function that creates list of node neighbors.
@@ -108,9 +104,8 @@ export const getManhattanDistance = (x1: number, y1: number, x2: number, y2: num
  * @param withDiagonal True if diagonal.
  * @return Function that creates list of node neighbors.
  */
-const createNeighborsFinder =
-  (isOpen: PositionChecker, withDiagonal = false) =>
-  (node: Node) => {
+function createNeighborsFinder(isOpen: PositionChecker, withDiagonal = false) {
+  return (node: Node) => {
     const neighbors = [];
 
     for (let y = -1; y <= 1; y++) {
@@ -134,3 +129,4 @@ const createNeighborsFinder =
 
     return neighbors;
   };
+}
