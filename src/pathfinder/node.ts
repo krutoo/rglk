@@ -1,4 +1,4 @@
-import { Point } from '../point';
+import { Point } from '../point.js';
 
 export class Node extends Point {
   g: number;
