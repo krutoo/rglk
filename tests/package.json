@@ -1,0 +1,10 @@
+{
+  "name": "rglk-tests",
+  "type": "module",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "preparing": "npm i --no-save ../rglk-0.0.0.tgz",
+    "test": "node index.js"
+  }
+}
