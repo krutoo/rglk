@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+    branches: [$default-branch]
+
+  pull_request:
+    branches: [$default-branch]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Unit tests
+        run: |
+          npm ci
+          npm run check
+
+      - name: Package build
+        run: |
+          npm run build
+          npm pack
+
+      - name: Package tests
+        working-directory: ./tests
+        run: |
+          npm run preparing
+          npm run test

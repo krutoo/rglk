@@ -2,8 +2,7 @@ name: Deploy demo on Github Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [$default-branch]
 
 jobs:
   build-and-deploy:
