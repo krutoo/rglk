@@ -5,15 +5,15 @@
  * @return Function that returns pseudo random number from 0 to 1.
  */
 export function createPRNG(seed: number): () => number {
-  let currentSeed = seed;
+  let part = seed;
 
   return (): number => {
-    // this values provides most random numbers
-    const newSeed = (currentSeed * 9301 + 49297) % 233280;
-    const random = newSeed / 233280;
+    // these magic values provides most random numbers
+    const newSeed = (part * 9301 + 49297) % 233280;
+    const value = newSeed / 233280;
 
-    currentSeed = newSeed;
+    part = newSeed;
 
-    return random;
+    return value;
   };
 }
