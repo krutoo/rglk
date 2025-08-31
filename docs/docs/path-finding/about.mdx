@@ -1,0 +1,20 @@
+export const meta = {
+  category: 'Path finding',
+  title: '',
+};
+
+# Path finding
+
+For create paths between two positions you can use `createPathfinder`.
+It returns function which works based on an algorithm **A\***.
+
+```js
+import { createPathfinder } from 'rglk';
+
+const findPath = createPathfinder((x, y) => {
+  // should return true if tile is can be visited
+});
+
+// returns Array of points
+const points = findPath(x1, y1, x2, y2);
+```

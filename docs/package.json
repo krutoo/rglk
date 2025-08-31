@@ -1,0 +1,27 @@
+{
+  "name": "rglk-docs",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "preparing": "npm add --no-save ../rglk-0.0.0.tgz",
+    "check": "tsc -p . --noEmit",
+    "dev": "rspack serve",
+    "build": "rspack"
+  },
+  "devDependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "@rspack/cli": "^1.5.1",
+    "@rspack/core": "^1.5.1",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "css-loader": "^7.1.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@krutoo/showcase": "^0.4.0",
+    "@krutoo/utils": "^0.0.26",
+    "classnames": "^2.5.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}
