@@ -1,0 +1,34 @@
+export const meta = {
+  category: 'Dungeon',
+  title: '',
+};
+
+# Dungeon generation
+
+Object of class Dungeon can generate a random two-dimensional map consisting of walls and floors. You can decide the size of rooms, rooms amount and length of corridors between rooms. Dungeon map can be restored by seed.
+
+```js
+import { Dungeon } from 'rglk';
+
+// create a new generated dungeon
+const dungeon = new Dungeon({
+  roomsAmount: 64,
+  roomMinSize: 5,
+  roomMaxSize: 11,
+  corridorMinLength: 1,
+  corridorMaxLength: 10,
+  seed: 12345,
+});
+
+// each call rebuilds dungeon
+dungeon.generate();
+
+// process each tile
+dungeon.forEachTile((x, y, isFloor) => {
+  // ...draw wall or floor
+});
+
+// check tile type (returns boolean)
+dungeon.isWall(x, y);
+dungeon.isFloor(x, y);
+```

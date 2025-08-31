@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "./",
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
@@ -8,5 +10,5 @@
     "noImplicitOverride": true,
     "skipLibCheck": true
   },
-  "exclude": ["node_modules", "example"]
+  "exclude": ["node_modules", "example", "docs"]
 }

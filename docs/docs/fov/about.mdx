@@ -1,0 +1,21 @@
+export const meta = {
+  category: 'Field of view (FOV)',
+  title: '',
+};
+
+# Field of view (FOV)
+
+For defining FOV you can use `createExplorer`. It returns function that allows to define 2d FOV based on **raycasting** algorytm.
+
+```js
+import { createExplorer } from 'rglk';
+
+const explore = createExplorer((x, y) => {
+  // should return boolean depends on tile is transparent
+});
+
+// get array of visible tile positions
+const fov = explore(centerX, centerY, radius, (x, y) => {
+  // this callback will be executed if tile is visible
+});
+```
