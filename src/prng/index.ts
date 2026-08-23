@@ -5,7 +5,7 @@
  * @return Function that returns pseudo random number from 0 to 1.
  */
 export function createPRNG(seed: number): () => number {
-  let part = seed;
+  let part = Number.isFinite(seed) ? seed : 0;
 
   return (): number => {
     // these magic values provides most random numbers

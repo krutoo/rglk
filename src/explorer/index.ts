@@ -1,11 +1,18 @@
-import { Point } from '../point.js';
-import { getLinePoints } from './utils.js';
+import { Point } from '../point.ts';
+import { getLinePoints } from './utils.ts';
 
 interface PositionChecker {
   (x: number, y: number): boolean;
 }
 
-export function createExplorer(isTransparent: PositionChecker) {
+export function createExplorer(
+  isTransparent: PositionChecker,
+): (
+  centerX: number,
+  centerY: number,
+  radius: number,
+  handleExplored?: (x: number, y: number) => void,
+) => { x: number; y: number }[] {
   return (
     centerX: number,
     centerY: number,

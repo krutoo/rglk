@@ -1,26 +1,28 @@
-import { Rectangle } from './rectangle.js';
+import { Rectangle } from './rectangle.ts';
 
-export const BUILD_TYPE = {
-  room: Symbol('room'),
-  corridor: Symbol('corridor'),
-  connector: Symbol('connector'),
-} as const;
+export type BuildType = 'room' | 'corridor' | 'connector';
 
-export const DIRECTION = {
-  top: Symbol('top'),
-  right: Symbol('right'),
-  bottom: Symbol('bottom'),
-  left: Symbol('left'),
-} as const;
-
-export type BuildType = (typeof BUILD_TYPE)[keyof typeof BUILD_TYPE];
-
-export type Direction = (typeof DIRECTION)[keyof typeof DIRECTION];
+export type Direction = 'top' | 'right' | 'bottom' | 'left';
 
 export class Build extends Rectangle {
+  static isRoom(build: Build): boolean {
+    return build.type === 'room';
+  }
+
+  static isCorridor(build: Build): boolean {
+    return build.type === 'corridor';
+  }
+
+  static isConnector(build: Build): boolean {
+    return build.type === 'connector';
+  }
+
   readonly type: BuildType;
+
   parent?: Build;
+
   children: Build[];
+
   direction?: Direction;
 
   constructor(
@@ -31,23 +33,17 @@ export class Build extends Rectangle {
       width = 1,
       height = 1,
       parent,
-    }: { x?: number; y?: number; width?: number; height?: number; parent?: Build },
+    }: {
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+      parent?: Build;
+    },
   ) {
     super(x, y, width, height);
     this.type = type;
     this.parent = parent;
     this.children = [];
-  }
-
-  static isRoom(build: Build): boolean {
-    return build.type === BUILD_TYPE.room;
-  }
-
-  static isCorridor(build: Build): boolean {
-    return build.type === BUILD_TYPE.corridor;
-  }
-
-  static isConnector(build: Build): boolean {
-    return build.type === BUILD_TYPE.connector;
   }
 }

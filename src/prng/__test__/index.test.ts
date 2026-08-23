@@ -1,6 +1,6 @@
-import { createPRNG } from '../index.js';
-import { test, describe } from 'node:test';
 import assert from 'node:assert';
+import { describe, test } from 'node:test';
+import { createPRNG } from '../index.ts';
 
 describe('createGenerator', () => {
   test('should number generators that based on seed', () => {

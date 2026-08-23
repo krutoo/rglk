@@ -16,23 +16,46 @@
     "type": "git",
     "url": "https://github.com/krutoo/rglk.js.git"
   },
+  "engines": {
+    "node": ">=16"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24.14.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=10.9.3",
+      "onFail": "error"
+    }
+  },
   "scripts": {
-    "check": "tsc -p . --noEmit",
     "fmt": "prettier . --write",
-    "test": "node --import=tsimp/import --test src/prng/__test__/index.test.ts",
-    "build:clean": "rm -rf dist",
-    "build:main": "tsc --project tsconfig.build.json",
-    "build": "npm run build:clean && npm run build:main"
+    "check": "tsc -p . --noEmit",
+    "test": "node --test './src/**/*.test.ts'",
+    "build": "node ./scripts/build.ts"
   },
   "devDependencies": {
+    "@krutoo/presets": "^0.0.1",
+    "@krutoo/utils": "^0.0.38",
     "@types/node": "^22.8.7",
+    "eslint": "^9.39.5",
     "prettier": "^3.3.3",
-    "tsimp": "^2.0.12",
-    "typescript": "^5.6.3"
+    "tsc-alias": "^1.9.2",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "@krutoo/utils": "^0.0.38"
+  },
+  "peerDependenciesMeta": {
+    "@krutoo/utils": {
+      "optional": true
+    }
   },
   "files": [
-    "dist",
-    "README.md"
+    "dist"
   ],
   "exports": {
     ".": "./dist/index.js"
