@@ -22,6 +22,7 @@ export default {
   resolve: {
     alias: {
       '#found-stories$': path.resolve(import.meta.dirname, './.generated/found-stories.js'),
+      rglk$: path.resolve(import.meta.dirname, '../src/index.ts'),
     },
   },
   module: {
