@@ -1,14 +1,4 @@
 {
-  "compilerOptions": {
-    "noEmit": true,
-    "rootDir": "./",
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
-    "strict": true,
-    "noImplicitOverride": true,
-    "skipLibCheck": true
-  },
+  "extends": "@krutoo/presets/tsconfig.check.json",
   "exclude": ["node_modules", "example", "docs"]
 }

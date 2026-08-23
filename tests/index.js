@@ -1,7 +1,17 @@
 import assert from 'node:assert';
-import { createExplorer, createPathfinder, createPRNG, Dungeon } from 'rglk';
+import { test } from 'node:test';
 
-assert.strictEqual('function' === typeof createExplorer, true);
-assert.strictEqual('function' === typeof createPathfinder, true);
-assert.strictEqual('function' === typeof createPRNG, true);
-assert.strictEqual('function' === typeof Dungeon, true);
+test('should export things properly', async () => {
+  const {
+    //
+    createExplorer,
+    createPathfinder,
+    createPRNG,
+    Dungeon,
+  } = await import('rglk');
+
+  assert.strictEqual('function' === typeof createExplorer, true);
+  assert.strictEqual('function' === typeof createPathfinder, true);
+  assert.strictEqual('function' === typeof createPRNG, true);
+  assert.strictEqual('function' === typeof Dungeon, true);
+});

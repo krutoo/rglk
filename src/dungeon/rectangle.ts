@@ -1,4 +1,4 @@
-import { Point } from '../point.js';
+import { Point } from '../point.ts';
 
 /**
  * Represents a 2D Rectangle.
@@ -23,7 +23,7 @@ export class Rectangle extends Point {
    * Get left of Rectangle.
    * @return The left border of Rectangle.
    */
-  get left() {
+  get left(): number {
     return this.x;
   }
 
@@ -39,7 +39,7 @@ export class Rectangle extends Point {
    * Get bottom of Rectangle.
    * @return The bottom border of Rectangle.
    */
-  get bottom() {
+  get bottom(): number {
     return this.y + this.height;
   }
 
@@ -55,7 +55,7 @@ export class Rectangle extends Point {
    * Get right of Rectangle.
    * @return The right border of Rectangle.
    */
-  get right() {
+  get right(): number {
     return this.x + this.width;
   }
 
@@ -71,7 +71,7 @@ export class Rectangle extends Point {
    * Get top of Rectangle.
    * @return The top border of Rectangle.
    */
-  get top() {
+  get top(): number {
     return this.y;
   }
 

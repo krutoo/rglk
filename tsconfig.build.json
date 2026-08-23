@@ -1,11 +1,4 @@
 {
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "noEmit": false,
-    "declaration": true,
-    "sourceMap": true
-  },
-  "exclude": ["node_modules", "example", "./src/**/__test__/*", "docs"]
+  "extends": "@krutoo/presets/tsconfig.build.json",
+  "exclude": ["**/node_modules", "${configDir}/dist", "./src/**/*.test.*"]
 }

@@ -1,7 +1,7 @@
-import { createPRNG } from '../prng/index.js';
-import { Point } from '../point.js';
-import { Matrix } from './matrix.js';
-import { Build, BuildType, BUILD_TYPE, DIRECTION } from './build.js';
+import { Point } from '../point.ts';
+import { createPRNG } from '../prng/index.ts';
+import { Build, type BuildType, type Direction } from './build.ts';
+import { Matrix } from './matrix.ts';
 
 export interface DungeonOptions {
   roomsAmount?: number;
@@ -65,7 +65,7 @@ export class Dungeon {
    * Width of generated  in tiles.
    * @return Width.
    */
-  get width() {
+  get width(): number {
     return this._buffer.width;
   }
 
@@ -73,7 +73,7 @@ export class Dungeon {
    * Returns height of generated dungeon in tiles.
    * @return Height.
    */
-  get height() {
+  get height(): number {
     return this._buffer.height;
   }
 
@@ -81,7 +81,7 @@ export class Dungeon {
    * Returns rooms of generated dungeon.
    * @return List of rooms.
    */
-  get rooms() {
+  get rooms(): Build[] {
     return this.builds.filter(Build.isRoom);
   }
 
@@ -89,7 +89,7 @@ export class Dungeon {
    * Returns corridors of generated dungeon.
    * @return List of corridors.
    */
-  get corridors() {
+  get corridors(): Build[] {
     return this.builds.filter(Build.isCorridor);
   }
 
@@ -97,7 +97,7 @@ export class Dungeon {
    * Returns connectors of generated dungeon.
    * @return List of corridor connectors.
    */
-  get connectors() {
+  get connectors(): Build[] {
     return this.builds.filter(Build.isConnector);
   }
 
@@ -105,7 +105,7 @@ export class Dungeon {
    * Returns all builds of generated dungeon.
    * @return List all builds.
    */
-  get builds() {
+  get builds(): Build[] {
     const privateBuilds = Array.isArray(this._builds) ? this._builds : [];
     return [...privateBuilds];
   }
@@ -114,7 +114,7 @@ export class Dungeon {
    * Update some options.
    * @param {Object} newOptions New options.
    */
-  setOptions(newOptions: DungeonOptions) {
+  setOptions(newOptions: DungeonOptions): void {
     if (this.isValidOptions(newOptions)) {
       this._options = {
         ...Dungeon.getDefaultOptions(),
@@ -152,7 +152,7 @@ export class Dungeon {
    * @param callback Callback that was called for each tile.
    * @return Instance.
    */
-  forEachTile(callback: (x: number, n: number, isFloor: boolean) => void) {
+  forEachTile(callback: (x: number, n: number, isFloor: boolean) => void): this {
     const { width, height } = this;
 
     for (let x = 0; x < width; x++) {
@@ -193,7 +193,7 @@ export class Dungeon {
   /**
    * Generate new dungeon map.
    */
-  generate() {
+  generate(): void {
     this._rng = createPRNG(this._options.seed);
     this._builds = optimizeBuilds(this._generateBuilds(this._options));
     this._buffer = this._createBuffer(this._builds);
@@ -216,7 +216,7 @@ export class Dungeon {
 
   private _tryBuild(readyBuilds: Build[], options: Required<DungeonOptions>) {
     const extensibleBuilds = readyBuilds.filter(b => !Build.isCorridor(b));
-    const branchRootBuild = extensibleBuilds[this._getRandom(0, extensibleBuilds.length - 1)];
+    const branchRootBuild = extensibleBuilds[this._getRandom(0, extensibleBuilds.length - 1)]!;
 
     let newBuilds = this._createBranch(branchRootBuild, options.corridorComplexity);
     const checkingBuilds = readyBuilds.concat(newBuilds);
@@ -265,7 +265,7 @@ export class Dungeon {
     parentBuild?: Build;
   }): Build {
     const { roomMinSize, roomMaxSize } = this._options;
-    const room = this._createBuild(BUILD_TYPE.room, {
+    const room = this._createBuild('room', {
       parentBuild,
       x,
       y,
@@ -282,13 +282,13 @@ export class Dungeon {
     const { corridorMinLength, corridorMaxLength } = this._options;
     const corridorLength = this._getRandom(corridorMinLength, corridorMaxLength);
 
-    const corridor = this._createBuild(BUILD_TYPE.corridor, {
+    const corridor = this._createBuild('corridor', {
       parentBuild,
       width: 1,
       height: 1,
     });
 
-    const allDirections = Object.values(DIRECTION);
+    const allDirections: Direction[] = ['top', 'right', 'bottom', 'left'];
     corridor.direction = allDirections[this._getRandom(0, allDirections.length - 1)];
 
     if (parentBuild) {
@@ -304,7 +304,7 @@ export class Dungeon {
   }
 
   private _createConnector({ parentBuild }: { parentBuild: Build }) {
-    const connector = this._createBuild(BUILD_TYPE.connector, {
+    const connector = this._createBuild('connector', {
       width: 1,
       height: 1,
       parentBuild,
@@ -347,8 +347,7 @@ export class Dungeon {
 
   private _placeBuild(build: Build, parentBuild: Build) {
     const direction =
-      (build.type === BUILD_TYPE.corridor ? build.direction : parentBuild.direction) ||
-      DIRECTION.left;
+      (build.type === 'corridor' ? build.direction : parentBuild.direction) || 'left';
 
     if (isHorizontal(direction)) {
       build.y = this._getRandom(parentBuild.top - build.height + 1, parentBuild.bottom - 1);
@@ -357,16 +356,16 @@ export class Dungeon {
     }
 
     switch (direction) {
-      case DIRECTION.left:
+      case 'left':
         build.x = parentBuild.right;
         break;
-      case DIRECTION.bottom:
+      case 'bottom':
         build.y = parentBuild.bottom;
         break;
-      case DIRECTION.right:
+      case 'right':
         build.x = parentBuild.left - build.width;
         break;
-      case DIRECTION.top:
+      case 'top':
         build.y = parentBuild.top - build.height;
         break;
     }
@@ -392,7 +391,7 @@ export class Dungeon {
 }
 
 function isHorizontal(value: unknown): boolean {
-  return value === DIRECTION.left || value === DIRECTION.right;
+  return value === 'left' || value === 'right';
 }
 
 const canAddBuild = (newBuild: Build, readyBuilds: Build[]) => {

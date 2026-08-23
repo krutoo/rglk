@@ -1,5 +1,5 @@
-import { Node } from './node.js';
-import { Point } from '../point.js';
+import { Point } from '../point.ts';
+import { Node } from './node.ts';
 
 interface PositionChecker {
   (x: number, y: number): boolean;
@@ -14,9 +14,13 @@ interface PositionChecker {
  */
 export function createPathfinder(
   isOpen: PositionChecker,
-  { getHeuristic = getManhattanDistance } = {},
-) {
-  const getNeighbors = createNeighborsFinder(isOpen);
+  {
+    getHeuristic = getManhattanDistance,
+  }: {
+    getHeuristic?: (x1: number, y1: number, x2: number, y2: number) => number;
+  } = {},
+): (x1: number, y1: number, x2: number, y2: number) => Point[] {
+  const getOpenNeighbors = createNeighborsFinder(isOpen);
 
   /**
    * Search path between two points.
@@ -27,11 +31,11 @@ export function createPathfinder(
    * @return List of path points.
    */
   return (x1: number, y1: number, x2: number, y2: number) => {
-    const visitedNodes = [];
-    const unvisitedNodes = [];
+    const visitedNodes: Node[] = [];
+    const unvisitedNodes: Node[] = [];
 
-    const start = new Node({ x: x1, y: y1 });
-    const finish = new Node({ x: x2, y: y2 });
+    const start = new Node(x1, y1);
+    const finish = new Node(x2, y2);
 
     let resultPath: Point[] = [];
 
@@ -41,15 +45,17 @@ export function createPathfinder(
     while (unvisitedNodes.length > 0) {
       // search in open list node with lowest value f = g + h
       let currentNodeIndex = 0;
-      let currentNode = unvisitedNodes[0];
+      let currentNode = unvisitedNodes[0]!;
 
       // @todo optimize search (maybe use binary heap)
-      unvisitedNodes.forEach((node, index) => {
+      for (let i = 0; i < unvisitedNodes.length; i++) {
+        const node = unvisitedNodes[i]!;
+
         if (node.f < currentNode.f) {
           currentNode = node;
-          currentNodeIndex = index;
+          currentNodeIndex = i;
         }
-      });
+      }
 
       // add found node to closed list, delete it from open list
       unvisitedNodes.splice(currentNodeIndex, 1);
@@ -61,12 +67,10 @@ export function createPathfinder(
         break;
       }
 
-      const neighbors = getNeighbors(currentNode);
-
-      for (const neighbor of neighbors) {
+      for (const neighbor of getOpenNeighbors(currentNode)) {
         const likeNeighbor = (p: Point) => Point.equals(p, neighbor);
 
-        // ignore neighbor node if it is already visited
+        // ignore already visited neighbor
         if (visitedNodes.some(likeNeighbor)) {
           continue;
         }
@@ -91,7 +95,7 @@ export function createPathfinder(
  * @param y2 Second position y.
  * @return Heuristic value.
  */
-export function getManhattanDistance(x1: number, y1: number, x2: number, y2: number) {
+export function getManhattanDistance(x1: number, y1: number, x2: number, y2: number): number {
   const horizontal = Math.abs(x2 - x1);
   const vertical = Math.abs(y2 - y1);
 
@@ -114,14 +118,15 @@ function createNeighborsFinder(isOpen: PositionChecker, withDiagonal = false) {
 
         if (withDiagonal || !isDiagonal) {
           if (isOpen(node.x + x, node.y + y)) {
-            neighbors.push(
-              new Node({
-                x: node.x + x,
-                y: node.y + y,
-                g: node.g + (isDiagonal ? Math.sqrt(2) : 1),
-                parent: node,
-              }),
+            const newNode = new Node(
+              node.x + x,
+              node.y + y,
+              node.g + (isDiagonal ? Math.sqrt(2) : 1),
+              undefined,
+              node,
             );
+
+            neighbors.push(newNode);
           }
         }
       }

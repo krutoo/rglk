@@ -19,14 +19,14 @@ export class Matrix implements IMatrix {
   }
 
   get(x: number, y: number): number {
-    return this.buffer[Matrix.pointToIndex(x, y, this.width)];
+    return this.buffer[Matrix.pointToIndex(x, y, this.width)]!;
   }
 
   set(x: number, y: number, item: number): void {
     this.buffer[Matrix.pointToIndex(x, y, this.width)] = item;
   }
 
-  forEach(callback: (x: number, y: number, value: number) => void) {
+  forEach(callback: (x: number, y: number, value: number) => void): void {
     this.forEachInRect(0, 0, this.width, this.height, callback);
   }
 
@@ -36,7 +36,7 @@ export class Matrix implements IMatrix {
     rectWidth: number,
     rectHeight: number,
     callback: (x: number, y: number, value: number) => void,
-  ) {
+  ): void {
     for (let x = rectLeft; x < rectLeft + rectWidth; x++) {
       for (let y = rectTop; y < rectTop + rectHeight; y++) {
         callback(x, y, this.get(x, y));
